@@ -1,5 +1,6 @@
-from SimPy.Parameters import Constant
 from covid_model.COVIDParameters import COVIDParameters
+
+from SimPy.Parameters import Constant
 from apace.CalibrationSupport import FeasibleConditions
 from apace.Compartment import Compartment, ChanceNode, DeathCompartment
 from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule

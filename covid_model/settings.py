@@ -1,5 +1,6 @@
-from apace.Inputs import ModelSettings
 import definitions as D
+from apace.Inputs import ModelSettings
+
 
 class COVIDSettings(ModelSettings):
     """ settings of COVID model """
