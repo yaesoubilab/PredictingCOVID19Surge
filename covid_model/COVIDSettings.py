@@ -1,5 +1,5 @@
 from apace.Inputs import ModelSettings
-
+import definitions as D
 
 class COVIDSettings(ModelSettings):
     """ settings of COVID model """
@@ -10,7 +10,7 @@ class COVIDSettings(ModelSettings):
 
         # model settings
         self.deltaT = 1 / 364
-        self.simulationDuration = 2.25  # years of simulation
+        self.simulationDuration = D.SIM_DURATION  # years of simulation
         self.simulationOutputPeriod = 7/364  # simulation output period
         self.observationPeriod = 7/364    # days for observation period
         self.timeToStartDecisionMaking = 0  # immediately after the detection of spread
@@ -21,12 +21,12 @@ class COVIDSettings(ModelSettings):
         self.checkEradicationConditions = False
 
         # economic evaluation settings
-        self.warmUpPeriod = 1.5
+        self.warmUpPeriod = D.CALIB_PERIOD
         self.collectEconEval = True  # to collect cost and health outcomes
         self.annualDiscountRate = 0.0
 
         # if physical distancing was in effect in the first 1.5 years
-        self.ifPDYear1 = True
-        self.calibrationPeriod = 1.5
+        self.ifPDInCalibrationPeriod = True
+        self.calibrationPeriod = D.CALIB_PERIOD
 
 

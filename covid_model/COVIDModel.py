@@ -1,10 +1,8 @@
-from SimPy.Optimization.ApproxPolicyIteration import GreedyApproxDecisionMaker
 from SimPy.Parameters import Constant
 from covid_model.COVIDParameters import COVIDParameters
 from apace.CalibrationSupport import FeasibleConditions
 from apace.Compartment import Compartment, ChanceNode, DeathCompartment
-from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule, \
-    TimeBasedDecisionRule, DynamicDecisionRule
+from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule
 from apace.Event import EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
@@ -237,7 +235,7 @@ def get_interventions_features_conditions(settings, params, in_icu):
         thresholds=[1.5])
 
     # use of physical distancing during year 1
-    if settings.ifPDYear1:
+    if settings.ifPDInCalibrationPeriod:
         # ---------- intervention -------
         pd_year_1 = InterventionAffectingContacts(
             name='Physical distancing Y1',
