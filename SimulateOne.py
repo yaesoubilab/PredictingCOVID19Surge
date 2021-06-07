@@ -1,0 +1,32 @@
+from covid_model import COVIDModel as M
+from covid_model.COVIDSettings import COVIDSettings
+from covid_visualization.PlotTrajs import plot
+from apace.Epidemic import EpiModel
+
+
+def simulate():
+
+    # get model settings
+    sets = COVIDSettings()
+
+    # make an (empty) epidemic model
+    model = EpiModel(id=1, settings=sets)
+    # populate the SIR model
+    M.build_covid_model(model)
+
+    # simulate
+    model.simulate(seed=209652396)
+    # print trajectories
+    model.export_trajectories(delete_existing_files=True)
+
+    # print discounted outcomes
+    print(model.get_total_discounted_cost_and_health())
+
+    # plot trajectories
+    plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
+         incd_multiplier=sets.simulationOutputPeriod*52,  # to show weeks on the x-axis of incidence data
+         obs_incd_multiplier=sets.observationPeriod*52)
+
+
+if __name__ == "__main__":
+    simulate()
