@@ -1,6 +1,6 @@
 from enum import Enum
 
-from SimPy.Parameters import Constant, Inverse, Division, LinearCombination, \
+from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Division, LinearCombination, \
     Logit, Product, MatrixOfConstantParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete
 from apace.Inputs import EpiParameters
 
@@ -11,6 +11,15 @@ class Profiles(Enum):
     # V = 2   # vaccinated and infected with novel strain
 
 
+class AgeGroups(Enum):
+    Age_0_4 = 0
+    Age_5_19 = 1
+    Age_20_49 = 2
+    Age_50_64 = 3
+    Age_65_79 = 4
+    Age_80_ = 5
+
+
 class COVIDParameters(EpiParameters):
     """ class to contain the parameters of the COVID model """
 
@@ -18,12 +27,20 @@ class COVIDParameters(EpiParameters):
         EpiParameters.__init__(self)
 
         d = 1 / 364  # one day (using year as the unit of time)
-        self.nProfiles = 2
+        self.nProfiles = len(Profiles)
+        self.nAgeGroups = len(AgeGroups)
 
         # -------- model main parameters -------------
-        self.sizeS = Constant(100000)
-        self.sizeE = [UniformDiscrete(minimum=1, maximum=5), Constant(0)]
-        self.sizeI = [UniformDiscrete(minimum=0, maximum=5), Constant(0)]
+        self.ageDist = Multinomial(par_n=Constant(100000), p_values=[0.060, 0.189, 0.395, 0.192, 0.125, 0.039])
+        self.sizeE = UniformDiscrete(minimum=1, maximum=5)
+        self.sizeEDist = Multinomial(par_n=self.sizeE, p_values=[0.060, 0.189, 0.395, 0.192, 0.125, 0.039])
+
+        self.sizeS = []
+        self.sizeE = []
+        for a in range(len(AgeGroups)):
+            self.sizeS.append(AMultinomialOutcome(par_multinomial=self.ageDist, outcome_index=a))
+            self.sizeE.append([AMultinomialOutcome(par_multinomial=self.sizeEDist, outcome_index=a), Constant(0)])
+
         self.R0s = [Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4), None]
         self.durE = [Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                      Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)]

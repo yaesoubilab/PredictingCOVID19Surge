@@ -6,7 +6,7 @@ from apace.Event import EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from apace.TimeSeries import SumIncidence, SumPrevalence, RatioTimeSeries
-from covid_model.parameters import COVIDParameters
+from covid_model.parameters import COVIDParameters, AgeGroups
 
 
 def build_covid_model(model):
@@ -21,6 +21,12 @@ def build_covid_model(model):
     params = COVIDParameters()
 
     n_profile = params.nProfiles
+    n_age_groups = params.nAgeGroups
+
+    Ss = [None] * n_age_groups
+    V_Imns = [None] * n_age_groups
+    V_Suss = [None] * n_age_groups
+
     Es = [None] * n_profile
     Is = [None] * n_profile
     Hs = [None] * n_profile
@@ -40,10 +46,11 @@ def build_covid_model(model):
     vaccinations_in_R = [None] * n_profile
 
     # --------- model compartments ---------
-    S = Compartment(name='Susceptible', size_par=params.sizeS,
-                    susceptibility_params=[Constant(value=1), Constant(value=1)])
-    V_Imn = Compartment(name='Vaccinated-Immune', num_of_pathogens=2)
-    V_Sus = Compartment(name='Vaccinated-Susceptible', num_of_pathogens=2)
+    for a in range(len(AgeGroups)):
+        Ss[a] = Compartment(name='Susceptible-'+str(a), size_par=params.sizeS[a],
+                            susceptibility_params=[Constant(value=1), Constant(value=1)])
+        V_Imns[a] = Compartment(name='Vaccinated-Immune'+str(a), num_of_pathogens=2)
+        V_Suss[a] = Compartment(name='Vaccinated-Susceptible'+str(a), num_of_pathogens=2)
 
     for i in range(n_profile):
 
