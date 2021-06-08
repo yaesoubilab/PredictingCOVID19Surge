@@ -1,5 +1,5 @@
-import covid_model.COVIDData as D
 import apace.analysis.Trajectories as A
+import covid_model.data as D
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 

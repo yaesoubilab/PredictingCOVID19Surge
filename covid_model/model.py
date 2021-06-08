@@ -1,5 +1,3 @@
-from covid_model.COVIDParameters import COVIDParameters
-
 from SimPy.Parameters import Constant
 from apace.CalibrationSupport import FeasibleConditions
 from apace.Compartment import Compartment, ChanceNode, DeathCompartment
@@ -8,6 +6,7 @@ from apace.Event import EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from apace.TimeSeries import SumIncidence, SumPrevalence, RatioTimeSeries
+from covid_model.parameters import COVIDParameters
 
 
 def build_covid_model(model):
