@@ -1,10 +1,10 @@
 import apace.Calibration as calib
-from covid_model import COVIDModel as M
-from covid_model.COVIDSettings import COVIDSettings
-from covid_visualization.PlotTrajs import plot
 from apace.MultiEpidemics import MultiEpidemics
+from covid_model import model as M
+from covid_model.settings import COVIDSettings
+from covid_visualization.PlotTrajs import plot
 
-N = 8
+N = 8   # number of trajectories to simulate
 IF_PARALLEL = True
 USE_CALIBRATED_MODEL = False
 
