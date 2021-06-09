@@ -176,9 +176,10 @@ def build_covid_model(model):
                              compartments=compartments)
     incidence = SumIncidence(name='Incidence', compartments=Is,
                              first_nonzero_obs_marks_start_of_epidemic=True)
-    in_hosp = SumPrevalence(name='# in hospital', compartments=Hs, if_surveyed=True)
+    in_hosp = SumPrevalence(name='# in hospital', compartments=Hs)
     in_icu = SumPrevalence(name='# in ICU', compartments=ICUs, if_surveyed=True)
-    cum_vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs, if_surveyed=True)
+    cum_death = SumCumulativeIncidence(name='Cumulative death', compartments=Ds)
+    cum_vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs)
 
     # % cases with novel strain
     Is_current = []
@@ -186,8 +187,8 @@ def build_covid_model(model):
     for a in range(indexer.nAgeGroups):
         Is_current.append(Is[indexer.get_row_index(age_group=a, profile=0)])
         Is_novel.append(Is[indexer.get_row_index(age_group=a, profile=1)])
-    incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current, if_surveyed=True)
-    incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel, if_surveyed=True)
+    incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current)
+    incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel)
     perc_cases_b = RatioTimeSeries(name='% of cases infected with novel strain',
                                    numerator_sum_time_series=incidence_b,
                                    denominator_sum_time_series=incidence,
@@ -202,25 +203,45 @@ def build_covid_model(model):
     # % population vaccinated
     perc_vaccinated = RatioTimeSeries(name='% of population vaccinated',
                                       numerator_sum_time_series=cum_vaccinated,
-                                      denominator_sum_time_series=pop_size,
-                                      if_surveyed=True)
+                                      denominator_sum_time_series=pop_size)
 
     incd_by_age = []
     in_hosp_by_age = []
     in_icu_by_age = []
     cum_death_by_age = []
+    age_dist_incd = []
+    age_dist_in_hosp = []
+    age_dist_in_icu = []
+    age_dist_cum_death = []
     for a in range(indexer.nAgeGroups):
+        str_a = indexer.get_str_age(age_group=a)
         i_current = indexer.get_row_index(age_group=a, profile=0)
         i_novel = indexer.get_row_index(age_group=a, profile=1)
 
         # age-distribution of incidence
-
+        incd_by_age.append(SumIncidence(name='Incidence-' + str_a,
+                                        compartments=[Is[i_current], Is[i_novel]]))
+        age_dist_incd.append(RatioTimeSeries(name='Incidence-'+str_a+' (%)',
+                                             numerator_sum_time_series=incd_by_age[a],
+                                             denominator_sum_time_series=incidence))
         # age-distribution of hospitalized patients
-
+        in_hosp_by_age.append(SumPrevalence(name='Hospitalized-' + str_a,
+                                            compartments=[Hs[i_current], Hs[i_novel]]))
+        age_dist_in_hosp.append(RatioTimeSeries(name='Hospitalized-'+str_a+' (%)',
+                                                numerator_sum_time_series=in_hosp_by_age[a],
+                                                denominator_sum_time_series=in_hosp))
         # age-distributions of ICU patients
-
+        in_icu_by_age.append(SumPrevalence(name='In ICU-' + str_a,
+                                           compartments=[ICUs[i_current], ICUs[i_novel]]))
+        age_dist_in_icu.append(RatioTimeSeries(name='In ICU-'+str_a+' (%)',
+                                               numerator_sum_time_series=in_icu_by_age[a],
+                                               denominator_sum_time_series=in_icu))
         # age-distribution of deaths
-
+        cum_death_by_age.append(SumCumulativeIncidence(name='Cumulative death-' + str_a,
+                                                       compartments=[Ds[i_current], Ds[i_novel]]))
+        age_dist_cum_death.append(RatioTimeSeries(name='Cumulative death-'+str_a+' (%)',
+                                                  numerator_sum_time_series=cum_death_by_age[a],
+                                                  denominator_sum_time_series=cum_death))
 
     # --------- feasibility conditions ---------
     # add feasible ranges of icu occupancy
@@ -228,28 +249,40 @@ def build_covid_model(model):
         in_icu.add_feasible_conditions(feasible_conditions=FeasibleConditions(feasible_max=4 * 10.3,
                                                                               min_threshold_to_hit=4))
 
-
-
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
         settings=sets, params=params, in_icu=in_icu)
 
     # --------- populate the model ---------
+    # change nodes
     chance_nodes = []
     chance_nodes.extend(ifs_hosp)
     chance_nodes.extend(ifs_icu)
     chance_nodes.extend(if_novel_strain)
 
+    # summation-time series
+    list_of_sum_time_series = [pop_size, incidence_a, incidence_b, incidence, in_hosp, in_icu,
+                               deaths, cum_death, cum_vaccinated]
+    list_of_sum_time_series.extend(incd_by_age)
+    list_of_sum_time_series.extend(in_hosp_by_age)
+    list_of_sum_time_series.extend(in_icu_by_age)
+    list_of_sum_time_series.extend(cum_death_by_age)
+
+    # ratio time-series
+    list_of_ratio_time_series = [case_fatality, perc_cases_b, perc_vaccinated]
+    list_of_ratio_time_series.extend(age_dist_incd)
+    list_of_ratio_time_series.extend(age_dist_in_hosp)
+    list_of_ratio_time_series.extend(age_dist_in_icu)
+    list_of_ratio_time_series.extend(age_dist_cum_death)
+
     model.populate(compartments=compartments,
                    parameters=params,
                    chance_nodes=chance_nodes,
-                   list_of_sum_time_series=[pop_size, incidence_a, incidence_b, incidence, in_hosp, in_icu,
-                                            deaths, cum_vaccinated],
-                   list_of_ratio_time_series=[case_fatality, perc_cases_b, perc_vaccinated],
+                   list_of_sum_time_series=list_of_sum_time_series,
+                   list_of_ratio_time_series=list_of_ratio_time_series,
                    interventions=interventions,
                    features=features,
-                   conditions=conditions
-                   )
+                   conditions=conditions)
 
 
 def get_interventions_features_conditions(settings, params, in_icu):
