@@ -5,8 +5,25 @@ from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionR
 from apace.Event import EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
-from apace.TimeSeries import SumIncidence, SumPrevalence, RatioTimeSeries
+from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.parameters import COVIDParameters, AgeGroups
+
+
+class AgeGroupsProfiles:
+    # to convert (age group index, profile index) to an index and vice versa
+
+    def __init__(self, n_age_groups, n_profiles):
+        self.nAgeGroups = n_age_groups
+        self.nProfiles = n_profiles
+        self.length = n_age_groups * n_profiles
+
+    def get_row_index(self, age_group, profile):
+
+        return self.nProfiles * age_group + profile
+
+    def get_age_group_and_profile(self, i):
+
+        return int(i/self.nProfiles), i % self.nAgeGroups
 
 
 def build_covid_model(model):
@@ -20,129 +37,137 @@ def build_covid_model(model):
     # parameters of the COVID model
     params = COVIDParameters()
 
-    n_profile = params.nProfiles
-    n_age_groups = params.nAgeGroups
+    indexer = AgeGroupsProfiles(n_age_groups=params.nAgeGroups, n_profiles=params.nProfiles)
 
-    Ss = [None] * n_age_groups
-    V_Imns = [None] * n_age_groups
-    V_Suss = [None] * n_age_groups
-
-    Es = [None] * n_profile
-    Is = [None] * n_profile
-    Hs = [None] * n_profile
-    ICUs = [None] * n_profile
-    Rs = [None] * n_profile
-    Ds = [None] * n_profile
-    ifs_hosp = [None] * n_profile
-    ifs_icu = [None] * n_profile
-    infections_in_S = [None] * n_profile
-    infections_in_V_Sus = [None] * n_profile
-    leaving_Es = [None] * n_profile
-    leaving_Is = [None] * n_profile
-    leaving_Hs = [None] * n_profile
-    leaving_ICUs = [None] * n_profile
-    leaving_Rs = [None] * n_profile
-    deaths_in_ICU = [None] * n_profile
-    vaccinations_in_R = [None] * n_profile
+    Ss = [None] * indexer.nAgeGroups
+    Vs = [None] * indexer.nAgeGroups
+    Es = [None] * indexer.length
+    Is = [None] * indexer.length
+    Hs = [None] * indexer.length
+    ICUs = [None] * indexer.length
+    Rs = [None] * indexer.length
+    Ds = [None] * indexer.length
+    ifs_hosp = [None] * indexer.length
+    ifs_icu = [None] * indexer.length
+    if_novel_strain = [None] * indexer.nAgeGroups
+    # events
+    importation = [None] * indexer.nAgeGroups
+    infection_in_S = [None] * indexer.length
+    leaving_Es = [None] * indexer.length
+    leaving_Is = [None] * indexer.length
+    leaving_Hs = [None] * indexer.length
+    leaving_ICUs = [None] * indexer.length
+    leaving_Rs = [None] * indexer.length
+    deaths_in_ICU = [None] * indexer.length
+    vaccination_in_S = [None] * indexer.nAgeGroups
+    vaccination_in_R = [None] * indexer.length
+    losing_vaccine_immunity = [None] * indexer.nAgeGroups
 
     # --------- model compartments ---------
-    for a in range(len(AgeGroups)):
-        Ss[a] = Compartment(name='Susceptible-'+str(a), size_par=params.sizeS[a],
+    for a in range(indexer.nAgeGroups):
+        str_a = 'age ' + str(a)
+        Ss[a] = Compartment(name='Susceptible-'+str_a, size_par=params.sizeSByAge[a],
                             susceptibility_params=[Constant(value=1), Constant(value=1)])
-        V_Imns[a] = Compartment(name='Vaccinated-Immune'+str(a), num_of_pathogens=2)
-        V_Suss[a] = Compartment(name='Vaccinated-Susceptible'+str(a), num_of_pathogens=2)
+        Vs[a] = Compartment(name='Vaccinated-'+str_a, num_of_pathogens=2)
 
-    for i in range(n_profile):
+        for p in range(indexer.nProfiles):
 
-        str_i = str(i)
-        infectivity_params = [Constant(value=0), Constant(value=0)]
-        infectivity_params[i] = params.infectivity[i]
+            str_a_p = 'age/profile ({},{})'.format(a, p)
+            i = indexer.get_row_index(age_group=a, profile=p)
 
-        # -------- compartments ----------
-        Es[i] = Compartment(name='Exposed-'+str_i,
-                            size_par=params.sizeE[i],
-                            infectivity_params=infectivity_params)
-        Is[i] = Compartment(name='Infectious-'+str_i,
-                            size_par=params.sizeI[i],
-                            infectivity_params=infectivity_params)
-        Hs[i] = Compartment(name='Hospitalized-'+str_i, num_of_pathogens=2, if_empty_to_eradicate=True)
-        ICUs[i] = Compartment(name='ICU-'+str_i, num_of_pathogens=2, if_empty_to_eradicate=True)
-        Rs[i] = Compartment(name='Recovered-'+str_i, num_of_pathogens=2)
-        Ds[i] = DeathCompartment(name='Death-'+str_i)
+            # infectivity
+            infectivity_params = [Constant(value=0), Constant(value=0)]
+            infectivity_params[p] = params.infectivity[p]
 
-        # --------- chance nodes ---------
-        # chance node to decide if a hospitalized individual would need intensive care
-        ifs_icu[i] = ChanceNode(name='If ICU-'+str_i,
-                                destination_compartments=[ICUs[i], Hs[i]],
-                                probability_params=params.probICUIfHosp[i])
-        # chance node to decide if an infected individual would get hospitalized
-        ifs_hosp[i] = ChanceNode(name='If hospitalized-'+str_i,
-                                 destination_compartments=[ifs_icu[i], Rs[i]],
-                                 probability_params=params.probHosp[i])
+            # -------- compartments ----------
+            Es[i] = Compartment(name='Exposed-'+str_a_p,
+                                size_par=params.sizeEProfile0ByAge[p] if p == 0 else Constant(value=0),
+                                infectivity_params=infectivity_params)
+            Is[i] = Compartment(name='Infectious-'+str_a_p,
+                                size_par=Constant(value=0),
+                                infectivity_params=infectivity_params)
+            Hs[i] = Compartment(name='Hospitalized-'+str_a_p, num_of_pathogens=2, if_empty_to_eradicate=True)
+            ICUs[i] = Compartment(name='ICU-'+str_a_p, num_of_pathogens=2, if_empty_to_eradicate=True)
+            Rs[i] = Compartment(name='Recovered-'+str_a_p, num_of_pathogens=2)
+            Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 
-    # if an imported cases is infected with the novel strain
-    if_novel_strain = ChanceNode(name='If infected with the novel strain',
-                                 destination_compartments=[Es[1], Es[0]],
-                                 probability_params=params.probNovelStrain)
+            # --------- chance nodes ---------
+            # chance node to decide if a hospitalized individual would need intensive care
+            ifs_icu[i] = ChanceNode(name='If ICU-'+str_a_p,
+                                    destination_compartments=[ICUs[i], Hs[i]],
+                                    probability_params=params.probICUIfHosp[p])
+            # chance node to decide if an infected individual would get hospitalized
+            ifs_hosp[i] = ChanceNode(name='If hospitalized-'+str_a_p,
+                                     destination_compartments=[ifs_icu[i], Rs[i]],
+                                     probability_params=params.probHospByAge[a][p])
 
-    # --------- model outputs to collect ---------
-    # set up prevalence, incidence, and cumulative incidence to collect
-    if sets.ifCollectTrajsOfCompartments:
+        # if an imported cases is infected with the novel strain
+        dest_if_novel = indexer.get_row_index(age_group=a, profile=1)
+        dest_if_current = indexer.get_row_index(age_group=a, profile=0)
+        if_novel_strain[a] = ChanceNode(name='If infected with the novel strain-'+str_a,
+                                        destination_compartments=[Es[dest_if_novel], Es[dest_if_current]],
+                                        probability_params=params.probNovelStrain)
 
-        S.setup_history(collect_prev=True)
-        V_Imn.setup_history(collect_prev=True)
-        V_Sus.setup_history(collect_prev=True)
+        # --------- model outputs to collect ---------
+        # set up prevalence, incidence, and cumulative incidence to collect
+        if sets.ifCollectTrajsOfCompartments:
 
-        for i in range(n_profile):
-            Es[i].setup_history(collect_prev=True)
-            Is[i].setup_history(collect_prev=True, collect_incd=True)
-            Hs[i].setup_history(collect_prev=True)
-            ICUs[i].setup_history(collect_prev=True)
-            Rs[i].setup_history(collect_prev=True)
-            Ds[i].setup_history(collect_cum_incd=True)
+            Ss[a].setup_history(collect_prev=True)
+            Vs[a].setup_history(collect_prev=True)
 
-    # --------- model events ---------
-    for i in range(n_profile):
-        str_i = str(i)
+            for p in range(indexer.nProfiles):
+                i = indexer.get_row_index(age_group=a, profile=p)
+                Es[i].setup_history(collect_prev=True)
+                Is[i].setup_history(collect_prev=True, collect_incd=True)
+                Hs[i].setup_history(collect_prev=True)
+                ICUs[i].setup_history(collect_prev=True)
+                Rs[i].setup_history(collect_prev=True)
+                Ds[i].setup_history(collect_cum_incd=True)
 
-        infections_in_S[i] = EpiDepEvent(
-            name='Infection in S-'+str_i, destination=Es[i], generating_pathogen=i)
-        infections_in_V_Sus[i] = EpiDepEvent(
-            name='Infection in V_Sus-'+str_i, destination=Es[i], generating_pathogen=i)
-        leaving_Es[i] = EpiIndepEvent(
-            name='Leaving E-'+str_i, rate_param=params.ratesOfLeavingE[i], destination=Is[i])
-        leaving_Is[i] = EpiIndepEvent(
-            name='Leaving I-'+str_i, rate_param=params.ratesOfLeavingI[i], destination=ifs_hosp[i])
-        leaving_Hs[i] = EpiIndepEvent(
-            name='Leaving H-'+str_i, rate_param=params.ratesOfLeavingHosp[i], destination=Rs[i])
-        leaving_ICUs[i] = EpiIndepEvent(
-            name='Leaving ICU-'+str_i, rate_param=params.ratesOfLeavingICU[i], destination=Rs[i])
-        leaving_Rs[i] = EpiIndepEvent(
-            name='Leaving R-'+str_i, rate_param=params.ratesOfLeavingR[i], destination=S)
-        deaths_in_ICU[i] = EpiIndepEvent(
-            name='Death in ICU-'+str_i, rate_param=params.ratesOfDeathInICU[i], destination=Ds[i])
-        vaccinations_in_R[i] = EpiIndepEvent(
-            name='Vaccinating R-'+str_i, rate_param=params.vaccRate, destination=V_Imn)
+        # --------- model events ---------
+        for p in range(indexer.nProfiles):
 
-    importation = PoissonEvent(
-        name='Importation', destination=if_novel_strain, rate_param=params.importRate)
-    vaccinating_S = EpiIndepEvent(
-        name='Vaccinating S', rate_param=params.vaccRate, destination=V_Imn)
-    losing_vaccine_immunity = EpiIndepEvent(
-        name='Losing vaccine immunity', rate_param=params.rateOfLosingVacImmunity, destination=V_Sus)
+            str_a_p = 'age/profile ({},{})'.format(a, p)
+            i = indexer.get_row_index(age_group=a, profile=p)
 
-    # --------- connections of events and compartments ---------
-    # attached epidemic events to compartments
-    S.add_events(events=[infections_in_S[0], infections_in_S[1], vaccinating_S, importation])
-    V_Sus.add_events(events=infections_in_V_Sus)
-    V_Imn.add_event(event=losing_vaccine_immunity)
+            infection_in_S[i] = EpiDepEvent(
+                name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=p)
+            leaving_Es[i] = EpiIndepEvent(
+                name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[p], destination=Is[i])
+            leaving_Is[i] = EpiIndepEvent(
+                name='Leaving I-'+str_a_p, rate_param=params.ratesOfLeavingI[p], destination=ifs_hosp[i])
+            leaving_Hs[i] = EpiIndepEvent(
+                name='Leaving H-'+str_a_p, rate_param=params.ratesOfLeavingHosp[p], destination=Rs[i])
+            leaving_ICUs[i] = EpiIndepEvent(
+                name='Leaving ICU-'+str_a_p, rate_param=params.ratesOfLeavingICU[p], destination=Rs[i])
+            leaving_Rs[i] = EpiIndepEvent(
+                name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[p], destination=Ss[a])
+            deaths_in_ICU[i] = EpiIndepEvent(
+                name='Death in ICU-'+str_a_p, rate_param=params.ratesOfDeathInICU[p], destination=Ds[i])
+            vaccination_in_R[i] = EpiIndepEvent(
+                name='Vaccinating R-'+str_a_p, rate_param=params.vaccRate, destination=Vs[a])
 
-    for i in range(n_profile):
-        Es[i].add_event(event=leaving_Es[i])
-        Is[i].add_event(event=leaving_Is[i])
-        Hs[i].add_event(event=leaving_Hs[i])
-        ICUs[i].add_events(events=[leaving_ICUs[i], deaths_in_ICU[i]])
-        Rs[i].add_events(events=[leaving_Rs[i], vaccinations_in_R[i]])
+        importation[a] = PoissonEvent(
+            name='Importation-'+str_a, destination=if_novel_strain[a], rate_param=params.importRateByAge[a])
+        vaccination_in_S[a] = EpiIndepEvent(
+            name='Vaccinating S-'+str_a, rate_param=params.vaccRate, destination=Vs[a])
+        losing_vaccine_immunity[a] = EpiIndepEvent(
+            name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
+
+        # --------- connections of events and compartments ---------
+        # attached epidemic events to compartments
+        i_inf_event = indexer.get_row_index(age_group=a, profile=0)
+        Ss[a].add_events(events=[infection_in_S[i_inf_event], infection_in_S[i_inf_event+1],
+                                 vaccination_in_S[a], importation[a]])
+        Vs[a].add_event(events=losing_vaccine_immunity[a])
+
+        for p in range(indexer.nProfiles):
+            i = indexer.get_row_index(age_group=a, profile=p)
+            Es[i].add_event(event=leaving_Es[i])
+            Is[i].add_event(event=leaving_Is[i])
+            Hs[i].add_event(event=leaving_Hs[i])
+            ICUs[i].add_events(events=[leaving_ICUs[i], deaths_in_ICU[i]])
+            Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R[i]])
 
     # --------- projections ---------
     deaths = SumIncidence(name='Total deaths',
@@ -155,9 +180,14 @@ def build_covid_model(model):
 
     # --------- sum time-series ------
     # population size
-    compartments = [S, V_Imn, V_Sus,
-                    Es[0], Is[0], Hs[0], ICUs[0], Rs[0], Ds[0],
-                    Es[1], Is[1], Hs[1], ICUs[1], Rs[1], Ds[1]]
+    compartments = Ss
+    compartments.extend(Vs)
+    compartments.extend(Es)
+    compartments.extend(Is)
+    compartments.extend(Hs)
+    compartments.extend(ICUs)
+    compartments.extend(Rs)
+
     pop_size = SumPrevalence(name='Population size',
                              compartments=compartments)
 
@@ -165,11 +195,17 @@ def build_covid_model(model):
     # setup surveillance to check the start of the epidemic
     incidence = SumIncidence(name='Incidence', compartments=Is,
                              first_nonzero_obs_marks_start_of_epidemic=True)
-    incidence_a = SumIncidence(name='Incidence-0', compartments=[Is[0]], if_surveyed=True)
-    incidence_b = SumIncidence(name='Incidence-1', compartments=[Is[1]], if_surveyed=True)
+    Is_current = []
+    Is_novel = []
+    for a in range(indexer.nAgeGroups):
+        Is_current.append(Is[indexer.get_row_index(age_group=a, profile=0)])
+        Is_novel.append(Is[indexer.get_row_index(age_group=a, profile=0)])
+
+    incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current, if_surveyed=True)
+    incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel, if_surveyed=True)
     in_hosp = SumPrevalence(name='# in hospital', compartments=Hs, if_surveyed=True)
     in_icu = SumPrevalence(name='# in ICU', compartments=ICUs, if_surveyed=True)
-    vaccinated = SumPrevalence(name='Vaccinated', compartments=[V_Imn, V_Sus], if_surveyed=True)
+    vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs, if_surveyed=True)
 
     # add feasible ranges of icu occupancy
     if sets.calcLikelihood:
@@ -197,9 +233,14 @@ def build_covid_model(model):
         settings=sets, params=params, in_icu=in_icu)
 
     # --------- populate the model ---------
+    chance_nodes = []
+    chance_nodes.extend(ifs_hosp)
+    chance_nodes.extend(ifs_icu)
+    chance_nodes.extend(if_novel_strain)
+
     model.populate(compartments=compartments,
                    parameters=params,
-                   chance_nodes=[ifs_hosp[0], ifs_hosp[1], ifs_icu[0], ifs_icu[1], if_novel_strain],
+                   chance_nodes=chance_nodes,
                    list_of_sum_time_series=[pop_size, incidence_a, incidence_b, incidence, in_hosp, in_icu,
                                             deaths, vaccinated],
                    list_of_ratio_time_series=[case_fatality, perc_cases_b, perc_vaccinated],
