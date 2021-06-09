@@ -38,7 +38,7 @@ class COVIDParameters(EpiParameters):
         self.sizeE0 = UniformDiscrete(minimum=1, maximum=5)
 
         self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
-        self.distE0ToEs = Multinomial(par_n=self.sizeEProfile0ByAge, p_values=us_age_dist)
+        self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
 
         self.sizeSByAge = []
         self.sizeEProfile0ByAge = []
@@ -123,7 +123,8 @@ class COVIDParameters(EpiParameters):
 
         # for the novel strain
         self.R0s[1] = Product(parameters=[self.R0s[0], self.ratioTransmmisibilityAToB])
-        self.probHospByAge[1] = Product(parameters=[self.probHospByAge[0], self.ratioProbHospAToB])
+        for a in range(self.nAgeGroups):
+            self.probHospByAge[a][1] = Product(parameters=[self.probHospByAge[a][0], self.ratioProbHospAToB])
         self.durIByProfile[1] = Product(parameters=[self.durIByProfile[0], self.ratioDurInfAToB])
 
         # probability of novel strain
@@ -146,26 +147,26 @@ class COVIDParameters(EpiParameters):
 
         self.rateOfLosingVacImmunity = Inverse(par=self.durVacImmunityByProfile)
 
-        for i in range(2):
-            self.ratesOfLeavingE[i] = Inverse(par=self.durEByProfile[i])
-            self.ratesOfLeavingI[i] = Inverse(par=self.durIByProfile[i])
-            self.ratesOfLeavingHosp[i] = Inverse(par=self.durHospByProfile[i])
-            self.ratesOfLeavingICU[i] = Inverse(par=self.durICUByProfile[i])
-            self.ratesOfLeavingR[i] = Inverse(par=self.durRByProfile[i])
+        for p in range(self.nProfiles):
+            self.ratesOfLeavingE[p] = Inverse(par=self.durEByProfile[p])
+            self.ratesOfLeavingI[p] = Inverse(par=self.durIByProfile[p])
+            self.ratesOfLeavingHosp[p] = Inverse(par=self.durHospByProfile[p])
+            self.ratesOfLeavingICU[p] = Inverse(par=self.durICUByProfile[p])
+            self.ratesOfLeavingR[p] = Inverse(par=self.durRByProfile[p])
 
             # duration of infectiousness is the sum of durations in E and I
-            self.durInfec[i] = LinearCombination(
-                parameters=[self.durEByProfile[i], self.durIByProfile[i]])
+            self.durInfec[p] = LinearCombination(
+                parameters=[self.durEByProfile[p], self.durIByProfile[p]])
 
             # infectivity = R0 / (duration of infectiousness)
-            self.infectivity[i] = Division(
-                par_numerator=self.R0s[i],
-                par_denominator=self.durInfec[i])
+            self.infectivity[p] = Division(
+                par_numerator=self.R0s[p],
+                par_denominator=self.durInfec[p])
 
             # Pr{Death in ICU} = p
             # Rate{Death in ICU} = p/(1-p) * Rate{Leaving ICU}
-            self.logitProbDeathInICU[i] = Logit(par=self.probDeathIfICU[i])
-            self.ratesOfDeathInICU[i] = Product(parameters=[self.logitProbDeathInICU[i], self.ratesOfLeavingICU[i]])
+            self.logitProbDeathInICU[p] = Logit(par=self.probDeathIfICU[p])
+            self.ratesOfDeathInICU[p] = Product(parameters=[self.logitProbDeathInICU[p], self.ratesOfLeavingICU[p]])
 
     def build_dict_of_params(self):
         self.dictOfParams = dict(
@@ -218,4 +219,4 @@ class COVIDParameters(EpiParameters):
              })
 
         for a in range(self.nAgeGroups):
-            self.dictOfParams['Prob Hosp'] = self.probHospByAge[a]
+            self.dictOfParams['Prob Hosp-age '+str(a)] = self.probHospByAge[a]
