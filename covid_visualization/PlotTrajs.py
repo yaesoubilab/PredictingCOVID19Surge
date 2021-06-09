@@ -79,7 +79,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                      title='Case-fatality (%)',
                                      y_range=(0, 100), y_multiplier=100,
                                      x_multiplier=obs_incd_multiplier)
-    ObsPercB = A.TrajPlotInfo(outcome_name='Obs: % of cases infected with strain B',
+    ObsPercB = A.TrajPlotInfo(outcome_name='Obs: % of cases infected with novel strain',
                               title='Cases with novel strain (%)',
                               y_range=(0, 100), y_multiplier=100,
                               x_multiplier=obs_incd_multiplier)

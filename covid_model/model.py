@@ -152,7 +152,7 @@ def build_covid_model(model):
             ICUs[i].add_events(events=[leaving_ICUs[i], deaths_in_ICU[i]])
             Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R[i]])
 
-    # --------- projections ---------
+    # --------- outcomes for projections ---------
     deaths = SumIncidence(name='Total deaths',
                           compartments=Ds,
                           if_surveyed=True,
@@ -174,43 +174,61 @@ def build_covid_model(model):
     
     pop_size = SumPrevalence(name='Population size',
                              compartments=compartments)
-
-    # --------- surveillance ---------
-    # setup surveillance to check the start of the epidemic
     incidence = SumIncidence(name='Incidence', compartments=Is,
                              first_nonzero_obs_marks_start_of_epidemic=True)
+    in_hosp = SumPrevalence(name='# in hospital', compartments=Hs, if_surveyed=True)
+    in_icu = SumPrevalence(name='# in ICU', compartments=ICUs, if_surveyed=True)
+    cum_vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs, if_surveyed=True)
+
+    # % cases with novel strain
     Is_current = []
     Is_novel = []
     for a in range(indexer.nAgeGroups):
         Is_current.append(Is[indexer.get_row_index(age_group=a, profile=0)])
         Is_novel.append(Is[indexer.get_row_index(age_group=a, profile=1)])
-
     incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current, if_surveyed=True)
     incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel, if_surveyed=True)
-    in_hosp = SumPrevalence(name='# in hospital', compartments=Hs, if_surveyed=True)
-    in_icu = SumPrevalence(name='# in ICU', compartments=ICUs, if_surveyed=True)
-    vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs, if_surveyed=True)
-
-    # add feasible ranges of icu occupancy
-    if sets.calcLikelihood:
-        in_icu.add_feasible_conditions(feasible_conditions=FeasibleConditions(feasible_max=4*10.3,
-                                                                              min_threshold_to_hit=4))
+    perc_cases_b = RatioTimeSeries(name='% of cases infected with novel strain',
+                                   numerator_sum_time_series=incidence_b,
+                                   denominator_sum_time_series=incidence,
+                                   if_surveyed=True)
 
     # case fatality
     case_fatality = RatioTimeSeries(name='Case fatality',
                                     numerator_sum_time_series=deaths,
                                     denominator_sum_time_series=incidence,
                                     if_surveyed=True)
-    # % cases with novel strain
-    perc_cases_b = RatioTimeSeries(name='% of cases infected with strain B',
-                                   numerator_sum_time_series=incidence_b,
-                                   denominator_sum_time_series=incidence,
-                                   if_surveyed=True)
+
     # % population vaccinated
     perc_vaccinated = RatioTimeSeries(name='% of population vaccinated',
-                                      numerator_sum_time_series=vaccinated,
+                                      numerator_sum_time_series=cum_vaccinated,
                                       denominator_sum_time_series=pop_size,
                                       if_surveyed=True)
+
+    incd_by_age = []
+    in_hosp_by_age = []
+    in_icu_by_age = []
+    cum_death_by_age = []
+    for a in range(indexer.nAgeGroups):
+        i_current = indexer.get_row_index(age_group=a, profile=0)
+        i_novel = indexer.get_row_index(age_group=a, profile=1)
+
+        # age-distribution of incidence
+
+        # age-distribution of hospitalized patients
+
+        # age-distributions of ICU patients
+
+        # age-distribution of deaths
+
+
+    # --------- feasibility conditions ---------
+    # add feasible ranges of icu occupancy
+    if sets.calcLikelihood:
+        in_icu.add_feasible_conditions(feasible_conditions=FeasibleConditions(feasible_max=4 * 10.3,
+                                                                              min_threshold_to_hit=4))
+
+
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
@@ -226,7 +244,7 @@ def build_covid_model(model):
                    parameters=params,
                    chance_nodes=chance_nodes,
                    list_of_sum_time_series=[pop_size, incidence_a, incidence_b, incidence, in_hosp, in_icu,
-                                            deaths, vaccinated],
+                                            deaths, cum_vaccinated],
                    list_of_ratio_time_series=[case_fatality, perc_cases_b, perc_vaccinated],
                    interventions=interventions,
                    features=features,
