@@ -1,23 +1,7 @@
-from enum import Enum
-
 from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Division, LinearCombination, \
     Logit, Product, MatrixOfConstantParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete
 from apace.Inputs import EpiParameters
-
-
-class Profiles(Enum):
-    A = 0   # infected with circulating strain
-    B = 1   # infected with novel strain
-    # V = 2   # vaccinated and infected with novel strain
-
-
-class AgeGroups(Enum):
-    Age_0_4 = 0
-    Age_5_19 = 1
-    Age_20_49 = 2
-    Age_50_64 = 3
-    Age_65_79 = 4
-    Age_80_ = 5
+from definitions import AgeGroups, Profiles
 
 
 class COVIDParameters(EpiParameters):

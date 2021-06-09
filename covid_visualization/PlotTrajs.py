@@ -1,5 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
+import definitions as Def
+from definitions import AgeGroups, Profiles
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 
@@ -15,55 +17,51 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     sim_outcomes = A.SimOutcomeTrajectories(csv_directory=directory)
 
     # defaults
-    SIM_DURATION = 2.25*52
+    SIM_DURATION = Def.SIM_DURATION*52
     A.X_RANGE = (0, SIM_DURATION)     # x-axis range
     A.X_TICKS = (0, 52/2)      # x-axis ticks (min at 0 with interval of 5)
     A.X_LABEL = 'Weeks'     # x-axis label
 
-    # plot information
-    S = A.TrajPlotInfo(outcome_name='In: Susceptible', title='Susceptible',
-                       y_range=(0, 105000), x_multiplier=prev_multiplier)
-    V_Sus = A.TrajPlotInfo(outcome_name='In: Vaccinated-Susceptible', title='Vaccinated-Susceptible',
-                           y_range=(0, 105000), x_multiplier=prev_multiplier)
-    V_Imn = A.TrajPlotInfo(outcome_name='In: Vaccinated-Immune', title='Vaccinated-Immune',
-                           y_range=(0, 105000), x_multiplier=prev_multiplier)
+    indexer = Def.AgeGroupsProfiles(n_age_groups=len(AgeGroups), n_profiles=len(Profiles))
 
-    E_A = A.TrajPlotInfo(outcome_name='In: Exposed-0', title='Exposed-A',
-                         y_range=(0, 22000), x_multiplier=prev_multiplier)
-    E_B = A.TrajPlotInfo(outcome_name='In: Exposed-1', title='Exposed-B',
-                         y_range=(0, 22000), x_multiplier=prev_multiplier)
-    I_A = A.TrajPlotInfo(outcome_name='In: Infectious-0', title='Infectious-A',
-                         y_range=(0, 17000), x_multiplier=prev_multiplier)
-    I_B = A.TrajPlotInfo(outcome_name='In: Infectious-1', title='Infectious-B',
-                         y_range=(0, 17000), x_multiplier=prev_multiplier)
-    H_A = A.TrajPlotInfo(outcome_name='In: Hospitalized-0', title='Hospitalized-A',
-                         y_range=(0, 5000), x_multiplier=prev_multiplier)
-    H_B = A.TrajPlotInfo(outcome_name='In: Hospitalized-1', title='Hospitalized-B',
-                         y_range=(0, 5000), x_multiplier=prev_multiplier)
-    ICU_A = A.TrajPlotInfo(outcome_name='In: ICU-0', title='In ICU-A',
-                           y_range=(0, 250), x_multiplier=prev_multiplier)
-    ICU_B = A.TrajPlotInfo(outcome_name='In: ICU-1', title='In ICU-B',
-                           y_range=(0, 250), x_multiplier=prev_multiplier)
-    R_A = A.TrajPlotInfo(outcome_name='In: Recovered-0', title='Recovered-A',
-                         y_range=(0, 105000), x_multiplier=prev_multiplier)
-    R_B = A.TrajPlotInfo(outcome_name='In: Recovered-1', title='Recovered-B',
-                         y_range=(0, 105000), x_multiplier=prev_multiplier)
-    D_A = A.TrajPlotInfo(outcome_name='Total to: Death-0', title='Cumulative deaths-A',
-                         y_range=(0, 500), x_multiplier=prev_multiplier)
-    D_B = A.TrajPlotInfo(outcome_name='Total to: Death-1', title='Cumulative deaths-B',
-                         y_range=(0, 500), x_multiplier=prev_multiplier)
+    # plot information for validation
+    for a in range(indexer.nAgeGroups):
 
-    Inc_A = A.TrajPlotInfo(outcome_name='To: Infectious-0', title='Incidence-A',
-                           y_range=(0, 25000), x_multiplier=incd_multiplier)
-    Inc_B = A.TrajPlotInfo(outcome_name='To: Infectious-1', title='Incidence-B',
-                           y_range=(0, 25000), x_multiplier=incd_multiplier)
+        str_a = indexer.get_str_age(age_group=a)
+        S = A.TrajPlotInfo(outcome_name='In: Susceptible-'+str_a, title='Susceptible-'+str_a,
+                           y_range=(0, 55000), x_multiplier=prev_multiplier)
+        V = A.TrajPlotInfo(outcome_name='In: Vaccinated-'+str_a, title='Vaccinated-'+str_a,
+                           y_range=(0, 55000), x_multiplier=prev_multiplier)
 
-    Inc = A.TrajPlotInfo(outcome_name='Incidence', title='Incidence',
-                         y_range=(0, 25000), x_multiplier=incd_multiplier)
-    ICU = A.TrajPlotInfo(outcome_name='# in ICU', title='ICU Occupancy',
-                         y_range=(0, 200), x_multiplier=prev_multiplier)
-    PercB = A.TrajPlotInfo(outcome_name='% of cases infected with strain B', title='% cases with novel strain',
-                           y_range=(0, 100), x_multiplier=incd_multiplier, y_multiplier=100)
+        Es = []
+        Is = []
+        Hs = []
+        ICUs = []
+        Rs = []
+        Ds = []
+        for p in range(indexer.nProfiles):
+            str_a_p = indexer.get_str_age_profile(age_group=a, profile=p)
+            Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
+                                     y_range=(0, 22000), x_multiplier=prev_multiplier))
+            Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,
+                                     y_range=(0, 17000), x_multiplier=prev_multiplier))
+            Hs.append(A.TrajPlotInfo(outcome_name='In: Hospitalized-'+str_a_p, title='Hospitalized-'+str_a_p,
+                                     y_range=(0, 5000), x_multiplier=prev_multiplier))
+            ICUs.append(A.TrajPlotInfo(outcome_name='In: ICU-'+str_a_p, title='ICU-'+str_a_p,
+                                       y_range=(0, 250), x_multiplier=prev_multiplier))
+            Rs.append(A.TrajPlotInfo(outcome_name='In: Recovered-'+str_a_p, title='Recovered-'+str_a_p,
+                                     y_range=(0, 105000), x_multiplier=prev_multiplier))
+            Ds.append(A.TrajPlotInfo(outcome_name='In: Death-'+str_a_p, title='Cumulative death-'+str_a_p,
+                                     y_range=(0, 500), x_multiplier=prev_multiplier))
+
+        # validation
+        filename_validation = 'outputs/fig_trajs/{}.png'.format(str_a)
+        sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
+                                      list_plot_info=[Es[0], Is[0], Hs[0], ICUs[0], Rs[0], Rs[0],
+                                                      Es[1], Is[1], Hs[1], ICUs[1], Rs[1], Rs[1],
+                                                      S, V],
+                                      file_name=filename_validation,
+                                      figure_size=(12, 5))
 
     # surveyed measures
     ObsIncA = A.TrajPlotInfo(outcome_name='Obs: Incidence-0', title='Incidence-A',
@@ -92,19 +90,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                               x_multiplier=prev_multiplier,
                               calibration_info=A.CalibrationTargetPlotInfo(rows_of_data=D.VACCINE_COVERAGE))
 
-    filename_validation = 'figures/trajs (val).png'
-    filename_summary = 'figures/trajs(sum).png'
-
-    # validation
-    sim_outcomes.plot_multi_panel(n_rows=4, n_cols=4,
-                                  list_plot_info=[E_A, I_A, H_A, ICU_A,# R_A, D_A,
-                                                  E_B, I_B, H_B, ICU_B,# R_B, D_B,
-                                                  S, V_Imn, V_Sus, ICU, PercB,
-                                                  Inc],
-                                  file_name=filename_validation,
-                                  figure_size=(7, 7))
-
     # summary
+    filename_summary = 'outputs/fig_trajs/summary.png'
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
                                   list_plot_info=[ObsInc, ObsIncA, ObsIncB, ObsICU, ObsPercB, ObsPercV],
                                   file_name=filename_summary,

@@ -7,24 +7,7 @@ from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.parameters import COVIDParameters
-
-
-class AgeGroupsProfiles:
-    # to convert (age group index, profile index) to an index and vice versa
-
-    def __init__(self, n_age_groups, n_profiles):
-        self.nAgeGroups = n_age_groups
-        self.nProfiles = n_profiles
-        self.length = n_age_groups * n_profiles
-
-    def get_row_index(self, age_group, profile):
-        return self.nProfiles * age_group + profile
-
-    def get_age_group_and_profile(self, i):
-        return int(i/self.nProfiles), i % self.nAgeGroups
-
-    def get_str(self, age_group, profile):
-        return 'age/profile ({},{})'.format(age_group, profile)
+from definitions import AgeGroupsProfiles
 
 
 def build_covid_model(model):
@@ -66,14 +49,14 @@ def build_covid_model(model):
 
     # --------- model compartments ---------
     for a in range(indexer.nAgeGroups):
-        str_a = 'age ' + str(a)
+        str_a = indexer.get_str_age(age_group=a)
         Ss[a] = Compartment(name='Susceptible-'+str_a, size_par=params.sizeSByAge[a],
                             susceptibility_params=[Constant(value=1), Constant(value=1)])
         Vs[a] = Compartment(name='Vaccinated-'+str_a, num_of_pathogens=2)
 
         for p in range(indexer.nProfiles):
 
-            str_a_p = indexer.get_str(age_group=a, profile=p)
+            str_a_p = indexer.get_str_age_profile(age_group=a, profile=p)
             i = indexer.get_row_index(age_group=a, profile=p)
 
             # infectivity
@@ -127,7 +110,7 @@ def build_covid_model(model):
         # --------- model events ---------
         for p in range(indexer.nProfiles):
 
-            str_a_p = indexer.get_str(age_group=a, profile=p)
+            str_a_p = indexer.get_str_age_profile(age_group=a, profile=p)
             i = indexer.get_row_index(age_group=a, profile=p)
 
             infection_in_S[i] = EpiDepEvent(
@@ -187,7 +170,8 @@ def build_covid_model(model):
     compartments.extend(Hs)
     compartments.extend(ICUs)
     compartments.extend(Rs)
-
+    compartments.extend(Ds)
+    
     pop_size = SumPrevalence(name='Population size',
                              compartments=compartments)
 
@@ -199,7 +183,7 @@ def build_covid_model(model):
     Is_novel = []
     for a in range(indexer.nAgeGroups):
         Is_current.append(Is[indexer.get_row_index(age_group=a, profile=0)])
-        Is_novel.append(Is[indexer.get_row_index(age_group=a, profile=0)])
+        Is_novel.append(Is[indexer.get_row_index(age_group=a, profile=1)])
 
     incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current, if_surveyed=True)
     incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel, if_surveyed=True)
