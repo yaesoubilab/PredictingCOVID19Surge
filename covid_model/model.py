@@ -175,11 +175,11 @@ def build_covid_model(model):
     pop_size = SumPrevalence(name='Population size',
                              compartments=compartments)
     incidence = SumIncidence(name='Incidence', compartments=Is,
-                             first_nonzero_obs_marks_start_of_epidemic=True)
-    in_hosp = SumPrevalence(name='# in hospital', compartments=Hs)
+                             first_nonzero_obs_marks_start_of_epidemic=True, if_surveyed=True)
+    in_hosp = SumPrevalence(name='# in hospital', compartments=Hs, if_surveyed=True)
     in_icu = SumPrevalence(name='# in ICU', compartments=ICUs, if_surveyed=True)
-    cum_death = SumCumulativeIncidence(name='Cumulative death', compartments=Ds)
-    cum_vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs)
+    cum_death = SumCumulativeIncidence(name='Cumulative death', compartments=Ds, if_surveyed=True)
+    cum_vaccinated = SumCumulativeIncidence(name='Vaccinated', compartments=Vs, if_surveyed=True)
 
     # % cases with novel strain
     Is_current = []
@@ -187,8 +187,8 @@ def build_covid_model(model):
     for a in range(indexer.nAgeGroups):
         Is_current.append(Is[indexer.get_row_index(age_group=a, profile=0)])
         Is_novel.append(Is[indexer.get_row_index(age_group=a, profile=1)])
-    incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current)
-    incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel)
+    incidence_a = SumIncidence(name='Incidence-0', compartments=Is_current, if_surveyed=True)
+    incidence_b = SumIncidence(name='Incidence-1', compartments=Is_novel, if_surveyed=True)
     perc_cases_b = RatioTimeSeries(name='% of cases infected with novel strain',
                                    numerator_sum_time_series=incidence_b,
                                    denominator_sum_time_series=incidence,
@@ -203,7 +203,8 @@ def build_covid_model(model):
     # % population vaccinated
     perc_vaccinated = RatioTimeSeries(name='% of population vaccinated',
                                       numerator_sum_time_series=cum_vaccinated,
-                                      denominator_sum_time_series=pop_size)
+                                      denominator_sum_time_series=pop_size,
+                                      if_surveyed=True)
 
     incd_by_age = []
     in_hosp_by_age = []

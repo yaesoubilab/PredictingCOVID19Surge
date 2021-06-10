@@ -24,7 +24,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
 
     indexer = Def.AgeGroupsProfiles(n_age_groups=len(AgeGroups), n_profiles=len(Profiles))
 
-    # plot information for validation
+    # ------ plot information for the validation plot (by age) --------
     for a in range(indexer.nAgeGroups):
 
         str_a = indexer.get_str_age(age_group=a)
@@ -61,9 +61,9 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                                       Es[1], Is[1], Hs[1], ICUs[1], Rs[1], Rs[1],
                                                       S, V],
                                       file_name=filename_validation,
-                                      figure_size=(12, 5))
+                                      figure_size=(11, 5.5))
 
-    # surveyed measures
+    # ------ plot information for the summary plot --------
     ObsIncA = A.TrajPlotInfo(outcome_name='Obs: Incidence-0', title='Incidence-A',
                              y_range=(0, 25000), x_multiplier=obs_incd_multiplier)
     ObsIncB = A.TrajPlotInfo(outcome_name='Obs: Incidence-1', title='Incidence-B',
@@ -98,3 +98,36 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   show_subplot_labels=True,
                                   figure_size=(6, 4)
                                   )
+
+    # ------ plot information for the age-distribution of outcome --------
+    age_dist_incd = []
+    age_dist_in_hosp = []
+    age_dist_in_icu = []
+    age_dist_cum_death = []
+
+    for a in range(indexer.nAgeGroups):
+
+        str_a = indexer.get_str_age(age_group=a)
+
+        age_dist_incd.append(A.TrajPlotInfo(outcome_name='Incidence-{} (%)'.format(str_a),
+                                            title='Incidence-{} (%)'.format(str_a),
+                                            y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
+        age_dist_in_hosp.append(A.TrajPlotInfo(outcome_name='Hospitalized-{} (%)'.format(str_a),
+                                               title='Hospitalized-{} (%)'.format(str_a),
+                                               y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_in_icu.append(A.TrajPlotInfo(outcome_name='In ICU-{} (%)'.format(str_a),
+                                              title='In ICU-{} (%)'.format(str_a),
+                                              y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_cum_death.append(A.TrajPlotInfo(outcome_name='Cumulative death-{} (%)'.format(str_a),
+                                                 title='Cumulative death-{} (%)'.format(str_a),
+                                                 y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+
+    filename_validation = 'outputs/fig_trajs/age_dist.png'
+    list_plot_info = age_dist_incd
+    list_plot_info.extend(age_dist_in_hosp)
+    list_plot_info.extend(age_dist_in_icu)
+    list_plot_info.extend(age_dist_cum_death)
+    sim_outcomes.plot_multi_panel(n_rows=4, n_cols=6,
+                                  list_plot_info=list_plot_info,
+                                  file_name=filename_validation,
+                                  figure_size=(10, 7))
