@@ -109,18 +109,22 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
 
         str_a = indexer.get_str_age(age_group=a)
 
-        age_dist_incd.append(A.TrajPlotInfo(outcome_name='Incidence-{} (%)'.format(str_a),
-                                            title='Incidence-{} (%)'.format(str_a),
-                                            y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
-        age_dist_in_hosp.append(A.TrajPlotInfo(outcome_name='Hospitalized-{} (%)'.format(str_a),
-                                               title='Hospitalized-{} (%)'.format(str_a),
-                                               y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
-        age_dist_in_icu.append(A.TrajPlotInfo(outcome_name='In ICU-{} (%)'.format(str_a),
-                                              title='In ICU-{} (%)'.format(str_a),
-                                              y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
-        age_dist_cum_death.append(A.TrajPlotInfo(outcome_name='Cumulative death-{} (%)'.format(str_a),
-                                                 title='Cumulative death-{} (%)'.format(str_a),
-                                                 y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_incd.append(A.TrajPlotInfo(
+            outcome_name='Incidence-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\nincident (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
+        age_dist_in_hosp.append(A.TrajPlotInfo(
+            outcome_name='Hospitalized-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\nhospitalized patients (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_in_icu.append(A.TrajPlotInfo(
+            outcome_name='In ICU-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\n patients in ICU (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_cum_death.append(A.TrajPlotInfo(
+            outcome_name='Cumulative death-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
 
     filename_validation = 'outputs/fig_trajs/age_dist.png'
     list_plot_info = age_dist_incd
