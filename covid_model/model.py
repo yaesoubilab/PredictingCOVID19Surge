@@ -276,7 +276,7 @@ def build_covid_model(model):
 
         # cumulative vaccinations
         cum_vaccine_by_age.append(SumCumulativeIncidence(name='Cumulative vaccination-' + str_a,
-                                                         compartments=[Vs[-1]]))
+                                                         compartments=[Vs[a]]))
         # rate
         cum_vaccine_rate_by_age.append(RatioTimeSeries(name='Cumulative vaccination rate-' + str_a,
                                                        numerator_sum_time_series=cum_vaccine_by_age[-1],
