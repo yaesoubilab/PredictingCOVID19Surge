@@ -8,6 +8,7 @@ PROJ_PERIOD = 0.75  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
 AGES = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65-79yrs', '80+yrs']
+PROFILES = ['Current', 'Novel', 'Vaccinated']
 
 
 class Profiles(Enum):
@@ -41,14 +42,10 @@ class AgeGroupsProfiles:
 
     def get_str_age_profile(self, age_group, profile):
 
-        if profile == 0:
-            return AGES[age_group] + '-Current'
-        elif profile == 1:
-            return AGES[age_group] + '-Novel'
-        else:
-            raise ValueError
-        #return 'age/profile ({},{})'.format(age_group, profile)
+        return AGES[age_group] + '-' + PROFILES[profile]
 
     def get_str_age(self, age_group):
         return AGES[age_group]
-        # return 'age {}'.format(age_group)
+
+    def get_str_profile(self, profile):
+        return PROFILES[profile]

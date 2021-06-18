@@ -41,27 +41,30 @@ class COVIDParameters(EpiParameters):
         self.durIByProfile = [Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d), None]
         self.durHospByProfile = [Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
                                  Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d)]
-        self.durICUByProfile = [Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d),
-                                Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d)]
         self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
                               Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
         self.durVacImmunityByProfile = Uniform(0.5, 1.5)  # Beta(mean=1.5, st_dev=0.25, minimum=0.5, maximum=2.5)
 
         # the probability of hospitalization is assumed to be age- and profile-dependent
-        self.probHospByAge = [None] * self.nAgeGroups
+        self.probHospByAgeAndProfile = [None] * self.nAgeGroups
         # TODO: update these parameters
-        self.probHospByAge[AgeGroups.Age_0_4.value] = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAge[AgeGroups.Age_5_19.value] = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAge[AgeGroups.Age_20_49.value] = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAge[AgeGroups.Age_50_64.value] = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAge[AgeGroups.Age_65_79.value] = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAge[AgeGroups.Age_80_.value] = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHospByAgeAndProfile[AgeGroups.Age_0_4.value] \
+            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHospByAgeAndProfile[AgeGroups.Age_5_19.value] \
+            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHospByAgeAndProfile[AgeGroups.Age_20_49.value] \
+            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHospByAgeAndProfile[AgeGroups.Age_50_64.value] \
+            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHospByAgeAndProfile[AgeGroups.Age_65_79.value] \
+            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHospByAgeAndProfile[AgeGroups.Age_80_.value] \
+            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
 
-        # probability of ICU or Death if hospitalized is age-independent
-        self.probICUIfHosp = [Beta(mean=0.326, st_dev=0.018, minimum=0, maximum=1),
-                              Beta(mean=0.326, st_dev=0.018, minimum=0, maximum=1)]
-        self.probDeathIfICU = [Beta(mean=0.330, st_dev=0.032, minimum=0, maximum=1),
-                               Beta(mean=0.330, st_dev=0.032, minimum=0, maximum=1)]
+        # probability of death if hospitalized is age-independent
+        self.probDeathIfHospByProfile = []
+        for p in range(self.nProfiles):
+            self.probDeathIfHospByProfile.append(Beta(mean=0.1, st_dev=0.032, minimum=0, maximum=1))
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),    # b
@@ -70,9 +73,9 @@ class COVIDParameters(EpiParameters):
                                Uniform(minimum=0, maximum=0.5),     # min
                                Uniform(minimum=1.25, maximum=1.75)] # max
 
-        self.pdY1Thresholds = [UniformDiscrete(2, 10), UniformDiscrete(1, 10)]  # on/off
-        self.changeInContactY1 = Uniform(-0.8, -0.5)
-        self.changeInContactY1Plus = Uniform(-0.8, -0.5)
+        self.pdY1Thresholds = [Uniform(1, 1), Uniform(0, 0)]  # on/off
+        self.changeInContactY1 = Uniform(-0.75, -0.25)
+        self.changeInContactY1Plus = Uniform(-0.75, -0.25)
 
         # parameters of the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
@@ -90,12 +93,11 @@ class COVIDParameters(EpiParameters):
         self.ratesOfLeavingE = [None] * self.nProfiles
         self.ratesOfLeavingI = [None] * self.nProfiles
         self.ratesOfLeavingHosp = [None] * self.nProfiles
-        self.ratesOfLeavingICU = [None] * self.nProfiles
         self.ratesOfLeavingR = [None] * self.nProfiles
         self.infectivity = [None] * self.nProfiles
         self.durInfec = [None] * self.nProfiles
-        self.logitProbDeathInICU = [None] * self.nProfiles
-        self.ratesOfDeathInICU = [None] * self.nProfiles
+        self.logitProbDeathInHosp = [None] * self.nProfiles
+        self.ratesOfDeathInHosp = [None] * self.nProfiles
         self.rateOfLosingVacImmunity = None
 
         self.calculate_dependent_params()
@@ -108,7 +110,8 @@ class COVIDParameters(EpiParameters):
         # for the novel strain
         self.R0s[1] = Product(parameters=[self.R0s[0], self.ratioTransmmisibilityAToB])
         for a in range(self.nAgeGroups):
-            self.probHospByAge[a][1] = Product(parameters=[self.probHospByAge[a][0], self.ratioProbHospAToB])
+            self.probHospByAgeAndProfile[a][1] = Product(
+                parameters=[self.probHospByAgeAndProfile[a][0], self.ratioProbHospAToB])
         self.durIByProfile[1] = Product(parameters=[self.durIByProfile[0], self.ratioDurInfAToB])
 
         # probability of novel strain
@@ -135,7 +138,6 @@ class COVIDParameters(EpiParameters):
             self.ratesOfLeavingE[p] = Inverse(par=self.durEByProfile[p])
             self.ratesOfLeavingI[p] = Inverse(par=self.durIByProfile[p])
             self.ratesOfLeavingHosp[p] = Inverse(par=self.durHospByProfile[p])
-            self.ratesOfLeavingICU[p] = Inverse(par=self.durICUByProfile[p])
             self.ratesOfLeavingR[p] = Inverse(par=self.durRByProfile[p])
 
             # duration of infectiousness is the sum of durations in E and I
@@ -147,10 +149,10 @@ class COVIDParameters(EpiParameters):
                 par_numerator=self.R0s[p],
                 par_denominator=self.durInfec[p])
 
-            # Pr{Death in ICU} = p
-            # Rate{Death in ICU} = p/(1-p) * Rate{Leaving ICU}
-            self.logitProbDeathInICU[p] = Logit(par=self.probDeathIfICU[p])
-            self.ratesOfDeathInICU[p] = Product(parameters=[self.logitProbDeathInICU[p], self.ratesOfLeavingICU[p]])
+            # Pr{Death in Hosp} = p
+            # Rate{Death in Hosp} = p/(1-p) * Rate{Leaving Hosp}
+            self.logitProbDeathInHosp[p] = Logit(par=self.probDeathIfHospByProfile[p])
+            self.ratesOfDeathInHosp[p] = Product(parameters=[self.logitProbDeathInHosp[p], self.ratesOfLeavingHosp[p]])
 
     def build_dict_of_params(self):
         self.dictOfParams = dict(
@@ -168,7 +170,6 @@ class COVIDParameters(EpiParameters):
              'Duration of E': self.durEByProfile,
              'Duration of I': self.durIByProfile,
              'Duration of Hosp': self.durHospByProfile,
-             'Duration of ICU': self.durICUByProfile,
              'Duration of R': self.durRByProfile,
              'Duration of vaccine immunity': self.durVacImmunityByProfile,
              'Duration of infectiousness': self.durInfec,
@@ -179,13 +180,11 @@ class COVIDParameters(EpiParameters):
              'Rates of leaving E': self.ratesOfLeavingE,
              'Rates of leaving I': self.ratesOfLeavingI,
              'Rates of leaving Hosp': self.ratesOfLeavingHosp,
-             'Rates of leaving ICU': self.ratesOfLeavingICU,
              'Rates of leaving R': self.ratesOfLeavingR,
 
-             'Prob ICU | Hosp': self.probICUIfHosp,
-             'Prob Death | ICU': self.probDeathIfICU,
-             'Logit of prob death in ICU': self.logitProbDeathInICU,
-             'Rate of death in ICU': self.ratesOfDeathInICU,
+             'Prob Death | Hosp': self.probDeathIfHospByProfile,
+             'Logit of prob death in Hosp': self.logitProbDeathInHosp,
+             'Rate of death in Hosp': self.ratesOfDeathInHosp,
 
              'Importation rate': self.importRateByAge,
              'Prob novel strain params': self.probNovelStrainParams,
@@ -203,4 +202,4 @@ class COVIDParameters(EpiParameters):
              })
 
         for a in range(self.nAgeGroups):
-            self.dictOfParams['Prob Hosp-age '+str(a)] = self.probHospByAge[a]
+            self.dictOfParams['Prob Hosp-age '+str(a)] = self.probHospByAgeAndProfile[a]
