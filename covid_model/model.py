@@ -173,7 +173,7 @@ def build_covid_model(model):
     # cumulative death 
     cum_death_by_age.append(SumCumulativeIncidence(name='Cumulative death', compartments=Ds, if_surveyed=True))
     # cumulative vaccination 
-    cum_vaccine_by_age.append(SumCumulativeIncidence(name='Vaccinated', compartments=Vs, if_surveyed=True))
+    cum_vaccine_by_age.append(SumCumulativeIncidence(name='Cumulative vaccination', compartments=Vs, if_surveyed=True))
 
     # incidence rate
     incd_rate_by_age.append(RatioTimeSeries(name='Incidence rate',
@@ -191,30 +191,30 @@ def build_covid_model(model):
                                                  denominator_sum_time_series=pop_size_by_age[-1],
                                                  if_surveyed=True))
     # cumulative vaccination rate
-    cum_vaccine_rate_by_age.append(RatioTimeSeries(name='Cummulative vaccination rate',
+    cum_vaccine_rate_by_age.append(RatioTimeSeries(name='Cumulative vaccination rate',
                                                    numerator_sum_time_series=cum_vaccine_by_age[-1],
                                                    denominator_sum_time_series=pop_size_by_age[-1],
                                                    if_surveyed=True))
     
-    # hospitalization by profile (current, novel, vaccinated)
-    in_hosp_by_profile = []
-    profile_dist_hosp = []
+    # new hospitalization by profile (current, novel, vaccinated)
+    new_hosp_by_profile = []
+    profile_dist_new_hosp = []
     for p in range(indexer.nProfiles):
         # find Hs in this profile
         Hs_this_profile = []
         for a in range(indexer.nAgeGroups):
             i = indexer.get_row_index(age_group=a, profile=p)
-            Hs_this_profile.append(Is[i])
+            Hs_this_profile.append(Hs[i])
 
         str_profile = indexer.get_str_profile(p)
         # hospitalization by profile
-        in_hosp_by_profile.append(SumPrevalence(name='Hosp-'+str_profile,
+        new_hosp_by_profile.append(SumIncidence(name='New hosp-'+str_profile,
                                                 compartments=Hs_this_profile))
-        # profile-distribution of incidence
-        profile_dist_hosp.append(RatioTimeSeries(name='% of hospitalizations due to '+str_profile,
-                                                 numerator_sum_time_series=in_hosp_by_profile[-1],
-                                                 denominator_sum_time_series=in_hosp_by_age[0],
-                                                 if_surveyed=True))
+        # profile-distribution of new hospitalization
+        profile_dist_new_hosp.append(RatioTimeSeries(name='% of new hospitalizations due to '+str_profile,
+                                                     numerator_sum_time_series=new_hosp_by_profile[-1],
+                                                     denominator_sum_time_series=in_hosp_by_age[0],
+                                                     if_surveyed=True))
     
     # list to contain summation statistics
     age_dist_incd = []
@@ -245,7 +245,7 @@ def build_covid_model(model):
         # rate
         incd_rate_by_age.append(RatioTimeSeries(name='Incidence rate-'+str_a,
                                                 numerator_sum_time_series=incd_by_age[a],
-                                                denominator_sum_time_series=pop_size_by_age[a]))
+                                                denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_incd.append(RatioTimeSeries(name='Incidence-'+str_a+' (%)',
                                              numerator_sum_time_series=incd_by_age[a],
@@ -257,7 +257,7 @@ def build_covid_model(model):
         # rate
         hosp_rate_by_age.append(RatioTimeSeries(name='Hospitalization rate-'+str_a,
                                                 numerator_sum_time_series=in_hosp_by_age[a],
-                                                denominator_sum_time_series=pop_size_by_age[a]))
+                                                denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_in_hosp.append(RatioTimeSeries(name='Hospitalized-'+str_a+' (%)',
                                                 numerator_sum_time_series=in_hosp_by_age[a],
@@ -268,7 +268,7 @@ def build_covid_model(model):
         # rate
         cum_death_rate_by_age.append(RatioTimeSeries(name='Cumulative death rate-' + str_a,
                                                      numerator_sum_time_series=cum_death_by_age[a],
-                                                     denominator_sum_time_series=pop_size_by_age[a]))
+                                                     denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_cum_death.append(RatioTimeSeries(name='Cumulative death-'+str_a+' (%)',
                                                   numerator_sum_time_series=cum_death_by_age[a],
@@ -280,7 +280,7 @@ def build_covid_model(model):
         # rate
         cum_vaccine_rate_by_age.append(RatioTimeSeries(name='Cumulative vaccination rate-' + str_a,
                                                        numerator_sum_time_series=cum_vaccine_by_age[a],
-                                                       denominator_sum_time_series=pop_size_by_age[a]))
+                                                       denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_cum_vaccine.append(RatioTimeSeries(name='Cumulative vaccination-'+str_a+' (%)',
                                                     numerator_sum_time_series=cum_vaccine_by_age[a],
@@ -310,7 +310,7 @@ def build_covid_model(model):
     list_of_sum_time_series.extend(in_hosp_by_age)
     list_of_sum_time_series.extend(cum_death_by_age)
     list_of_sum_time_series.extend(cum_vaccine_by_age)
-    list_of_sum_time_series.extend(in_hosp_by_profile)
+    list_of_sum_time_series.extend(new_hosp_by_profile)
 
     # ratio time-series
     list_of_ratio_time_series = []
@@ -318,11 +318,11 @@ def build_covid_model(model):
     list_of_ratio_time_series.extend(hosp_rate_by_age)
     list_of_ratio_time_series.extend(cum_death_rate_by_age)
     list_of_ratio_time_series.extend(cum_vaccine_rate_by_age)
-    list_of_ratio_time_series.extend(profile_dist_hosp)
+    list_of_ratio_time_series.extend(profile_dist_new_hosp)
     list_of_ratio_time_series.extend(age_dist_incd)
     list_of_ratio_time_series.extend(age_dist_in_hosp)
     list_of_ratio_time_series.extend(age_dist_cum_death)
-    list_of_ratio_time_series.extend(cum_vaccine_rate_by_age)
+    list_of_ratio_time_series.extend(age_dist_cum_vaccine)
 
     model.populate(compartments=compartments,
                    parameters=params,
