@@ -244,11 +244,11 @@ def build_covid_model(model):
                                         compartments=Is_this_age))
         # rate
         incd_rate_by_age.append(RatioTimeSeries(name='Incidence rate-'+str_a,
-                                                numerator_sum_time_series=incd_by_age[a],
+                                                numerator_sum_time_series=incd_by_age[-1],
                                                 denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_incd.append(RatioTimeSeries(name='Incidence-'+str_a+' (%)',
-                                             numerator_sum_time_series=incd_by_age[a],
+                                             numerator_sum_time_series=incd_by_age[-1],
                                              denominator_sum_time_series=incd_by_age[0]))
 
         # hospitalization
@@ -256,34 +256,34 @@ def build_covid_model(model):
                                             compartments=Hs_this_age))
         # rate
         hosp_rate_by_age.append(RatioTimeSeries(name='Hospitalization rate-'+str_a,
-                                                numerator_sum_time_series=in_hosp_by_age[a],
+                                                numerator_sum_time_series=in_hosp_by_age[-1],
                                                 denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_in_hosp.append(RatioTimeSeries(name='Hospitalized-'+str_a+' (%)',
-                                                numerator_sum_time_series=in_hosp_by_age[a],
+                                                numerator_sum_time_series=in_hosp_by_age[-1],
                                                 denominator_sum_time_series=in_hosp_by_age[0]))
         # cumulative death
         cum_death_by_age.append(SumCumulativeIncidence(name='Cumulative death-' + str_a,
                                                        compartments=Ds_this_age))
         # rate
         cum_death_rate_by_age.append(RatioTimeSeries(name='Cumulative death rate-' + str_a,
-                                                     numerator_sum_time_series=cum_death_by_age[a],
+                                                     numerator_sum_time_series=cum_death_by_age[-1],
                                                      denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_cum_death.append(RatioTimeSeries(name='Cumulative death-'+str_a+' (%)',
-                                                  numerator_sum_time_series=cum_death_by_age[a],
+                                                  numerator_sum_time_series=cum_death_by_age[-1],
                                                   denominator_sum_time_series=cum_death_by_age[0]))
 
         # cumulative vaccinations
         cum_vaccine_by_age.append(SumCumulativeIncidence(name='Cumulative vaccination-' + str_a,
-                                                         compartments=[Vs[a]]))
+                                                         compartments=[Vs[-1]]))
         # rate
         cum_vaccine_rate_by_age.append(RatioTimeSeries(name='Cumulative vaccination rate-' + str_a,
-                                                       numerator_sum_time_series=cum_vaccine_by_age[a],
+                                                       numerator_sum_time_series=cum_vaccine_by_age[-1],
                                                        denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution
         age_dist_cum_vaccine.append(RatioTimeSeries(name='Cumulative vaccination-'+str_a+' (%)',
-                                                    numerator_sum_time_series=cum_vaccine_by_age[a],
+                                                    numerator_sum_time_series=cum_vaccine_by_age[-1],
                                                     denominator_sum_time_series=cum_vaccine_by_age[0]))
 
     # --------- feasibility conditions ---------

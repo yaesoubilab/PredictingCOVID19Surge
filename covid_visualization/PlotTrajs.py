@@ -89,11 +89,47 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   figure_size=(5, 5)
                                   )
 
+    # ------ plot information for the rates by age --------
+    incd_rate_by_age = []
+    hosp_rate_by_age = []
+    cum_death_rate_by_age = []
+    cum_vaccine_rate_by_age = []
+
+    for a in range(indexer.nAgeGroups):
+        str_a = indexer.get_str_age(age_group=a)
+
+        incd_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Incidence rate-{}'.format(str_a),
+            title=str_a, y_label='Incidence rate\n(per 100,000 population) ' if a == 0 else None,
+            y_range=(0, 20000), y_multiplier=100000, x_multiplier=incd_multiplier))
+        hosp_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Hospitalization rate-{}'.format(str_a),
+            title=str_a, y_label='Hospitalization rate\n(per 100,000 population)' if a == 0 else None,
+            y_range=(0, 1500), y_multiplier=100000, x_multiplier=prev_multiplier))
+        cum_death_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Cumulative death rate-{}'.format(str_a),
+            title=str_a, y_label='Cumulative deaths rate\n(per 100,000 population)' if a == 0 else None,
+            y_range=(0, 1000), y_multiplier=100000, x_multiplier=prev_multiplier))
+        cum_vaccine_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Cumulative vaccination rate-{}'.format(str_a),
+            title=str_a, y_label='Cumulative vaccination rate (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+
+    filename_validation = 'outputs/fig_trajs/rates_by_age.png'
+    list_plot_info = incd_rate_by_age
+    list_plot_info.extend(hosp_rate_by_age)
+    list_plot_info.extend(cum_death_rate_by_age)
+    list_plot_info.extend(cum_vaccine_rate_by_age)
+    sim_outcomes.plot_multi_panel(n_rows=4, n_cols=6,
+                                  list_plot_info=list_plot_info,
+                                  file_name=filename_validation,
+                                  figure_size=(10, 7))
+
     # ------ plot information for the age-distribution of outcome --------
     age_dist_incd = []
     age_dist_in_hosp = []
-    age_dist_in_icu = []
     age_dist_cum_death = []
+    age_dist_cum_vaccine = []
 
     for a in range(indexer.nAgeGroups):
 
@@ -107,20 +143,20 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             outcome_name='Hospitalized-{} (%)'.format(str_a),
             title=str_a, y_label='Age-distribution of\nhospitalized patients (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
-        age_dist_in_icu.append(A.TrajPlotInfo(
-            outcome_name='In ICU-{} (%)'.format(str_a),
-            title=str_a, y_label='Age-distribution of\n patients in ICU (%)' if a == 0 else None,
-            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
         age_dist_cum_death.append(A.TrajPlotInfo(
             outcome_name='Cumulative death-{} (%)'.format(str_a),
             title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_cum_vaccine.append(A.TrajPlotInfo(
+            outcome_name='Cumulative vaccination-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\n cumulative vaccination (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
 
     filename_validation = 'outputs/fig_trajs/age_dist.png'
     list_plot_info = age_dist_incd
     list_plot_info.extend(age_dist_in_hosp)
-    list_plot_info.extend(age_dist_in_icu)
     list_plot_info.extend(age_dist_cum_death)
+    list_plot_info.extend(age_dist_cum_vaccine)
     sim_outcomes.plot_multi_panel(n_rows=4, n_cols=6,
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
