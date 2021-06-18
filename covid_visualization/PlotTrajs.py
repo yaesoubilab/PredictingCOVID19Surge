@@ -118,12 +118,13 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     filename_validation = 'outputs/fig_trajs/rates_by_age.png'
     list_plot_info = incd_rate_by_age
     list_plot_info.extend(hosp_rate_by_age)
-    list_plot_info.extend(cum_death_rate_by_age)
+    #list_plot_info.extend(cum_death_rate_by_age)
     list_plot_info.extend(cum_vaccine_rate_by_age)
-    sim_outcomes.plot_multi_panel(n_rows=4, n_cols=6,
+    A.Y_LABEL_COORD_X = -0.35
+    sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(10, 7))
+                                  figure_size=(9.5, 5))
 
     # ------ plot information for the age-distribution of outcome --------
     age_dist_incd = []
@@ -155,9 +156,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     filename_validation = 'outputs/fig_trajs/age_dist.png'
     list_plot_info = age_dist_incd
     list_plot_info.extend(age_dist_in_hosp)
-    list_plot_info.extend(age_dist_cum_death)
+    #list_plot_info.extend(age_dist_cum_death)
     list_plot_info.extend(age_dist_cum_vaccine)
-    sim_outcomes.plot_multi_panel(n_rows=4, n_cols=6,
+    A.Y_LABEL_COORD_X = -0.25
+    sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(10, 7))
+                                  figure_size=(9.5, 5))
