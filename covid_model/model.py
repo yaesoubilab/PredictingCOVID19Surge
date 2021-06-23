@@ -251,8 +251,8 @@ def build_covid_model(model):
                                              numerator_sum_time_series=incd_by_age[-1],
                                              denominator_sum_time_series=incd_by_age[0]))
 
-        # hospitalization
-        in_hosp_by_age.append(SumPrevalence(name='Hospitalized-' + str_a,
+        # new hospitalizations
+        in_hosp_by_age.append(SumPrevalence(name='New hospitalizations-' + str_a,
                                             compartments=Hs_this_age))
         # rate
         hosp_rate_by_age.append(RatioTimeSeries(name='Hospitalization rate-'+str_a,
