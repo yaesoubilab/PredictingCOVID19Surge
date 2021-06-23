@@ -10,7 +10,7 @@ SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 # -------------------
 # feasibility ranges
 # -------------------
-MAX_HOSP = 50  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
+MAX_HOSP_RATE = 50  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
 
 
 # --------------------

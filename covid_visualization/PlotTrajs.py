@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from definitions import AgeGroups, Profiles, MAX_HOSP
+from definitions import AgeGroups, Profiles, MAX_HOSP_RATE, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 
@@ -66,10 +66,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
     obs_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Hospitalization rate',
                                    title='Hospitalization rate\n(per 100,000 population)',
-                                   y_range=(0, MAX_HOSP*4), y_multiplier=100000, x_multiplier=incd_multiplier,
+                                   y_range=(0, MAX_HOSP_RATE * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
                                    calibration_info=A.CalibrationTargetPlotInfo(
                                        feasible_range_info=A.FeasibleRangeInfo(
-                                           x_range=[0, SIM_DURATION], y_range=[0, MAX_HOSP])))
+                                           x_range=[0, CALIB_PERIOD*52], y_range=[0, MAX_HOSP_RATE])))
     obs_new_hosp_novel = A.TrajPlotInfo(outcome_name='Obs: % of new hospitalizations due to Novel',
                                         title='New hospitalizations\nwith novel strain (%)',
                                         y_range=(0, 100), y_multiplier=100,

@@ -6,7 +6,7 @@ from covid_visualization.PlotTrajs import plot
 
 N = 8   # number of trajectories to simulate
 IF_PARALLEL = True
-USE_CALIBRATED_MODEL = False
+USE_CALIBRATED_MODEL = True
 
 
 def simulate(n=25, calibrated=True, seeds=None, weights=None, sample_seeds_by_weights=False):
@@ -19,7 +19,7 @@ def simulate(n=25, calibrated=True, seeds=None, weights=None, sample_seeds_by_we
 
     if calibrated:
         # get the seeds and probability weights
-        seeds, weights = calib.get_seeds_and_probs('output/summaries/calibration_summary.csv')
+        seeds, weights = calib.get_seeds_and_probs('outputs/summary/calibration_summary.csv')
 
     multi_model.simulate(function_to_populate_model=M.build_covid_model,
                          n=n,

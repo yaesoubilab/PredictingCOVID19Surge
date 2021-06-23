@@ -49,7 +49,7 @@ class COVIDParameters(EpiParameters):
                                Uniform(minimum=0, maximum=0.5),     # min
                                Uniform(minimum=1.25, maximum=1.75)] # max
 
-        self.pdY1Thresholds = [Uniform(0, 0.005), Uniform(0, 0.005)]  # on/off
+        self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
         self.changeInContactY1 = Uniform(-0.75, -0.25)
         self.changeInContactY1Plus = Uniform(-0.75, -0.25)
 

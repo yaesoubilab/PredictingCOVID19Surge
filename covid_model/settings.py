@@ -30,4 +30,7 @@ class COVIDSettings(ModelSettings):
         self.ifPDInCalibrationPeriod = True
         self.calibrationPeriod = D.CALIB_PERIOD
 
+        # parameter values
+        self.storeParameterValues = True
+
 
