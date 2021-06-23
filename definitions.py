@@ -15,7 +15,7 @@ MAX_HOSP_RATE = 50  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/
 
 # --------------------
 # --------------------
-AGES = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65-79yrs', '80+yrs']
+AGES = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
 PROFILES = ['Current', 'Novel', 'Vaccinated']
 
 

@@ -15,8 +15,8 @@ class COVIDParameters(EpiParameters):
         d = 1 / 364  # one day (using year as the unit of time)
 
         # -------- model main parameters -------------
-        us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.125, 0.039]
-        hosp_relative_risk = [2, 1, 10, 25, 40, 80] # https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
+        us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.960, 0.0690]
+        hosp_relative_risk = [2, 1, 10.2, 25.0, 40.0, 73.8] # https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
         importation_rate = 52 * 5
 
         self.sizeS0 = Constant(100000)
