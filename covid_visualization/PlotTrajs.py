@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from definitions import AgeGroups, Profiles
+from definitions import AgeGroups, Profiles, MAX_HOSP
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 
@@ -66,10 +66,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
     obs_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Hospitalization rate',
                                    title='Hospitalization rate\n(per 100,000 population)',
-                                   y_range=(0, 2000), y_multiplier=100000, x_multiplier=prev_multiplier,
+                                   y_range=(0, MAX_HOSP*4), y_multiplier=100000, x_multiplier=incd_multiplier,
                                    calibration_info=A.CalibrationTargetPlotInfo(
                                        feasible_range_info=A.FeasibleRangeInfo(
-                                           x_range=[0, SIM_DURATION], y_range=[0, 10.34])))
+                                           x_range=[0, SIM_DURATION], y_range=[0, MAX_HOSP])))
     obs_new_hosp_novel = A.TrajPlotInfo(outcome_name='Obs: % of new hospitalizations due to Novel',
                                         title='New hospitalizations\nwith novel strain (%)',
                                         y_range=(0, 100), y_multiplier=100,
@@ -105,7 +105,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
         hosp_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Hospitalization rate-{}'.format(str_a),
             title=str_a, y_label='Hospitalization rate\n(per 100,000 population)' if a == 0 else None,
-            y_range=(0, 1500), y_multiplier=100000, x_multiplier=prev_multiplier))
+            y_range=(0, 1500), y_multiplier=100000, x_multiplier=incd_multiplier))
         cum_death_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Cumulative death rate-{}'.format(str_a),
             title=str_a, y_label='Cumulative deaths rate\n(per 100,000 population)' if a == 0 else None,
@@ -141,9 +141,9 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             title=str_a, y_label='Age-distribution of\nincident (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
         age_dist_in_hosp.append(A.TrajPlotInfo(
-            outcome_name='Hospitalized-{} (%)'.format(str_a),
-            title=str_a, y_label='Age-distribution of\nhospitalized patients (%)' if a == 0 else None,
-            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+            outcome_name='Hospitalizations-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\nhospitalizations (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
         age_dist_cum_death.append(A.TrajPlotInfo(
             outcome_name='Cumulative death-{} (%)'.format(str_a),
             title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,

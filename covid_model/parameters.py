@@ -1,5 +1,5 @@
 from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Division, LinearCombination, \
-    Logit, Product, MatrixOfConstantParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete
+    Logit, Product, MatrixOfConstantParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete, Gamma
 from apace.Inputs import EpiParameters
 from definitions import AgeGroups, Profiles
 
@@ -10,29 +10,17 @@ class COVIDParameters(EpiParameters):
     def __init__(self):
         EpiParameters.__init__(self)
 
-        d = 1 / 364  # one day (using year as the unit of time)
-        us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.125, 0.039]
-        importation_rate = 52 * 5
-
         self.nProfiles = len(Profiles)
         self.nAgeGroups = len(AgeGroups)
+        d = 1 / 364  # one day (using year as the unit of time)
 
         # -------- model main parameters -------------
+        us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.125, 0.039]
+        hosp_relative_risk = [2, 1, 10, 25, 40, 80] # https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
+        importation_rate = 52 * 5
+
         self.sizeS0 = Constant(100000)
         self.sizeE0 = UniformDiscrete(minimum=1, maximum=5)
-
-        self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
-        self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
-
-        self.sizeSByAge = []
-        self.sizeEProfile0ByAge = []
-        self.importRateByAge = []
-        for a in range(self.nAgeGroups):
-            self.sizeSByAge.append(AMultinomialOutcome(par_multinomial=self.distS0ToSs, outcome_index=a))
-            self.sizeEProfile0ByAge.append(AMultinomialOutcome(par_multinomial=self.distE0ToEs, outcome_index=a))
-            self.importRateByAge.append(Constant(value=importation_rate * us_age_dist[a]))
-
-        # TODO: figure out R0 by age
         self.R0s = [Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4), None]
 
         # these duration parameters are age-independent
@@ -46,25 +34,13 @@ class COVIDParameters(EpiParameters):
         self.durVacImmunityByProfile = Uniform(0.5, 1.5)  # Beta(mean=1.5, st_dev=0.25, minimum=0.5, maximum=2.5)
 
         # the probability of hospitalization is assumed to be age- and profile-dependent
-        self.probHospByAgeAndProfile = [None] * self.nAgeGroups
-        # TODO: update these parameters
-        self.probHospByAgeAndProfile[AgeGroups.Age_0_4.value] \
-            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAgeAndProfile[AgeGroups.Age_5_19.value] \
-            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAgeAndProfile[AgeGroups.Age_20_49.value] \
-            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAgeAndProfile[AgeGroups.Age_50_64.value] \
-            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAgeAndProfile[AgeGroups.Age_65_79.value] \
-            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
-        self.probHospByAgeAndProfile[AgeGroups.Age_80_.value] \
-            = [Beta(mean=0.065, st_dev=0.01, minimum=0, maximum=1), None]
+        self.probHosp5To17 = Uniform(0.001, 0.002)
 
         # probability of death if hospitalized is age-independent
+        # TODO: https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
         self.probDeathIfHospByProfile = []
         for p in range(self.nProfiles):
-            self.probDeathIfHospByProfile.append(Beta(mean=0.1, st_dev=0.032, minimum=0, maximum=1))
+            self.probDeathIfHospByProfile.append(Beta(mean=0.2, st_dev=0.032, minimum=0, maximum=1))
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),    # b
@@ -85,11 +61,19 @@ class COVIDParameters(EpiParameters):
         self.ratioProbHospAToB = Uniform(0.5, 1.5)
         self.ratioDurInfAToB = Uniform(1, 1.5)
 
+        # ------------------------------
         # calculate dependent parameters
+        self.sizeSByAge = []
+        self.sizeEProfile0ByAge = []
+        self.importRateByAge = []
+        self.distS0ToSs = None
+        self.distE0ToEs = None
         self.probNovelStrain = None
         self.vaccRate = None
         self.matrixChangeInContactsY1 = None
         self.matrixChangeInContactsY1Plus = None
+        self.relativeProbHosp = [None] * self.nAgeGroups
+        self.probHospByAgeAndProfile = [None] * self.nAgeGroups
         self.ratesOfLeavingE = [None] * self.nProfiles
         self.ratesOfLeavingI = [None] * self.nProfiles
         self.ratesOfLeavingHosp = [None] * self.nProfiles
@@ -100,18 +84,43 @@ class COVIDParameters(EpiParameters):
         self.ratesOfDeathInHosp = [None] * self.nProfiles
         self.rateOfLosingVacImmunity = None
 
-        self.calculate_dependent_params()
+        self.calculate_dependent_params(us_age_dist=us_age_dist,
+                                        hosp_relative_risk=hosp_relative_risk,
+                                        importation_rate=importation_rate)
 
         # build the dictionary of parameters
         self.build_dict_of_params()
 
-    def calculate_dependent_params(self):
+    def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, importation_rate):
+
+        self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
+        self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
+
+        for a in range(self.nAgeGroups):
+            self.sizeSByAge.append(AMultinomialOutcome(par_multinomial=self.distS0ToSs, outcome_index=a))
+            self.sizeEProfile0ByAge.append(AMultinomialOutcome(par_multinomial=self.distE0ToEs, outcome_index=a))
+            self.importRateByAge.append(Constant(value=importation_rate * us_age_dist[a]))
 
         # for the novel strain
         self.R0s[1] = Product(parameters=[self.R0s[0], self.ratioTransmmisibilityAToB])
+
+        # relative probability of hospitalization to age 5-17
+        for a in range(self.nAgeGroups):
+            if a == AgeGroups.Age_5_19.value:
+                self.relativeProbHosp[a] = Constant(1)
+            else:
+                self.relativeProbHosp[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a]/2)
+
+        # probability of hospitalization by age
+        for a in range(self.nAgeGroups):
+            self.probHospByAgeAndProfile[a] = [Product(
+                parameters=[self.probHosp5To17, self.relativeProbHosp[a]]), None]
+
+        # probability of hospitalization for new variant
         for a in range(self.nAgeGroups):
             self.probHospByAgeAndProfile[a][1] = Product(
                 parameters=[self.probHospByAgeAndProfile[a][0], self.ratioProbHospAToB])
+
         self.durIByProfile[1] = Product(parameters=[self.durIByProfile[0], self.ratioDurInfAToB])
 
         # probability of novel strain
@@ -182,6 +191,8 @@ class COVIDParameters(EpiParameters):
              'Rates of leaving Hosp': self.ratesOfLeavingHosp,
              'Rates of leaving R': self.ratesOfLeavingR,
 
+             'Prob Hosp for 5-17': self.probHosp5To17,
+             'Relative prob hosp': self.relativeProbHosp,
              'Prob Death | Hosp': self.probDeathIfHospByProfile,
              'Logit of prob death in Hosp': self.logitProbDeathInHosp,
              'Rate of death in Hosp': self.ratesOfDeathInHosp,

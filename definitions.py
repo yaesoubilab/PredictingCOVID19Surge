@@ -7,6 +7,14 @@ CALIB_PERIOD = 1.5  # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
 PROJ_PERIOD = 0.75  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
+# -------------------
+# feasibility ranges
+# -------------------
+MAX_HOSP = 50  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
+
+
+# --------------------
+# --------------------
 AGES = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65-79yrs', '80+yrs']
 PROFILES = ['Current', 'Novel', 'Vaccinated']
 
