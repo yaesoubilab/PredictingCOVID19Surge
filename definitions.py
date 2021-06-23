@@ -10,12 +10,14 @@ SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 # -------------------
 # feasibility ranges
 # -------------------
-MAX_HOSP_RATE = 50  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
-
-
-# --------------------
-# --------------------
 AGES = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
+FACTOR = 3
+MAX_HOSP_RATE = 20.5*FACTOR  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
+MAX_HOSP_RATE_BY_AGE = [2.2*FACTOR, 1.3*FACTOR, 9.7*FACTOR, 28.3*FACTOR, 51.1*FACTOR, 140*FACTOR]
+
+
+# --------------------
+# --------------------
 PROFILES = ['Current', 'Novel', 'Vaccinated']
 
 
