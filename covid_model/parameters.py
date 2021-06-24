@@ -37,12 +37,6 @@ class COVIDParameters(EpiParameters):
         # the probability of hospitalization is assumed to be age- and profile-dependent
         self.probHosp5To17 = Uniform(0.001, 0.002)
 
-        # probability of death if hospitalized is age-independent
-        # TODO: https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
-        self.probDeathIfHospByProfile = []
-        for p in range(self.nProfiles):
-            self.probDeathIfHospByProfile.append(Beta(mean=0.2, st_dev=0.032, minimum=0, maximum=1))
-
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),    # b
                                Uniform(minimum=1, maximum=1.2),     # t_min
@@ -75,24 +69,26 @@ class COVIDParameters(EpiParameters):
         self.matrixChangeInContactsY1Plus = None
         self.relativeProbHosp = [None] * self.nAgeGroups
         self.probHospByAgeAndProfile = [None] * self.nAgeGroups
+        self.probDeathIfHospByAgeAndProfile = [None] * self.nAgeGroups
         self.ratesOfLeavingE = [None] * self.nProfiles
         self.ratesOfLeavingI = [None] * self.nProfiles
         self.ratesOfLeavingHosp = [None] * self.nProfiles
         self.ratesOfLeavingR = [None] * self.nProfiles
         self.infectivity = [None] * self.nProfiles
         self.durInfec = [None] * self.nProfiles
-        self.logitProbDeathInHosp = [None] * self.nProfiles
-        self.ratesOfDeathInHosp = [None] * self.nProfiles
+        self.logitProbDeathInHospByAge = [None] * self.nAgeGroups
+        self.ratesOfDeathInHospByAge = [None] * self.nAgeGroups
         self.rateOfLosingVacImmunity = None
 
         self.calculate_dependent_params(us_age_dist=us_age_dist,
                                         hosp_relative_risk=hosp_relative_risk,
+                                        prob_death=prob_death,
                                         importation_rate=importation_rate)
 
         # build the dictionary of parameters
         self.build_dict_of_params()
 
-    def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, importation_rate):
+    def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, prob_death, importation_rate):
 
         self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
         self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
@@ -121,6 +117,14 @@ class COVIDParameters(EpiParameters):
         for a in range(self.nAgeGroups):
             self.probHospByAgeAndProfile[a][1] = Product(
                 parameters=[self.probHospByAgeAndProfile[a][0], self.ratioProbHospAToB])
+
+        # probability of death by age
+        for a in range(self.nAgeGroups):
+            if a == AgeGroups.Age_0_4.value:
+                self.probDeathIfHospByAgeAndProfile[a] = [Constant(0), Constant(0)]
+            else:
+                self.probDeathIfHospByAgeAndProfile[a] = [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25),
+                                                          Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25)]
 
         self.durIByProfile[1] = Product(parameters=[self.durIByProfile[0], self.ratioDurInfAToB])
 
@@ -159,10 +163,15 @@ class COVIDParameters(EpiParameters):
                 par_numerator=self.R0s[p],
                 par_denominator=self.durInfec[p])
 
-            # Pr{Death in Hosp} = p
-            # Rate{Death in Hosp} = p/(1-p) * Rate{Leaving Hosp}
-            self.logitProbDeathInHosp[p] = Logit(par=self.probDeathIfHospByProfile[p])
-            self.ratesOfDeathInHosp[p] = Product(parameters=[self.logitProbDeathInHosp[p], self.ratesOfLeavingHosp[p]])
+        for a in range(self.nAgeGroups):
+            self.logitProbDeathInHospByAge[a] = [None] * self.nProfiles
+            self.ratesOfDeathInHospByAge[a] = [None] * self.nProfiles
+            for p in range(self.nProfiles):
+                # Pr{Death in Hosp} = p
+                # Rate{Death in Hosp} = p/(1-p) * Rate{Leaving Hosp}
+                self.logitProbDeathInHospByAge[a][p] = Logit(par=self.probDeathIfHospByAgeAndProfile[a][p])
+                self.ratesOfDeathInHospByAge[a][p] = Product(
+                    parameters=[self.logitProbDeathInHospByAge[a][p], self.ratesOfLeavingHosp[p]])
 
     def build_dict_of_params(self):
         self.dictOfParams = dict(
@@ -194,9 +203,7 @@ class COVIDParameters(EpiParameters):
 
              'Prob Hosp for 5-17': self.probHosp5To17,
              'Relative prob hosp': self.relativeProbHosp,
-             'Prob Death | Hosp': self.probDeathIfHospByProfile,
-             'Logit of prob death in Hosp': self.logitProbDeathInHosp,
-             'Rate of death in Hosp': self.ratesOfDeathInHosp,
+
 
              'Importation rate': self.importRateByAge,
              'Prob novel strain params': self.probNovelStrainParams,
@@ -215,3 +222,12 @@ class COVIDParameters(EpiParameters):
 
         for a in range(self.nAgeGroups):
             self.dictOfParams['Prob Hosp-age '+str(a)] = self.probHospByAgeAndProfile[a]
+
+        for a in range(self.nAgeGroups):
+            self.dictOfParams['Prob Death|Hosp-age' + str(a)] = self.probDeathIfHospByAgeAndProfile[a]
+
+        for a in range(self.nAgeGroups):
+            self.dictOfParams['Logit of prob death in Hosp' + str(a)] = self.logitProbDeathInHospByAge[a]
+
+        for a in range(self.nAgeGroups):
+            self.dictOfParams['Rate of death in Hosp' + str(a)] = self.ratesOfDeathInHospByAge[a]

@@ -23,7 +23,7 @@ class COVIDSettings(ModelSettings):
 
         # economic evaluation settings
         self.warmUpPeriod = D.CALIB_PERIOD
-        self.collectEconEval = True  # to collect cost and health outcomes
+        self.collectEconEval = False  # to collect cost and health outcomes
         self.annualDiscountRate = 0.0
 
         # if physical distancing was in effect in the first 1.5 years

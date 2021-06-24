@@ -115,7 +115,7 @@ def build_covid_model(model):
             leaving_Rs[i] = EpiIndepEvent(
                 name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[p], destination=Ss[a])
             deaths_in_hosp[i] = EpiIndepEvent(
-                name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHosp[p], destination=Ds[i])
+                name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][p], destination=Ds[i])
             vaccination_in_R[i] = EpiIndepEvent(
                 name='Vaccinating R-'+str_a_p, rate_param=params.vaccRate, destination=Vs[a])
 
