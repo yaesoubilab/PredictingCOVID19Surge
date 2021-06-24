@@ -17,6 +17,7 @@ class COVIDParameters(EpiParameters):
         # -------- model main parameters -------------
         us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.096, 0.068]
         hosp_relative_risk = [2, 1, 10.2, 25.0, 40.0, 73.8] # https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
+        prob_death = [0, 0.002, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
 
         self.sizeS0 = Constant(100000)
@@ -109,7 +110,7 @@ class COVIDParameters(EpiParameters):
             if a == AgeGroups.Age_5_19.value:
                 self.relativeProbHosp[a] = Constant(1)
             else:
-                self.relativeProbHosp[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a]/2)
+                self.relativeProbHosp[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a]*0.25)
 
         # probability of hospitalization by age
         for a in range(self.nAgeGroups):
