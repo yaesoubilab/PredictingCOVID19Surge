@@ -20,7 +20,7 @@ class COVIDParameters(EpiParameters):
         prob_death = [0, 0.002, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
 
-        self.sizeS0 = Constant(100000)
+        self.sizeS0 = Constant(500000)
         self.sizeE0 = UniformDiscrete(minimum=1, maximum=5)
         self.R0s = [Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4), None]
 

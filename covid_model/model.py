@@ -6,8 +6,9 @@ from apace.Event import EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
+from covid_model.data import MAX_HOSP_RATE, MIN_HOSP_RATE
 from covid_model.parameters import COVIDParameters
-from definitions import AgeGroupsProfiles, MAX_HOSP_RATE
+from definitions import AgeGroupsProfiles
 
 
 def build_covid_model(model):
@@ -292,7 +293,7 @@ def build_covid_model(model):
     if sets.calcLikelihood:
         new_hosp_rate_by_age[0].add_feasible_conditions(
             feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE/100000,
-                                                   min_threshold_to_hit=20/100000))
+                                                   min_threshold_to_hit=MIN_HOSP_RATE/100000))
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
