@@ -2,13 +2,18 @@
 
 # https://usafacts.org/visualizations/covid-vaccine-tracker-states/
 VACCINE_COVERAGE_OVER_TIME = [
-    [52+9, 0.0847*100],  # March 4
-    [52+13, 0.1767*100],  # April 2
-    [52+17, 0.3089*100],  # April 30
-    [52+20, 0.3822*100],  # May 21
+    # week, value (%)
+    [49, 1.0718],  # 31-Jan-21
+    [53, 6.9001],  # 28-Feb-21
+    [57, 14.792],  # 28-Mar-21
+    [61, 27.7761],  # 25-Apr-21
+    [65, 38.9504],  # 23-May-21
+    [69, 45.2347],  # 20-Jun-21
+    [70, 46.43, 32.31, 65.57]  # 27-Jun-21
 ]
 
 VACCINE_COVERAGE_BY_AGE = [
+    # week, value
     [[52+20, 0]],    # 0-4
     [[52+20, 20]],   # 5-17
     [[52+20, 35]],   # 19-29
@@ -26,6 +31,7 @@ MIN_HOSP_RATE_BY_AGE = [9.4, 2, 1.1, 3.8, 11.1, 24.7, 58.4, 103]
 
 # age distribution of hospitalization
 HOSP_AGE_DIST = [
+    # week, value, minimum, maximum
     [[52, 0.69, 0, 1.9]],       # 0-4
     [[52, 1.2, 0, 3.6]],        # 5-17
     [[52, 29.0, 19.4, 41.8]],   # 19-29
