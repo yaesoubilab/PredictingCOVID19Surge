@@ -39,7 +39,7 @@ class COVIDParameters(EpiParameters):
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),    # b
-                               Uniform(minimum=1, maximum=1.2),     # t_min
+                               Uniform(minimum=0.7, maximum=1.1),     # t_min
                                Uniform(minimum=1.5, maximum=2),     # t_middle
                                Uniform(minimum=0, maximum=0.5),     # min
                                Uniform(minimum=1.25, maximum=1.75)] # max
@@ -50,7 +50,7 @@ class COVIDParameters(EpiParameters):
 
         # parameters of the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                      Beta(mean=1.25, st_dev=0.2, minimum=0.75, maximum=1.75),  # t0
+                                      Beta(mean=1.75, st_dev=0.1, minimum=1, maximum=2),  # t_middle
                                       Uniform(minimum=0.4, maximum=0.6)]  # max
         self.ratioTransmmisibilityAToB = Uniform(1, 2)
         self.ratioProbHospAToB = Uniform(0.5, 1.5)
