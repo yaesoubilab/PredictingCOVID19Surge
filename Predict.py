@@ -4,5 +4,5 @@ from covid_prediction.DataDirectory import *
 
 df = pd.read_csv('outputs/prediction_dataset/cleaned_data.csv')
 
-DRT = DecisionTree(features=FEATURES, y_name=Y_NAME)
-DRT.run(df=df)
+Model = LogRegression(features=FEATURES, y_name=Y_NAME)
+Model.run(df=df)

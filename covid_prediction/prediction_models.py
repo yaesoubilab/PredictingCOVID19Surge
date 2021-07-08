@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 import matplotlib.pyplot as plt
 
@@ -18,14 +19,40 @@ class Classifier:
     def run(self, df, test_size, rng):
         raise NotImplementedError
 
-    def _update_performance_plot_roc_curve(self, y_test, y_test_hat, model_name=None, display_roc_curve=True):
+    def _update_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
+                                           model_name=None, display_roc_curve=True):
         """
         :param y_test: actual binary y_test
         :param y_test_hat: predicted binary y_test
         """
-        self.performanceTest = PerformanceSummary(y_test=y_test, y_test_hat=y_test_hat)
+        self.performanceTest = PerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob)
         if display_roc_curve:
             self.performanceTest.plot_roc_curve(model_name=model_name)
+
+
+class LogRegression(Classifier):
+    def __init__(self, features, y_name):
+        super().__init__(features, y_name)
+
+    def run(self, df, test_size=0.2, display_roc_curve=True):
+        X = np.asarray(df[self.features])
+        y = np.asarray(df[self.y_name])
+
+        # split train vs. test set
+        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+
+        # fit model
+        LR = LogisticRegression()
+        LR.fit(X=x_train, y=y_train)
+
+        # prediction
+        y_test_hat = LR.predict(x_test)
+        y_test_hat_prob = LR.predict_proba(x_test)
+
+        # update model performance attributes
+        self._update_performance_plot_roc_curve(
+            y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
+            model_name='Logistic Regression', display_roc_curve=display_roc_curve)
 
 
 class DecisionTree(Classifier):
@@ -36,7 +63,7 @@ class DecisionTree(Classifier):
         X = np.asarray(df[self.features])
         y = np.asarray(df[self.y_name])
 
-        # split train vs. text
+        # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
         # x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=rng)
 
@@ -49,7 +76,7 @@ class DecisionTree(Classifier):
 
         # update model performance attributes
         self._update_performance_plot_roc_curve(
-            y_test=y_test, y_test_hat=y_test_hat, display_roc_curve=display_roc_curve)
+            y_test=y_test, y_test_hat=y_test_hat, model_name='Decision Tree', display_roc_curve=display_roc_curve)
 
         # feature importance
         fi = DTR.feature_importances_
@@ -75,14 +102,18 @@ class PerformanceSummary:
     def print(self):
         print("Sensitivity:", self.sensitivity)
         print("Specificity:", self.specificity)
-        print("AUC:", self.roc_auc)
+        if self.y_test_hat_prob is not None:
+            print("AUC:", self.roc_auc)
 
     def plot_roc_curve(self, model_name):
         fpr, tpr, threshold = roc_curve(self.y_test, self.y_test_hat_prob[:, 1])
-        plt.plot(fpr, tpr, color='lightblue', lw=0.5, alpha=0.4)
-        plt.plot([0, 1], [0, 1], color='blue', lw=0.8, alpha=0.6, linestyle='--')
+        plt.plot(fpr, tpr, color='green', lw=1, alpha=1)
+        plt.plot([0, 1], [0, 1], color='blue', lw=1, alpha=1, linestyle='--')
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title('ROC curve for {} model'.format(model_name))
+        if self.y_test_hat_prob is not None:
+            plt.text(0.7, 0.1, 'AUC: {}'.format(round(self.roc_auc, 2)))
+        plt.show()
