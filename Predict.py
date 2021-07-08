@@ -1,2 +1,8 @@
+import pandas as pd
+from covid_prediction.prediction_models import *
+from covid_prediction.DataDirectory import *
 
-# predict
+df = pd.read_csv('outputs/prediction_dataset/cleaned_data.csv')
+
+DRT = DecisionTree(features=FEATURES, y_name=Y_NAME)
+DRT.run(df=df)
