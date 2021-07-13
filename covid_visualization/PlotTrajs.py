@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from covid_model.data import MAX_HOSP_RATE, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE
+from covid_model.data import MAX_HOSP_RATE, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, HOSP_AGE_DIST
 from definitions import AgeGroups, Profiles, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
@@ -26,7 +26,9 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
 
     indexer = Def.AgeGroupsProfiles(n_age_groups=len(AgeGroups), n_profiles=len(Profiles))
 
+    # -----------------------------------------------------------------
     # ------ plot information for the validation plot (by age) --------
+    # -----------------------------------------------------------------
     if IF_MAKE_VALIDATION_PLOTS:
         for a in range(indexer.nAgeGroups):
 
@@ -63,11 +65,13 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                           file_name=filename_validation,
                                           figure_size=(11, 5.5))
 
+    # -----------------------------------------------------
     # ------ plot information for the summary plot --------
+    # -----------------------------------------------------
     obs_inc_rate = A.TrajPlotInfo(outcome_name='Obs: Incidence rate',
                                   title='Incidence rate\n(per 100,000 population)',
                                   y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
-    obs_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Hospitalization rate',
+    obs_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: New hospitalization rate',
                                    title='Hospitalization rate\n(per 100,000 population)',
                                    y_range=(0, MAX_HOSP_RATE * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
                                    calibration_info=A.CalibrationTargetPlotInfo(
@@ -93,7 +97,9 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   figure_size=(5, 5)
                                   )
 
+    # -----------------------------------------------------
     # ------ plot information for the rates by age --------
+    # -----------------------------------------------------
     incd_rate_by_age = []
     hosp_rate_by_age = []
     cum_death_rate_by_age = []
@@ -104,7 +110,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
 
         incd_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Incidence rate-{}'.format(str_a),
-            title=str_a, y_label='Incidence rate\n(per 100,000 population) ' if a == 0 else None,
+            title=str_a, y_label='Cumulative incidence rate\n(per 100,000 population) ' if a == 0 else None,
             y_range=(0, 20000), y_multiplier=100000, x_multiplier=incd_multiplier))
         hosp_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Hospitalization rate-{}'.format(str_a),
@@ -135,40 +141,44 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   file_name=filename_validation,
                                   figure_size=(9.5, 5))
 
+    # --------------------------------------------------------------------
     # ------ plot information for the age-distribution of outcome --------
-    age_dist_incd = []
-    age_dist_in_hosp = []
+    # --------------------------------------------------------------------
+    age_dist_cum_incd = []
+    age_dist_cum_hosp = []
     age_dist_cum_death = []
-    age_dist_cum_vaccine = []
 
     for a in range(indexer.nAgeGroups):
 
         str_a = indexer.get_str_age(age_group=a)
 
-        age_dist_incd.append(A.TrajPlotInfo(
-            outcome_name='Incidence-{} (%)'.format(str_a),
-            title=str_a, y_label='Age-distribution of\nincident (%)' if a == 0 else None,
-            y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
-        age_dist_in_hosp.append(A.TrajPlotInfo(
-            outcome_name='Hospitalizations-{} (%)'.format(str_a),
-            title=str_a, y_label='Age-distribution of\nhospitalizations (%)' if a == 0 else None,
-            y_range=(0, 100), y_multiplier=100, x_multiplier=incd_multiplier))
+        # calibration info for age distribution
+        if a in (AgeGroups.Age_65_79.value, AgeGroups.Age_80_.value):
+            calib_info = None
+        else:
+            calib_info = A.CalibrationTargetPlotInfo(rows_of_data=HOSP_AGE_DIST[a])
+
+        age_dist_cum_incd.append(A.TrajPlotInfo(
+            outcome_name='Cumulative incidence-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\ncumulative incident (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+        age_dist_cum_hosp.append(A.TrajPlotInfo(
+            outcome_name='Cumulative hospitalizations-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\ncumulative hospitalizations (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
+            calibration_info=calib_info))
         age_dist_cum_death.append(A.TrajPlotInfo(
             outcome_name='Cumulative death-{} (%)'.format(str_a),
             title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
-        age_dist_cum_vaccine.append(A.TrajPlotInfo(
-            outcome_name='Cumulative vaccination-{} (%)'.format(str_a),
-            title=str_a, y_label='Age-distribution of\n cumulative vaccination (%)' if a == 0 else None,
-            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
+
 
     filename_validation = 'outputs/fig_trajs/age_dist.png'
-    list_plot_info = age_dist_incd
-    list_plot_info.extend(age_dist_in_hosp)
+    list_plot_info = age_dist_cum_incd
+    list_plot_info.extend(age_dist_cum_hosp)
     #list_plot_info.extend(age_dist_cum_death)
-    list_plot_info.extend(age_dist_cum_vaccine)
     A.Y_LABEL_COORD_X = -0.25
-    sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
+    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=6,
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(9.5, 5))
+                                  figure_size=(9.5, 4))
