@@ -38,11 +38,18 @@ class COVIDParameters(EpiParameters):
         self.probHosp5To17 = Uniform(0.001, 0.002)
 
         # vaccination rate is age-dependent
-        self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),    # b
-                               Uniform(minimum=0.7, maximum=1.1),     # t_min
-                               Uniform(minimum=1.5, maximum=2),     # t_middle
-                               Uniform(minimum=0, maximum=0.5),     # min
-                               Uniform(minimum=1.25, maximum=1.75)] # max
+        self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),        # b
+                               Uniform(minimum=1.5, maximum=2),         # t_middle
+                               Uniform(minimum=0, maximum=0.5),         # min
+                               Uniform(minimum=1.25, maximum=1.75)]     # max
+        self.vaccRateTMinByAge = [
+            Constant(0),  # 0-4
+            Uniform(minimum=0.7, maximum=1.1),  # 5-19
+            Uniform(minimum=0.7, maximum=1.1),  # 20-49
+            Uniform(minimum=0.7, maximum=1.1),  # 50-64
+            Uniform(minimum=0.7, maximum=1.1),  # 65-79
+            Uniform(minimum=0.7, maximum=1.1)   # 80+
+        ]
 
         self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
         self.changeInContactY1 = Uniform(-0.75, -0.25)
@@ -64,7 +71,7 @@ class COVIDParameters(EpiParameters):
         self.distS0ToSs = None
         self.distE0ToEs = None
         self.probNovelStrain = None
-        self.vaccRate = None
+        self.vaccRateByAge = [None] * self.nAgeGroups
         self.matrixChangeInContactsY1 = None
         self.matrixChangeInContactsY1Plus = None
         self.relativeProbHosp = [None] * self.nAgeGroups
@@ -135,12 +142,13 @@ class COVIDParameters(EpiParameters):
             par_max=self.probNovelStrainParams[2])
 
         # vaccination rate
-        self.vaccRate = TimeDependentSigmoid(
-            par_b=self.vaccRateParams[0],
-            par_t_min=self.vaccRateParams[1],
-            par_t_middle=self.vaccRateParams[2],
-            par_min=self.vaccRateParams[3],
-            par_max=self.vaccRateParams[4])
+        for a in range(self.nAgeGroups):
+            self.vaccRateByAge[a] = TimeDependentSigmoid(
+                par_b=self.vaccRateParams[0],
+                par_t_min=self.vaccRateTMinByAge[a],
+                par_t_middle=self.vaccRateParams[1],
+                par_min=self.vaccRateParams[2],
+                par_max=self.vaccRateParams[3])
 
         # change in contact matrices
         self.matrixChangeInContactsY1 = MatrixOfConstantParams([[self.changeInContactY1]])
@@ -204,12 +212,13 @@ class COVIDParameters(EpiParameters):
              'Prob Hosp for 5-17': self.probHosp5To17,
              'Relative prob hosp': self.relativeProbHosp,
 
-
              'Importation rate': self.importRateByAge,
              'Prob novel strain params': self.probNovelStrainParams,
              'Prob novel strain': self.probNovelStrain,
+
              'Vaccination rate params': self.vaccRateParams,
-             'Vaccination rate': self.vaccRate,
+             'Vaccination rate t_min by age': self.vaccRateTMinByAge,
+             'Vaccination rate': self.vaccRateByAge,
              'Rate of losing vaccine immunity': self.rateOfLosingVacImmunity,
 
              'PD Y1 thresholds': self.pdY1Thresholds,
