@@ -23,8 +23,8 @@ class AgeGroups(Enum):
     Age_5_19 = 1
     Age_20_49 = 2
     Age_50_64 = 3
-    Age_65_79 = 4
-    Age_80_ = 5
+    Age_65_74 = 4
+    Age_75_ = 5
 
 
 class AgeGroupsProfiles:
