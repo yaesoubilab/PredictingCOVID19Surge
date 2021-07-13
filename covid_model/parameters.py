@@ -16,7 +16,7 @@ class COVIDParameters(EpiParameters):
 
         # -------- model main parameters -------------
         us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.096, 0.068]
-        hosp_relative_risk = [2, 1, 10.2, 25.0, 40.0, 73.8] # https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html
+        hosp_relative_risk = [1, 1, 1.7, 4, 6, 10.8]
         prob_death = [0, 0.002, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
 
@@ -35,14 +35,21 @@ class COVIDParameters(EpiParameters):
         self.durVacImmunityByProfile = Uniform(0.5, 1.5)  # Beta(mean=1.5, st_dev=0.25, minimum=0.5, maximum=2.5)
 
         # the probability of hospitalization is assumed to be age- and profile-dependent
-        self.probHosp5To17 = Uniform(0.001, 0.002)
+        self.probHosp5To17 = Uniform(0.001, 0.01)
 
         # vaccination rate is age-dependent
-        self.vaccRateParams = [Uniform(minimum=-10, maximum=-6),    # b
-                               Uniform(minimum=0.7, maximum=1.1),     # t_min
-                               Uniform(minimum=1.5, maximum=2),     # t_middle
-                               Uniform(minimum=0, maximum=0.5),     # min
-                               Uniform(minimum=1.25, maximum=1.75)] # max
+        self.vaccRateParams = [Uniform(minimum=-10, maximum=-5),        # b
+                               Uniform(minimum=1.5, maximum=2.5),         # t_middle
+                               Uniform(minimum=0.25, maximum=0.5),         # min
+                               Uniform(minimum=2, maximum=3)]     # max
+        self.vaccRateTMinByAge = [
+            Constant(100),                      # 0-4
+            Uniform(minimum=1.0, maximum=1.4),  # 5-19
+            Uniform(minimum=1.0, maximum=1.4),  # 20-49
+            Uniform(minimum=0.9, maximum=1.3),  # 50-64
+            Uniform(minimum=0.8, maximum=1.2),  # 65-75
+            Uniform(minimum=0.7, maximum=1.1)   # 75+
+        ]
 
         self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
         self.changeInContactY1 = Uniform(-0.75, -0.25)
@@ -64,7 +71,7 @@ class COVIDParameters(EpiParameters):
         self.distS0ToSs = None
         self.distE0ToEs = None
         self.probNovelStrain = None
-        self.vaccRate = None
+        self.vaccRateByAge = [None] * self.nAgeGroups
         self.matrixChangeInContactsY1 = None
         self.matrixChangeInContactsY1Plus = None
         self.relativeProbHosp = [None] * self.nAgeGroups
@@ -135,12 +142,16 @@ class COVIDParameters(EpiParameters):
             par_max=self.probNovelStrainParams[2])
 
         # vaccination rate
-        self.vaccRate = TimeDependentSigmoid(
-            par_b=self.vaccRateParams[0],
-            par_t_min=self.vaccRateParams[1],
-            par_t_middle=self.vaccRateParams[2],
-            par_min=self.vaccRateParams[3],
-            par_max=self.vaccRateParams[4])
+        for a in range(self.nAgeGroups):
+            if a == AgeGroups.Age_0_4.value:
+                self.vaccRateByAge[a] = Constant(0)
+            else:
+                self.vaccRateByAge[a] = TimeDependentSigmoid(
+                    par_b=self.vaccRateParams[0],
+                    par_t_min=self.vaccRateTMinByAge[a],
+                    par_t_middle=self.vaccRateParams[1],
+                    par_min=self.vaccRateParams[2],
+                    par_max=self.vaccRateParams[3])
 
         # change in contact matrices
         self.matrixChangeInContactsY1 = MatrixOfConstantParams([[self.changeInContactY1]])
@@ -204,12 +215,13 @@ class COVIDParameters(EpiParameters):
              'Prob Hosp for 5-17': self.probHosp5To17,
              'Relative prob hosp': self.relativeProbHosp,
 
-
              'Importation rate': self.importRateByAge,
              'Prob novel strain params': self.probNovelStrainParams,
              'Prob novel strain': self.probNovelStrain,
+
              'Vaccination rate params': self.vaccRateParams,
-             'Vaccination rate': self.vaccRate,
+             'Vaccination rate t_min by age': self.vaccRateTMinByAge,
+             'Vaccination rate': self.vaccRateByAge,
              'Rate of losing vaccine immunity': self.rateOfLosingVacImmunity,
 
              'PD Y1 thresholds': self.pdY1Thresholds,

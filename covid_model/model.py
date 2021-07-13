@@ -1,10 +1,9 @@
 from SimPy.Parameters import Constant
 from apace.CalibrationSupport import FeasibleConditions
-from apace.Compartment import Compartment, ChanceNode, DeathCompartment
 from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule
-from apace.Event import EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
+from apace.ModelObjects import Compartment, ChanceNode, DeathCompartment, EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.data import MAX_HOSP_RATE, MIN_HOSP_RATE
 from covid_model.parameters import COVIDParameters
@@ -118,12 +117,12 @@ def build_covid_model(model):
             deaths_in_hosp[i] = EpiIndepEvent(
                 name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][p], destination=Ds[i])
             vaccination_in_R[i] = EpiIndepEvent(
-                name='Vaccinating R-'+str_a_p, rate_param=params.vaccRate, destination=Vs[a])
+                name='Vaccinating R-'+str_a_p, rate_param=params.vaccRateByAge[a], destination=Vs[a])
 
         importation[a] = PoissonEvent(
             name='Importation-'+str_a, destination=if_novel_strain[a], rate_param=params.importRateByAge[a])
         vaccination_in_S[a] = EpiIndepEvent(
-            name='Vaccinating S-'+str_a, rate_param=params.vaccRate, destination=Vs[a])
+            name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=Vs[a])
         losing_vaccine_immunity[a] = EpiIndepEvent(
             name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
 
