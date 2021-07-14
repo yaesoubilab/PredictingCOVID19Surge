@@ -1,8 +1,6 @@
 
 
-# TODO: I think this file can be deleted after the changes I suggested to make.
-
-
+# TODO: I think this can be deleted since we are not using it anywhere.
 # current raw names for features of interests
 list_of_features = ['Observation Time', 'Observation Period',
                     'Obs: Incidence', 'Obs: Cumulative vaccination',
