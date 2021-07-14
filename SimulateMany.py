@@ -6,7 +6,7 @@ from covid_visualization.PlotTrajs import plot
 
 N = 16   # number of trajectories to simulate
 IF_PARALLEL = True
-USE_CALIBRATED_MODEL = False
+USE_CALIBRATED_MODEL = True
 
 
 def simulate(n=25, calibrated=True, seeds=None, weights=None, sample_seeds_by_weights=False):
