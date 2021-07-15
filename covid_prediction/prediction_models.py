@@ -76,7 +76,7 @@ class LinearReg(Classifier):
         self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg)
 
 
-class LogRegression(Classifier):
+class LogisticReg(Classifier):
     def __init__(self, features, y_name):
         super().__init__(features, y_name)
 
