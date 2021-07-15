@@ -12,9 +12,11 @@ feature_names = ['Obs: Incidence', 'Obs: Cumulative vaccination']
 y_name_binary = 'if_surpass'
 y_name_rate = 'maximum_occupancy'
 
+# decision tree model
 Model1 = DecisionTree(features=feature_names, y_name=y_name_binary)
 Model1.run(df=df, display_decision_path=True)
 
-# Model2 = LinearReg(features=feature_names, y_name=y_name_rate)
-# Model2.run(df=df)
+# linear regression model
+Model2 = LinearReg(features=feature_names, y_name=y_name_rate)
+Model2.run(df=df)
 
