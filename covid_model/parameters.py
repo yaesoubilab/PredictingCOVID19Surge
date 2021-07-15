@@ -1,6 +1,7 @@
-from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Division, LinearCombination, \
+from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, LinearCombination, \
     Logit, Product, MatrixOfConstantParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete, Gamma
 from apace.Inputs import EpiParameters
+from apace.Inputs import InfectivityFromR0
 from definitions import AgeGroups, Profiles
 
 
@@ -19,6 +20,14 @@ class COVIDParameters(EpiParameters):
         hosp_relative_risk = [1, 1, 1.7, 4, 6, 10.8]
         prob_death = [0, 0.002, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
+        contact_matrix = [
+            [1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1]
+        ]
 
         self.sizeS0 = Constant(500000)
         self.sizeE0 = UniformDiscrete(minimum=1, maximum=5)
@@ -90,12 +99,13 @@ class COVIDParameters(EpiParameters):
         self.calculate_dependent_params(us_age_dist=us_age_dist,
                                         hosp_relative_risk=hosp_relative_risk,
                                         prob_death=prob_death,
-                                        importation_rate=importation_rate)
+                                        importation_rate=importation_rate,
+                                        contact_matrix=contact_matrix)
 
         # build the dictionary of parameters
         self.build_dict_of_params()
 
-    def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, prob_death, importation_rate):
+    def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, prob_death, importation_rate, contact_matrix):
 
         self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
         self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
@@ -169,10 +179,17 @@ class COVIDParameters(EpiParameters):
             self.durInfec[p] = LinearCombination(
                 parameters=[self.durEByProfile[p], self.durIByProfile[p]])
 
-            # infectivity = R0 / (duration of infectiousness)
-            self.infectivity[p] = Division(
-                par_numerator=self.R0s[p],
-                par_denominator=self.durInfec[p])
+            self.infectivity[p] = InfectivityFromR0(
+                contact_matrix=contact_matrix,
+                par_r0=self.R0s[p],
+                list_par_susceptibilities=[Constant(value=1)]*self.nAgeGroups,
+                list_par_pop_sizes=self.sizeSByAge,
+                par_inf_duration=self.durInfec[p])
+
+            # # infectivity = R0 / (duration of infectiousness)
+            # self.infectivity[p] = Division(
+            #     par_numerator=self.R0s[p],
+            #     par_denominator=self.durInfec[p])
 
         for a in range(self.nAgeGroups):
             self.logitProbDeathInHospByAge[a] = [None] * self.nProfiles
