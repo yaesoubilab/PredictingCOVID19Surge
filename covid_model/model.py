@@ -48,8 +48,10 @@ def build_covid_model(model):
     for a in range(indexer.nAgeGroups):
         str_a = indexer.get_str_age(age_group=a)
         Ss[a] = Compartment(name='Susceptible-'+str_a, size_par=params.sizeSByAge[a],
-                            susceptibility_params=[Constant(value=1), Constant(value=1)])
-        Vs[a] = Compartment(name='Vaccinated-'+str_a, num_of_pathogens=2)
+                            susceptibility_params=[Constant(value=1), Constant(value=1)],
+                            row_index_contact_matrix=a)
+        Vs[a] = Compartment(name='Vaccinated-'+str_a, num_of_pathogens=2,
+                            row_index_contact_matrix=a)
 
         for p in range(indexer.nProfiles):
 
@@ -63,11 +65,15 @@ def build_covid_model(model):
             # -------- compartments ----------
             Es[i] = Compartment(name='Exposed-'+str_a_p,
                                 size_par=params.sizeEProfile0ByAge[a] if p == 0 else Constant(value=0),
-                                infectivity_params=infectivity_params, if_empty_to_eradicate=True)
+                                infectivity_params=infectivity_params, if_empty_to_eradicate=True,
+                                row_index_contact_matrix=a)
             Is[i] = Compartment(name='Infectious-'+str_a_p,
-                                infectivity_params=infectivity_params, if_empty_to_eradicate=True)
-            Hs[i] = Compartment(name='Hospitalized-'+str_a_p, num_of_pathogens=2, if_empty_to_eradicate=True)
-            Rs[i] = Compartment(name='Recovered-'+str_a_p, num_of_pathogens=2)
+                                infectivity_params=infectivity_params, if_empty_to_eradicate=True,
+                                row_index_contact_matrix=a)
+            Hs[i] = Compartment(name='Hospitalized-'+str_a_p, num_of_pathogens=2, if_empty_to_eradicate=True,
+                                row_index_contact_matrix=a)
+            Rs[i] = Compartment(name='Recovered-'+str_a_p, num_of_pathogens=2,
+                                row_index_contact_matrix=a)
             Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 
             # --------- chance nodes ---------
@@ -348,6 +354,7 @@ def build_covid_model(model):
 
     model.populate(compartments=compartments,
                    parameters=params,
+                   param_base_contact_matrix=param_base_contact_matrix,
                    chance_nodes=chance_nodes,
                    list_of_sum_time_series=list_of_sum_time_series,
                    list_of_ratio_time_series=list_of_ratio_time_series,
