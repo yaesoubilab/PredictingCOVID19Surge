@@ -23,15 +23,14 @@ HOSPITALIZATION_THRESHOLD = 0.0001  # per 100,000 population
 
 
 # read dataset
-trajs = DataEngineering(directory_name='outputs/trajectories',
-                        calib_period=CALIB_PERIOD,
-                        proj_period=PROJ_PERIOD,
-                        icu_capacity_rate=HOSPITALIZATION_THRESHOLD)
+feature_engineer = FeatureEngineering(
+    directory_name='outputs/trajectories',
+    calib_period=CALIB_PERIOD,
+    proj_period=PROJ_PERIOD,
+    hosp_threshold=HOSPITALIZATION_THRESHOLD)
 
 # create new dataset based on raw data
-df = trajs.pre_processing(id_f_names_list=['Obs: Incidence'],
-                          p_f_names_list=['Obs: Cumulative vaccination'],
-                          outcome_names_list=['maximum_occupancy', 'if_surpass'])
-
-# save new dataset to file
-df.to_csv('outputs/prediction_dataset/cleaned_data.csv', index=False)
+df = feature_engineer.pre_process(
+    names_of_incidence_features=['Obs: Incidence'],
+    names_of_prevalence_features=['Obs: Cumulative vaccination'],
+    file_name='outputs/prediction_dataset/cleaned_data.csv')

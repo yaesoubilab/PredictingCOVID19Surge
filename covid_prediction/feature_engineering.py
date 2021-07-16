@@ -1,43 +1,44 @@
 import os
+
 import pandas as pd
 
 
-class DataEngineering:
-    def __init__(self, directory_name, calib_period, proj_period, icu_capacity_rate):
+class FeatureEngineering:
+    def __init__(self, directory_name, calib_period, proj_period, hosp_threshold):
         """ to create the dataset needed to develop the predictive models """
-        self.directory_name = directory_name
-        self.calib_period = calib_period
-        self.proj_period = proj_period
-        self.sim_duration = proj_period + calib_period
-        self.hospitalization_threshold = icu_capacity_rate
-        self.list_of_dataset_names = os.listdir(directory_name)
+        self.directoryName = directory_name
+        self.calibPeriod = calib_period
+        self.simDuration = proj_period + calib_period
+        self.hospThreshold = hosp_threshold
+        self.datasetNames = os.listdir(directory_name)
 
-    def pre_processing(self, id_f_names_list, p_f_names_list, outcome_names_list):
+    def pre_process(self, names_of_incidence_features, names_of_prevalence_features, file_name):
         """
         read a trajectory in the assigned the directory and pre-process
-        :param id_f_names_list: names of incidence feature names
-        :param p_f_names_list: names of prevalence feature names
-        :param outcome_names_list: names of outcomes to predict
-        :return: pre-processed dataset
+        :param names_of_incidence_features: names of incidence feature
+        :param names_of_prevalence_features: names of prevalence feature
         """
 
         row_list = []
-        for name in self.list_of_dataset_names:
-            df = pd.read_csv('{}/{}'.format(self.directory_name, name))
+        for name in self.datasetNames:
+            df = pd.read_csv('{}/{}'.format(self.directoryName, name))
 
             # create a new row based on this trajectory
-            incidence_f = self._get_incidence_feature(df=df, feature_names=id_f_names_list)
-            prevalence_f = self._get_prevalence_feature(df=df, feature_names=p_f_names_list)
-            row = incidence_f + prevalence_f
+            incidence_f = self._get_incidence_feature(df=df, feature_names=names_of_incidence_features)
+            prevalence_f = self._get_prevalence_feature(df=df, feature_names=names_of_prevalence_features)
+            if_hosp_threshold_passed, hosp_max = self._get_if_surpass_threshold_and_max(df=df)
 
-            if_hosp_thred_passed, hosp_maximum = self._get_if_surpass_threshold_and_max(df=df)
-            row.append(hosp_maximum)
-            row.append(if_hosp_thred_passed)
+            row = incidence_f + prevalence_f
+            row.extend([hosp_max, if_hosp_threshold_passed])
             row_list.append(row)
 
         # convert to DataFrame
-        df = pd.DataFrame(row_list, columns=(id_f_names_list + p_f_names_list + outcome_names_list))
-        return df
+        outcomes_labels = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
+        df = pd.DataFrame(data=row_list,
+                          columns=(names_of_incidence_features + names_of_prevalence_features + outcomes_labels))
+
+        # save new dataset to file
+        df.to_csv(file_name, index=False)
 
     def _get_if_surpass_threshold_and_max(self, df):
         """
@@ -50,12 +51,12 @@ class DataEngineering:
         # get maximum hospitalization rate during [calib_period, proj_period]
         maximum = 0
         for pair in zip(observation_time_list, hospitalization_rate_list):
-            if self.calib_period <= pair[0] <= self.sim_duration:
+            if self.calibPeriod <= pair[0] <= self.simDuration:
                 maximum = max(pair[1], maximum)
 
         # decide if surpass the hospitalization threshold
         if_surpass_threshold = 0
-        if maximum > self.hospitalization_threshold:
+        if maximum > self.hospThreshold:
             if_surpass_threshold = 1
 
         return if_surpass_threshold, maximum
@@ -70,7 +71,7 @@ class DataEngineering:
         incidence_f_list = []
         for feature_name in feature_names:
             for pair in zip(df['Observation Period'], df[feature_name]):
-                if pair[0] == 52 * self.calib_period:
+                if pair[0] == 52 * self.calibPeriod:
                     incidence_f_list.append(pair[1])
         return incidence_f_list
 
@@ -84,6 +85,6 @@ class DataEngineering:
         prevalence_f_list = []
         for feature_name in feature_names:
             for pair in zip(df['Observation Time'], df[feature_name]):
-                if round(pair[0], 3) == self.calib_period:
+                if round(pair[0], 3) == self.calibPeriod:
                     prevalence_f_list.append(pair[1])
         return prevalence_f_list
