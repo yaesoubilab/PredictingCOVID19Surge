@@ -400,7 +400,7 @@ def get_interventions_features_conditions(settings, params, in_hosp_rate):
         # ---------- intervention -------
         pd_year_1 = InterventionAffectingContacts(
             name='Physical distancing Y1',
-            par_change_in_contact_matrix=params.matrixChangeInContactsY1)
+            par_perc_change_in_contact_matrix=params.matrixOfPercChangeInContactsY1)
 
         # --------- features ---------
         # feature defined on the intervention

@@ -1,5 +1,5 @@
 from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, LinearCombination, \
-    Logit, Product, MatrixOfConstantParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete, Gamma
+    Logit, Product, MatrixOfParams, TimeDependentSigmoid, Beta, Uniform, UniformDiscrete, Gamma
 from apace.Inputs import EpiParameters
 from apace.Inputs import InfectivityFromR0
 from definitions import AgeGroups, Profiles
@@ -21,12 +21,12 @@ class COVIDParameters(EpiParameters):
         prob_death = [0, 0.002, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
         contact_matrix = [
-            [1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1]
+            [2.598, 1.917, 3.993, 0.21, 0.039, 0.777],
+            [0.489, 10.904, 4.525, 0.145, 0.038, 0.689],
+            [0.486, 2.571, 9.401, 0.149, 0.037, 1.565],
+            [0.43, 2.307, 5.942, 0.361, 0.069, 2.944],
+            [0.191, 1.01, 2.243, 1.144, 0.154, 1.179],
+            [0.21, 1.038, 1.596, 0.489, 0.396, 0.772]
         ]
 
         self.sizeS0 = Constant(500000)
@@ -61,8 +61,8 @@ class COVIDParameters(EpiParameters):
         ]
 
         self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        self.changeInContactY1 = Uniform(-0.75, -0.25)
-        self.changeInContactY1Plus = Uniform(-0.75, -0.25)
+        self.percChangeInContactY1 = Uniform(-0.75, -0.25)
+        self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
 
         # parameters of the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
@@ -82,8 +82,8 @@ class COVIDParameters(EpiParameters):
         self.distE0ToEs = None
         self.probNovelStrain = None
         self.vaccRateByAge = [None] * self.nAgeGroups
-        self.matrixChangeInContactsY1 = None
-        self.matrixChangeInContactsY1Plus = None
+        self.matrixOfPercChangeInContactsY1 = None
+        self.matrixOfPercChangeInContactsY1Plus = None
         self.relativeProbHosp = [None] * self.nAgeGroups
         self.probHospByAgeAndProfile = [None] * self.nAgeGroups
         self.probDeathIfHospByAgeAndProfile = [None] * self.nAgeGroups
@@ -108,7 +108,7 @@ class COVIDParameters(EpiParameters):
 
     def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, prob_death, importation_rate, contact_matrix):
 
-        self.baseContactMatrix = MatrixOfConstantParams(matrix_of_values=contact_matrix)
+        self.baseContactMatrix = MatrixOfParams(matrix_of_params_or_values=contact_matrix)
         self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
         self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
 
@@ -166,8 +166,12 @@ class COVIDParameters(EpiParameters):
                     par_max=self.vaccRateParams[3])
 
         # change in contact matrices
-        self.matrixChangeInContactsY1 = MatrixOfConstantParams([[self.changeInContactY1]])
-        self.matrixChangeInContactsY1Plus = MatrixOfConstantParams([[self.changeInContactY1Plus]])
+        matrix_of_params_y1 = [[self.percChangeInContactY1] * self.nAgeGroups] * self.nAgeGroups
+        matrix_of_params_y1_plus = [[self.percChangeInContactY1] * self.nAgeGroups] * self.nAgeGroups
+        self.matrixOfPercChangeInContactsY1 = MatrixOfParams(
+            matrix_of_params_or_values=matrix_of_params_y1)
+        self.matrixOfPercChangeInContactsY1Plus = MatrixOfParams(
+            matrix_of_params_or_values=matrix_of_params_y1_plus)
 
         self.rateOfLosingVacImmunity = Inverse(par=self.durVacImmunityByProfile)
 
@@ -246,10 +250,10 @@ class COVIDParameters(EpiParameters):
 
              'PD Y1 thresholds': self.pdY1Thresholds,
 
-             'Change in contacts - PD Y1': self.changeInContactY1,
-             'Change in contacts - PD Y1+': self.changeInContactY1Plus,
-             'Matrix of change in contacts - PD Y1': self.matrixChangeInContactsY1,
-             'Matrix of change in contacts - PD Y1+': self.matrixChangeInContactsY1Plus
+             'Change in contacts - PD Y1': self.percChangeInContactY1,
+             'Change in contacts - PD Y1+': self.percChangeInContactY1Plus,
+             'Matrix of change in contacts - PD Y1': self.matrixOfPercChangeInContactsY1,
+             'Matrix of change in contacts - PD Y1+': self.matrixOfPercChangeInContactsY1Plus
              })
 
         for a in range(self.nAgeGroups):
