@@ -1,10 +1,18 @@
-import pydotplus
+import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeRegressor, export_graphviz
+import pydotplus
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import confusion_matrix, roc_curve, auc, r2_score
-import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeRegressor, export_graphviz
+
+
+# TODO: right now we only include main effects of features but I think adding the interaction and second-order
+#   terms could improve the prediction. Would you modify the classes below so that we can also fit
+#   second-order polynomial models (see eq. 8 here http://article.sapub.org/10.5923.j.statistics.20190904.01.html)?
+#   you get the degree of the polynomial as an argument and then covert a list of features to a list of
+#   polynomial and interaction features using PolynomialFeatures:
+#   https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html.
 
 
 class Classifier:

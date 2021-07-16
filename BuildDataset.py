@@ -30,6 +30,9 @@ feature_engineer = FeatureEngineering(
     hosp_threshold=HOSPITALIZATION_THRESHOLD)
 
 # create new dataset based on raw data
+# TODO: let's use 'Obs: Cumulative hospitalizations', 'Obs: Cumulative vaccination rate' for prevalence features
+#   and 'Obs: New hospitalizations' for incidence feature
+#   (in addition to 'R0s-0' as parameter feature, see my comments on feature_engeering.py)
 df = feature_engineer.pre_process(
     names_of_incidence_features=['Obs: Incidence'],
     names_of_prevalence_features=['Obs: Cumulative vaccination'],

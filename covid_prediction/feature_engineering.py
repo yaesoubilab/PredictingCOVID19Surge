@@ -6,6 +6,11 @@ import pandas as pd
 class FeatureEngineering:
     def __init__(self, directory_name, calib_period, proj_period, hosp_threshold):
         """ to create the dataset needed to develop the predictive models """
+        # TODO: I think instead of calib_period and proj_period we should get
+        #   time_of_prediction and simulation_duration.
+        #   Right now, the time when we'd like to make predictions is at the time when calibration period ends
+        #   (i.e., time_of_prediction=calib_period) but later now we'd like to repeat these predictions
+        #   maybe 4, 6, 8, ... weeks after the calib_period.
         self.directoryName = directory_name
         self.calibPeriod = calib_period
         self.simDuration = proj_period + calib_period
@@ -19,16 +24,24 @@ class FeatureEngineering:
         :param names_of_prevalence_features: names of prevalence feature
         """
 
+        # TODO: we will need to use epidemic parameter values as features too. The list of parameter values
+        #   for each trajectory is here: outputs\summary\parameter_values.csv.
+        #   (row with ID 0 correspond to trajectory 0, row with ID 1 correspond to trajectory 1, etc.)
+        #   You can add a new argument 'names_of_parameter_features' to read the values of
+        #   selected parameters here (if you'd like to test it, read the values of 'R0s-0' parameter as a feature).
+
         row_list = []
         for name in self.datasetNames:
             df = pd.read_csv('{}/{}'.format(self.directoryName, name))
 
             # create a new row based on this trajectory
-            incidence_f = self._get_incidence_feature(df=df, feature_names=names_of_incidence_features)
-            prevalence_f = self._get_prevalence_feature(df=df, feature_names=names_of_prevalence_features)
-            if_hosp_threshold_passed, hosp_max = self._get_if_surpass_threshold_and_max(df=df)
+            # features
+            incd_fs = self._get_incd_features(df=df, feature_names=names_of_incidence_features)
+            prev_fs = self._get_prev_features(df=df, feature_names=names_of_prevalence_features)
+            # outcomes to predict
+            if_hosp_threshold_passed, hosp_max = self._get_if_threshold_passed_and_max(df=df)
 
-            row = incidence_f + prevalence_f
+            row = incd_fs + prev_fs
             row.extend([hosp_max, if_hosp_threshold_passed])
             row_list.append(row)
 
@@ -40,7 +53,7 @@ class FeatureEngineering:
         # save new dataset to file
         df.to_csv(file_name, index=False)
 
-    def _get_if_surpass_threshold_and_max(self, df):
+    def _get_if_threshold_passed_and_max(self, df):
         """
         :return: 'if threshold is passed' (0=no, 1=yes) and 'max hospitalization rate'
         """
@@ -61,7 +74,7 @@ class FeatureEngineering:
 
         return if_surpass_threshold, maximum
 
-    def _get_incidence_feature(self, df, feature_names):
+    def _get_incd_features(self, df, feature_names):
         """
         get value of an incidence feature over the specified week
         :param df: df of interest
@@ -75,7 +88,7 @@ class FeatureEngineering:
                     incidence_f_list.append(pair[1])
         return incidence_f_list
 
-    def _get_prevalence_feature(self, df, feature_names):
+    def _get_prev_features(self, df, feature_names):
         """
         value of a prevalence feature at the specified time
         :param df: df of interest
