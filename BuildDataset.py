@@ -25,15 +25,13 @@ HOSPITALIZATION_THRESHOLD = 0.0001  # per 100,000 population
 # read dataset
 feature_engineer = FeatureEngineering(
     directory_name='outputs/trajectories',
-    calib_period=CALIB_PERIOD,
-    proj_period=PROJ_PERIOD,
+    time_of_prediction=CALIB_PERIOD,
+    sim_duration=PROJ_PERIOD + CALIB_PERIOD,
     hosp_threshold=HOSPITALIZATION_THRESHOLD)
 
 # create new dataset based on raw data
-# TODO: let's use 'Obs: Cumulative hospitalizations', 'Obs: Cumulative vaccination rate' for prevalence features
-#   and 'Obs: New hospitalizations' for incidence feature
-#   (in addition to 'R0s-0' as parameter feature, see my comments on feature_engeering.py)
 df = feature_engineer.pre_process(
-    names_of_incidence_features=['Obs: Incidence'],
-    names_of_prevalence_features=['Obs: Cumulative vaccination'],
+    names_of_incd_fs=['Obs: New hospitalizations'],
+    names_of_prev_fs=['Obs: Cumulative vaccination rate', 'Obs: Cumulative hospitalizations'],
+    names_of_epidemic_fs=['R0s-0'],
     file_name='outputs/prediction_dataset/cleaned_data.csv')

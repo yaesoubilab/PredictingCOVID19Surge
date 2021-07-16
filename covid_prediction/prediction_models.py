@@ -1,28 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pydotplus
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import confusion_matrix, roc_curve, auc, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor, export_graphviz
 
 
-# TODO: right now we only include main effects of features but I think adding the interaction and second-order
-#   terms could improve the prediction. Would you modify the classes below so that we can also fit
-#   second-order polynomial models (see eq. 8 here http://article.sapub.org/10.5923.j.statistics.20190904.01.html)?
-#   you get the degree of the polynomial as an argument and then covert a list of features to a list of
-#   polynomial and interaction features using PolynomialFeatures:
-#   https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html.
-
-
 class Classifier:
-    def __init__(self, features, y_name):
+    def __init__(self, df, features, y_name):
         self.features = features
         self.y_name = y_name
+        self.df = df
 
     def _update_linear_performance(self, y_test, y_test_hat, model):
         """ update model performance for linear regression model & print coefficient/intercept, R-square"""
         self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, linear_model=model)
+        # print coefficient, intercept, and R-square
         self.performanceTest.print()
 
     def _update_binary_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
@@ -64,33 +59,38 @@ class Classifier:
 
 
 class LinearReg(Classifier):
-    def __init__(self, features, y_name):
-        super().__init__(features, y_name)
+    def __init__(self, df, features, y_name):
+        super().__init__(df, features, y_name)
 
-    def run(self, df, test_size=0.2):
-        X = np.asarray(df[self.features])
-        y = np.asarray(df[self.y_name])
+    def run(self, degree_of_polynomial, test_size=0.2, interaction_only=False):
+        X = np.asarray(self.df[self.features])
+        y = np.asarray(self.df[self.y_name])
 
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 
+        # add polynomial terms
+        poly = PolynomialFeatures(degree_of_polynomial, include_bias=False, interaction_only=interaction_only)
+        x_train_poly = poly.fit_transform(x_train)
+        x_test_poly = poly.fit_transform(x_test)
+
         # fit model
-        reg = LinearRegression().fit(X=x_train, y=y_train)
+        reg = LinearRegression().fit(X=x_train_poly, y=y_train)
 
         # prediction
-        y_test_hat = reg.predict(x_test)
+        y_test_hat = reg.predict(x_test_poly)
 
         # update performance
         self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg)
 
 
 class LogisticReg(Classifier):
-    def __init__(self, features, y_name):
-        super().__init__(features, y_name)
+    def __init__(self, df, features, y_name):
+        super().__init__(df, features, y_name)
 
-    def run(self, df, test_size=0.2, display_roc_curve=True):
-        X = np.asarray(df[self.features])
-        y = np.asarray(df[self.y_name])
+    def run(self, test_size=0.2, display_roc_curve=True):
+        X = np.asarray(self.df[self.features])
+        y = np.asarray(self.df[self.y_name])
 
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
@@ -110,12 +110,12 @@ class LogisticReg(Classifier):
 
 
 class DecisionTree(Classifier):
-    def __init__(self, features, y_name):
-        super().__init__(features, y_name)
+    def __init__(self, df, features, y_name):
+        super().__init__(df, features, y_name)
 
-    def run(self, df, test_size=0.2, display_decision_path=True):
-        X = np.asarray(df[self.features])
-        y = np.asarray(df[self.y_name])
+    def run(self, test_size=0.2, display_decision_path=True):
+        X = np.asarray(self.df[self.features])
+        y = np.asarray(self.df[self.y_name])
 
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
