@@ -354,7 +354,7 @@ def build_covid_model(model):
 
     model.populate(compartments=compartments,
                    parameters=params,
-                   param_base_contact_matrix=param_base_contact_matrix,
+                   param_base_contact_matrix=params.baseContactMatrix,
                    chance_nodes=chance_nodes,
                    list_of_sum_time_series=list_of_sum_time_series,
                    list_of_ratio_time_series=list_of_ratio_time_series,

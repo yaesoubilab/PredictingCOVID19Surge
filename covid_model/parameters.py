@@ -74,6 +74,7 @@ class COVIDParameters(EpiParameters):
 
         # ------------------------------
         # calculate dependent parameters
+        self.baseContactMatrix = None
         self.sizeSByAge = []
         self.sizeEProfile0ByAge = []
         self.importRateByAge = []
@@ -107,6 +108,7 @@ class COVIDParameters(EpiParameters):
 
     def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, prob_death, importation_rate, contact_matrix):
 
+        self.baseContactMatrix = MatrixOfConstantParams(matrix_of_values=contact_matrix)
         self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
         self.distE0ToEs = Multinomial(par_n=self.sizeE0, p_values=us_age_dist)
 
@@ -209,6 +211,7 @@ class COVIDParameters(EpiParameters):
              'Distributing E0 to Es': self.distE0ToEs,
              'Size S by age': self.sizeSByAge,
              'Size E by age': self.sizeEProfile0ByAge,
+             'Base contact matrix': self.baseContactMatrix,
 
              'Transmissibility of B to A': self.ratioTransmmisibilityAToB,
              'Prob of hospitalization of B to A': self.ratioProbHospAToB,
