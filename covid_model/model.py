@@ -167,6 +167,7 @@ def build_covid_model(model):
     # rates
     incd_rate_by_age = []
     new_hosp_rate_by_age = []
+    cum_hosp_rate_by_age = []
     cum_death_rate_by_age = []
     cum_vaccine_rate_by_age = []
     # age distributions
@@ -204,6 +205,10 @@ def build_covid_model(model):
     # new hospitalization rate
     new_hosp_rate_by_age.append(RatioTimeSeries(name='New hospitalization rate',
                                                 numerator_sum_time_series=new_hosp_by_age[0],
+                                                denominator_sum_time_series=pop_size_by_age[0],
+                                                if_surveyed=True))
+    cum_hosp_rate_by_age.append(RatioTimeSeries(name='Cumulative hospitalization rate',
+                                                numerator_sum_time_series=cum_hosp_by_age[0],
                                                 denominator_sum_time_series=pop_size_by_age[0],
                                                 if_surveyed=True))
     # cumulative death rate 
@@ -281,9 +286,15 @@ def build_covid_model(model):
             name='Hospitalization rate-'+str_a,
             numerator_sum_time_series=new_hosp_by_age[-1],
             denominator_sum_time_series=pop_size_by_age[-1]))
+
         # cumulative hospitalizations
         cum_hosp_by_age.append(SumCumulativeIncidence(
             name='Cumulative hospitalizations-' + str_a, compartments=Hs_this_age))
+        # rate of cumulative hospitalizations
+        new_hosp_rate_by_age.append(RatioTimeSeries(
+            name='Cumulative hospitalization rate-' + str_a,
+            numerator_sum_time_series=cum_hosp_by_age[-1],
+            denominator_sum_time_series=pop_size_by_age[-1]))
         # age-distribution of cumulative hospitalizations
         age_dist_new_hosp.append(RatioTimeSeries(
             name='Cumulative hospitalizations-'+str_a+' (%)',
@@ -349,6 +360,7 @@ def build_covid_model(model):
     list_of_ratio_time_series = []
     list_of_ratio_time_series.extend(incd_rate_by_age)
     list_of_ratio_time_series.extend(new_hosp_rate_by_age)
+    list_of_ratio_time_series.extend(cum_hosp_rate_by_age)
     list_of_ratio_time_series.extend(cum_death_rate_by_age)
     list_of_ratio_time_series.extend(cum_vaccine_rate_by_age)
     list_of_ratio_time_series.extend(profile_dist_new_hosp)
