@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pydotplus
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import confusion_matrix, roc_curve, auc, r2_score
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.tree import DecisionTreeRegressor, export_graphviz
 
 
@@ -62,7 +62,7 @@ class LinearReg(Classifier):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run(self, degree_of_polynomial, test_size=0.2, interaction_only=False):
+    def run(self, degree_of_polynomial, test_size=0.2, interaction_only=True):
         X = np.asarray(self.df[self.features])
         y = np.asarray(self.df[self.y_name])
 
@@ -70,6 +70,11 @@ class LinearReg(Classifier):
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
 
         # add polynomial terms
+        # TODO: I am not sure why the include_bias argument is set to False. I believe to have the intercept,
+        #   we need to set include_bais = True:
+        #   https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PolynomialFeatures.html.
+        #   What do you think? When I set it to True, R2 score increases.
+
         poly = PolynomialFeatures(degree_of_polynomial, include_bias=False, interaction_only=interaction_only)
         x_train_poly = poly.fit_transform(x_train)
         x_test_poly = poly.fit_transform(x_test)

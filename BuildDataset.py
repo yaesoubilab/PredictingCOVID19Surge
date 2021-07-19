@@ -33,5 +33,5 @@ feature_engineer = FeatureEngineering(
 df = feature_engineer.pre_process(
     names_of_incd_fs=['Obs: New hospitalizations'],
     names_of_prev_fs=['Obs: Cumulative vaccination rate', 'Obs: Cumulative hospitalizations'],
-    names_of_epidemic_fs=['R0s-0'],
+    names_of_parameter_fs=['R0s-0'],
     file_name='outputs/prediction_dataset/cleaned_data.csv')

@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 import pandas as pd
 
@@ -12,27 +13,27 @@ class FeatureEngineering:
         :param hosp_threshold: threshold of hospital capacity
         """
         self.directoryName = directory_name
-        self.timePrediction = time_of_prediction
+        self.timeOfPrediction = time_of_prediction
         self.simDuration = sim_duration
         self.hospThreshold = hosp_threshold
         self.datasetNames = os.listdir(directory_name)
 
-    def pre_process(self, names_of_incd_fs, names_of_prev_fs, names_of_epidemic_fs, file_name):
+    def pre_process(self, names_of_incd_fs, names_of_prev_fs, names_of_parameter_fs, file_name):
         """
         read a trajectory in the assigned the directory and pre-process
         :param names_of_incd_fs: names of incidence feature
         :param names_of_prev_fs: names of prevalence feature
-        :param names_of_epidemic_fs: names of epidemic feature
+        :param names_of_parameter_fs: names of epidemic feature
         :param file_name: name of output csv
         """
 
         # read dataset of epidemic features
-        epi_df = pd.read_csv('outputs/summary/parameter_values.csv')
-        epi_col = []
-        for name in names_of_epidemic_fs:
-            epi_col.append(np.asarray(epi_df[name]))
+        param_df = pd.read_csv('outputs/summary/parameter_values.csv')
+        param_col = []
+        for name in names_of_parameter_fs:
+            param_col.append(np.asarray(param_df[name]))
 
-        row_list = []
+        dataset = []
         for i in range(len(self.datasetNames)):
             df = pd.read_csv('{}/{}'.format(self.directoryName, self.datasetNames[i]))
 
@@ -46,17 +47,17 @@ class FeatureEngineering:
             # incidence features, prevalence features
             traj_row = incd_fs + prev_fs
             # add epidemic parameter values for corresponding trajectory
-            for col in epi_col:
+            for col in param_col:
                 traj_row.append(col[i])
             # max hospital rate and whether surpass capacity
             traj_row.extend([hosp_max, if_hosp_threshold_passed])
 
-            row_list.append(traj_row)
+            dataset.append(traj_row)
 
         # convert to DataFrame
         outcomes_labels = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
-        df = pd.DataFrame(data=row_list,
-                          columns=(names_of_incd_fs + names_of_prev_fs + names_of_epidemic_fs + outcomes_labels))
+        df = pd.DataFrame(data=dataset,
+                          columns=(names_of_incd_fs + names_of_prev_fs + names_of_parameter_fs + outcomes_labels))
 
         # save new dataset to file
         df.to_csv(file_name, index=False)
@@ -72,7 +73,7 @@ class FeatureEngineering:
         # get maximum hospitalization rate during [calib_period, proj_period]
         maximum = 0
         for pair in zip(observation_time_list, hospitalization_rate_list):
-            if self.timePrediction <= pair[0] <= self.simDuration:
+            if self.timeOfPrediction <= pair[0] <= self.simDuration:
                 maximum = max(pair[1], maximum)
 
         # decide if surpass the hospitalization threshold
@@ -92,7 +93,7 @@ class FeatureEngineering:
         incidence_f_list = []
         for feature_name in feature_names:
             for pair in zip(df['Observation Period'], df[feature_name]):
-                if pair[0] == 52 * self.timePrediction:
+                if pair[0] == 52 * self.timeOfPrediction:
                     incidence_f_list.append(pair[1])
         return incidence_f_list
 
@@ -106,6 +107,6 @@ class FeatureEngineering:
         prevalence_f_list = []
         for feature_name in feature_names:
             for pair in zip(df['Observation Time'], df[feature_name]):
-                if round(pair[0], 3) == self.timePrediction:
+                if round(pair[0], 3) == self.timeOfPrediction:
                     prevalence_f_list.append(pair[1])
         return prevalence_f_list
