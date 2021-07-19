@@ -153,7 +153,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
         str_a = indexer.get_str_age(age_group=a)
 
         # calibration info for age distribution
-        calib_info = None
+        calib_info = A.CalibrationTargetPlotInfo(rows_of_data=D.HOSP_AGE_DIST[a])
         # if a in (AgeGroups.Age_65_74.value, AgeGroups.Age_75_.value):
         #     calib_info = None
         # else:
