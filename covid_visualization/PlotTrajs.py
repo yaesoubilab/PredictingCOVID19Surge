@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from covid_model.data import MAX_HOSP_RATE, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, HOSP_AGE_DIST
+from covid_model.data import MAX_HOSP_RATE, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE
 from definitions import AgeGroups, Profiles, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
@@ -136,10 +136,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     #list_plot_info.extend(cum_death_rate_by_age)
     list_plot_info.extend(cum_vaccine_rate_by_age)
     A.Y_LABEL_COORD_X = -0.35
-    sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
+    sim_outcomes.plot_multi_panel(n_rows=3, n_cols=len(AgeGroups),
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(9.5, 5))
+                                  figure_size=(11, 5))
 
     # --------------------------------------------------------------------
     # ------ plot information for the age-distribution of outcome --------
@@ -153,10 +153,11 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
         str_a = indexer.get_str_age(age_group=a)
 
         # calibration info for age distribution
-        if a in (AgeGroups.Age_65_74.value, AgeGroups.Age_75_.value):
-            calib_info = None
-        else:
-            calib_info = A.CalibrationTargetPlotInfo(rows_of_data=HOSP_AGE_DIST[a])
+        calib_info = None
+        # if a in (AgeGroups.Age_65_74.value, AgeGroups.Age_75_.value):
+        #     calib_info = None
+        # else:
+        #     calib_info = A.CalibrationTargetPlotInfo(rows_of_data=HOSP_AGE_DIST[a])
 
         age_dist_cum_incd.append(A.TrajPlotInfo(
             outcome_name='Cumulative incidence-{} (%)'.format(str_a),
@@ -178,7 +179,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     list_plot_info.extend(age_dist_cum_hosp)
     #list_plot_info.extend(age_dist_cum_death)
     A.Y_LABEL_COORD_X = -0.25
-    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=6,
+    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=len(AgeGroups),
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
                                   figure_size=(9.5, 3.6))

@@ -1,4 +1,4 @@
-
+import numpy as np
 
 # https://usafacts.org/visualizations/covid-vaccine-tracker-states/
 VACCINE_COVERAGE_OVER_TIME = [
@@ -22,7 +22,7 @@ VACCINE_COVERAGE_BY_AGE = [
         [65, 0],  # 23-May-21
         [69, 0],  # 20-Jun-21
     ],
-    [   # 5-19
+    [   # 5-12
         [49, 0.0073],  # 31-Jan-21
         [53, 0.082],  # 28-Feb-21
         [57, 0.2332],  # 28-Mar-21
@@ -30,32 +30,45 @@ VACCINE_COVERAGE_BY_AGE = [
         [65, 6.9529],  # 23-May-21
         [69, 21.007],  # 20-Jun-21
     ],
-    [   # 20-49
+    [   # 13-17
+        [49, 0.0073],  # 31-Jan-21
+        [53, 0.082],  # 28-Feb-21
+        [57, 0.2332],  # 28-Mar-21
+        [61, 1.3419],  # 25-Apr-21
+        [65, 6.9529],  # 23-May-21
+        [69, 21.007],  # 20-Jun-21
+    ],
+    [   # 18-29
+        [49, 0.0073],  # 31-Jan-21
+        [53, 0.082],  # 28-Feb-21
+        [57, 0.2332],  # 28-Mar-21
+        [61, 1.3419],  # 25-Apr-21
+        [65, 6.9529],  # 23-May-21
+        [69, 21.007],  # 20-Jun-21
+    ],
+    [   # 30-49
         [49, 1.4729],  # 31-Jan-21
         [53, 5.6849],  # 28-Feb-21
         [57, 9.9144],  # 28-Mar-21
         [61, 21.4632],  # 25-Apr-21
         [65, 36.473],  # 23-May-21
         [69, 44.3438],  # 20-Jun-21
-
     ],
-    [   # 50-64
+    [  # 50-64
         [49, 1.6514],  # 31-Jan-21
         [53, 7.4224],  # 28-Feb-21
         [57, 15.4783],  # 28-Mar-21
         [61, 38.4468],  # 25-Apr-21
         [65, 55.4664],  # 23-May-21
         [69, 62.3142],  # 20-Jun-21
-
     ],
-    [   # 65-75
+    [  # 65-75
         [49, 0.824],  # 31-Jan-21
         [53, 14.5025],  # 28-Feb-21
         [57, 42.8015],  # 28-Mar-21
         [61, 66.6688],  # 25-Apr-21
         [65, 74.6353],  # 23-May-21
         [69, 78.4774],  # 20-Jun-21
-
     ],
     [   # 75+
         [49, 0.7601],  # 31-Jan-21
@@ -68,18 +81,19 @@ VACCINE_COVERAGE_BY_AGE = [
 ]
 
 
-FACTOR = 1.5
-MAX_HOSP_RATE = 51*FACTOR  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
+UP_FACTOR = 1.5
+MAX_HOSP_RATE = 51 * UP_FACTOR  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
 MIN_HOSP_RATE = 9.4
-MAX_HOSP_RATE_BY_AGE = [24.3*FACTOR, 4.9*FACTOR, 25.9*FACTOR, 66.3*FACTOR, 124.6*FACTOR, 308.4*FACTOR]
-MIN_HOSP_RATE_BY_AGE = [9.4, 2, 1.1, 3.8, 11.1, 24.7, 58.4, 103]
+MAX_HOSP_RATE_BY_AGE = np.array([24.3, 4.9, 4.9, 4.9, 25.9, 66.3, 124.6, 308.4])*UP_FACTOR
+DOWN_FACTOR = 0
+MIN_HOSP_RATE_BY_AGE = np.array([2, 1.1, 1.1, 1.1, 3.8, 11.1, 24.7, 58.4]) * DOWN_FACTOR
 
 # age distribution of hospitalization
 HOSP_AGE_DIST = [
     # week, value, minimum, maximum
     [[52, 0.69, 0, 1.9]],       # 0-4
     [[52, 1.2, 0, 3.6]],        # 5-17
-    [[52, 29.0, 19.4, 41.8]],   # 19-29
+    [[52, 29.0, 19.4, 41.8]],   # 18-49
     [[52, 28.3, 20.6, 37.1]],   # 50-64
     [[52, 40.9, 27.4, 53.3]]    # 65+
 ]

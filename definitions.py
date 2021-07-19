@@ -7,8 +7,7 @@ CALIB_PERIOD = 1.5  # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
 PROJ_PERIOD = 0.75  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
-AGES = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
-AGES2 = ['0-4yrs', '5-19yrs', '20-49yrs', '50-64yrs', '65+yrs']
+AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
 PROFILES = ['Current', 'Novel', 'Vaccinated']
 
 
@@ -20,11 +19,13 @@ class Profiles(Enum):
 
 class AgeGroups(Enum):
     Age_0_4 = 0
-    Age_5_19 = 1
-    Age_20_49 = 2
-    Age_50_64 = 3
-    Age_65_74 = 4
-    Age_75_ = 5
+    Age_5_12 = 1
+    Age_13_17 = 2
+    Age_18_29 = 3
+    Age_30_49 = 4
+    Age_50_64 = 5
+    Age_65_74 = 6
+    Age_75_ = 7
 
 
 class AgeGroupsProfiles:

@@ -319,6 +319,10 @@ def build_covid_model(model):
         new_hosp_rate_by_age[0].add_feasible_conditions(
             feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE/100000,
                                                    min_threshold_to_hit=MIN_HOSP_RATE/100000))
+        # for a in range(indexer.nAgeGroups):
+        #     new_hosp_rate_by_age[a+1].add_feasible_conditions(
+        #         feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_BY_AGE[a] / 100000,
+        #                                                min_threshold_to_hit=MIN_HOSP_RATE_BY_AGE[a] / 100000))
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(

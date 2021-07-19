@@ -16,17 +16,20 @@ class COVIDParameters(EpiParameters):
         d = 1 / 364  # one day (using year as the unit of time)
 
         # -------- model main parameters -------------
-        us_age_dist = [0.060, 0.189, 0.395, 0.192, 0.096, 0.068]
-        hosp_relative_risk = [1, 1, 1.7, 4, 6, 10.8]
-        prob_death = [0, 0.002, 0.026, 0.079, 0.141, 0.209]
+        # age groups: ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
+        us_age_dist = [0.060, 0.100, 0.064, 0.163, 0.256, 0.192, 0.096, 0.069]
+        hosp_relative_risk = [0.5, 0.5, 1, 1, 2, 4, 6, 10.8]
+        prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
         contact_matrix = [
-            [2.598, 1.917, 3.993, 0.21, 0.039, 0.777],
-            [0.489, 10.904, 4.525, 0.145, 0.038, 0.689],
-            [0.486, 2.571, 9.401, 0.149, 0.037, 1.565],
-            [0.43, 2.307, 5.942, 0.361, 0.069, 2.944],
-            [0.191, 1.01, 2.243, 1.144, 0.154, 1.179],
-            [0.21, 1.038, 1.596, 0.489, 0.396, 0.772]
+            [2.598, 1.401, 0.389, 2.866, 0.777, 1.254, 0.21, 0.039],
+            [0.733, 6.398, 1.898, 3.105, 0.602, 0.915, 0.169, 0.044],
+            [0.226, 4.108, 6.294, 3.406, 0.756, 4.511, 0.125, 0.034],
+            [0.38, 0.746, 2.287, 4.496, 1.327, 6.492, 0.094, 0.028],
+            [0.518, 1.336, 0.953, 6.79, 1.638, 2.531, 0.177, 0.041],
+            [0.43, 1.043, 0.872, 4.154, 2.944, 2.18, 0.361, 0.069],
+            [0.191, 0.583, 0.311, 1.736, 1.179, 0.624, 1.144, 0.154],
+            [0.21, 0.534, 0.37, 1.304, 0.772, 0.427, 0.489, 0.396]
         ]
 
         self.sizeS0 = Constant(500000)
@@ -44,7 +47,7 @@ class COVIDParameters(EpiParameters):
         self.durVacImmunityByProfile = Uniform(0.5, 1.5)  # Beta(mean=1.5, st_dev=0.25, minimum=0.5, maximum=2.5)
 
         # the probability of hospitalization is assumed to be age- and profile-dependent
-        self.probHosp5To17 = Uniform(0.001, 0.01)
+        self.probHosp18To29 = Uniform(0.001, 0.01)
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-10, maximum=-5),        # b
@@ -53,8 +56,10 @@ class COVIDParameters(EpiParameters):
                                Uniform(minimum=2, maximum=3)]     # max
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
-            Uniform(minimum=1.0, maximum=1.4),  # 5-19
-            Uniform(minimum=1.0, maximum=1.4),  # 20-49
+            Uniform(minimum=1.0, maximum=1.4),  # 5-12
+            Uniform(minimum=1.0, maximum=1.4),  # 13-17
+            Uniform(minimum=1.0, maximum=1.4),  # 18-20
+            Uniform(minimum=1.0, maximum=1.4),  # 30-49
             Uniform(minimum=0.9, maximum=1.3),  # 50-64
             Uniform(minimum=0.8, maximum=1.2),  # 65-75
             Uniform(minimum=0.7, maximum=1.1)   # 75+
@@ -120,17 +125,17 @@ class COVIDParameters(EpiParameters):
         # for the novel strain
         self.R0s[1] = Product(parameters=[self.R0s[0], self.ratioTransmmisibilityAToB])
 
-        # relative probability of hospitalization to age 5-17
+        # relative probability of hospitalization to age 18-29
         for a in range(self.nAgeGroups):
-            if a == AgeGroups.Age_5_19.value:
+            if a == AgeGroups.Age_18_29.value:
                 self.relativeProbHosp[a] = Constant(1)
             else:
-                self.relativeProbHosp[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a]*0.25)
+                self.relativeProbHosp[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a]*0.2)
 
         # probability of hospitalization by age
         for a in range(self.nAgeGroups):
             self.probHospByAgeAndProfile[a] = [Product(
-                parameters=[self.probHosp5To17, self.relativeProbHosp[a]]), None]
+                parameters=[self.probHosp18To29, self.relativeProbHosp[a]]), None]
 
         # probability of hospitalization for new variant
         for a in range(self.nAgeGroups):
@@ -139,11 +144,8 @@ class COVIDParameters(EpiParameters):
 
         # probability of death by age
         for a in range(self.nAgeGroups):
-            if a == AgeGroups.Age_0_4.value:
-                self.probDeathIfHospByAgeAndProfile[a] = [Constant(0), Constant(0)]
-            else:
-                self.probDeathIfHospByAgeAndProfile[a] = [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25),
-                                                          Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25)]
+            self.probDeathIfHospByAgeAndProfile[a] = [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25),
+                                                      Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25)]
 
         self.durIByProfile[1] = Product(parameters=[self.durIByProfile[0], self.ratioDurInfAToB])
 
@@ -236,7 +238,7 @@ class COVIDParameters(EpiParameters):
              'Rates of leaving Hosp': self.ratesOfLeavingHosp,
              'Rates of leaving R': self.ratesOfLeavingR,
 
-             'Prob Hosp for 5-17': self.probHosp5To17,
+             'Prob Hosp for 5-17': self.probHosp18To29,
              'Relative prob hosp': self.relativeProbHosp,
 
              'Importation rate': self.importRateByAge,
