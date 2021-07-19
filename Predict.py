@@ -12,19 +12,40 @@ features = ['Obs: New hospitalizations',
 y_binary = 'If hospitalization threshold passed'
 y_continuous = 'Maximum hospitalization rate'
 
-# TODO: since we will be trying a large number of features,
-#   can we implement l1 or l2 regularization for the logistic regression and the linear regression?
-#   ( I think you can run Ridge and Lasso models for the linear regression models:
-#   https://scikit-learn.org/stable/supervised_learning.html#supervised-learning)
+rng = np.random.RandomState(seed=1)
 
-Model = LinearReg(df=df, features=features, y_name=y_continuous)
-Model.run(degree_of_polynomial=POLYNOMIAL_DEGREE)
+# linear regression
+print('\nLinear regression:')
+Model_linear = LinearReg(df=df, features=features, y_name=y_continuous)
+Model_linear.run(degree_of_polynomial=POLYNOMIAL_DEGREE, random_state=rng, ridge=True)
+Model_linear.performanceTest.print()
 
-# TODO: would you also add the logistic regression and the decision tree models?
+print('\nLinear regression bootstrap:')
+MultiModel_linear = MultiLinearReg(df=df, features=features, y_name=y_continuous)
+MultiModel_linear.run_many(num_bootstraps=10, degree_of_polynomial=POLYNOMIAL_DEGREE, ridge=True)
+MultiModel_linear.performancesTest.print(decimal=8)
 
-# TODO: in terms of performance measures, would you please report the mean squared error for
-#  linear regression models?
+# logistic regression
+print('\nLogistic regression:')
+Model_logistic = LogisticReg(df=df, features=features, y_name=y_binary)
+Model_logistic.run(penalty='l2', random_state=rng, display_roc_curve=False)
+Model_logistic.performanceTest.print()
 
-# TODO: Finally, would you please add the bootstrap algorithm (not the optimism-corrected one,
-#   but the one we had initially implemented: keep 20% of data for testing and repeating
-#   the model training-testing 200 times to form confidence intervals)?
+print('\nLogistic regression bootstrap:')
+MultiModel_logistic = MultiLogisticReg(df=df, features=features, y_name=y_binary)
+MultiModel_logistic.run_many(num_bootstraps=10, display_roc_curve=True)
+MultiModel_logistic.performancesTest.print(decimal=3)
+
+# decision tree
+print('\nDecision Tree:')
+Model_tree = DecisionTree(df=df, features=features, y_name=y_binary)
+Model_tree.run(display_decision_path=False)
+Model_tree.performanceTest.print()
+
+print('\nDecision Tree bootstrap:')
+MultiModel_tree = MultiDecisionTrees(df=df, features=features, y_name=y_binary)
+MultiModel_tree.run_many(num_bootstraps=10)
+MultiModel_tree.performancesTest.print(decimal=3)
+
+
+
