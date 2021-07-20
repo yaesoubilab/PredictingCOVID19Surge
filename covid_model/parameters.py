@@ -18,7 +18,7 @@ class COVIDParameters(EpiParameters):
         # -------- model main parameters -------------
         # age groups: ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
         us_age_dist = [0.060, 0.100, 0.064, 0.163, 0.256, 0.192, 0.096, 0.069]
-        hosp_relative_risk = [0.5, 0.5, 1, 1, 2, 4, 6, 15]
+        hosp_relative_risk = [0.5, 0.5, 1, 1, 2, 4, 8, 20]
         prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
         contact_matrix = [
@@ -56,7 +56,7 @@ class COVIDParameters(EpiParameters):
                                Uniform(minimum=2, maximum=3)]     # max
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
-            Uniform(minimum=1.0, maximum=1.4),  # 5-12
+            Uniform(minimum=1.5, maximum=2),  # 5-12
             Uniform(minimum=1.0, maximum=1.4),  # 13-17
             Uniform(minimum=1.0, maximum=1.4),  # 18-20
             Uniform(minimum=1.0, maximum=1.4),  # 30-49
@@ -75,7 +75,7 @@ class COVIDParameters(EpiParameters):
                                       Uniform(minimum=0.4, maximum=0.6)]  # max
         self.ratioTransmmisibilityAToB = Uniform(1, 2)
         self.ratioProbHospAToB = Uniform(0.5, 1.5)
-        self.ratioDurInfAToB = Uniform(1, 1.5)
+        self.ratioDurInfAToB = Uniform(0.75, 1.25)
 
         # ------------------------------
         # calculate dependent parameters

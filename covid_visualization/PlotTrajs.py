@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from covid_model.data import MAX_HOSP_RATE, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE
+from covid_model.data import MAX_HOSP_RATE_OVERALL, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
 from definitions import AgeGroups, Profiles, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
@@ -73,14 +73,15 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
     obs_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: New hospitalization rate',
                                    title='Hospitalization rate\n(per 100,000 population)',
-                                   y_range=(0, MAX_HOSP_RATE * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
+                                   y_range=(0, MAX_HOSP_RATE_OVERALL * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
                                    calibration_info=A.CalibrationTargetPlotInfo(
                                        feasible_range_info=A.FeasibleRangeInfo(
-                                           x_range=[0, CALIB_PERIOD*52], y_range=[0, MAX_HOSP_RATE])))
+                                           x_range=[0, CALIB_PERIOD*52], y_range=[0, MAX_HOSP_RATE_OVERALL])))
     obs_cum_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Cumulative hospitalization rate',
+                                       title='Cumulative hospitalization rate\n(per 100,000 population)',
                                        y_range=(0, 1000*3), y_multiplier=100000, x_multiplier=prev_multiplier,
                                        calibration_info=A.CalibrationTargetPlotInfo(
-                                           rows_of_data=CUM_HOSP_RATE
+                                           rows_of_data=CUM_HOSP_RATE_OVERALL
                                        ))
     obs_new_hosp_novel = A.TrajPlotInfo(outcome_name='Obs: % of new hospitalizations due to Novel',
                                         title='New hospitalizations\nwith novel strain (%)',

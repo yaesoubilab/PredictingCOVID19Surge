@@ -5,7 +5,7 @@ from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from apace.ModelObjects import Compartment, ChanceNode, DeathCompartment, EpiIndepEvent, EpiDepEvent, PoissonEvent
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
-from covid_model.data import MAX_HOSP_RATE, MIN_HOSP_RATE
+from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL
 from covid_model.parameters import COVIDParameters
 from definitions import AgeGroupsProfiles
 
@@ -328,8 +328,8 @@ def build_covid_model(model):
     # add feasible ranges of hospitalization rate
     if sets.calcLikelihood:
         new_hosp_rate_by_age[0].add_feasible_conditions(
-            feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE/100000,
-                                                   min_threshold_to_hit=MIN_HOSP_RATE/100000))
+            feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_OVERALL / 100000,
+                                                   min_threshold_to_hit=MIN_HOSP_RATE_OVERALL / 100000))
         # for a in range(indexer.nAgeGroups):
         #     new_hosp_rate_by_age[a+1].add_feasible_conditions(
         #         feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_BY_AGE[a] / 100000,
