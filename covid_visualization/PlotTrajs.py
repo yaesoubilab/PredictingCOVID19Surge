@@ -92,7 +92,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                        y_range=(0, 100), y_multiplier=100,
                                        x_multiplier=prev_multiplier,
                                        calibration_info=A.CalibrationTargetPlotInfo(
-                                           rows_of_data=D.VACCINE_COVERAGE_OVER_TIME))
+                                           rows_of_data=D.VACCINE_COVERAGE_OVER_TIME,
+                                           if_connect_obss=True))
 
     # summary
     filename_summary = 'outputs/fig_trajs/summary.png'
@@ -139,7 +140,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             outcome_name='Cumulative vaccination rate-{}'.format(str_a),
             title=str_a, y_label='Cumulative vaccination rate (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
-            calibration_info=A.CalibrationTargetPlotInfo(rows_of_data=VACCINE_COVERAGE_BY_AGE[a])
+            calibration_info=A.CalibrationTargetPlotInfo(rows_of_data=VACCINE_COVERAGE_BY_AGE[a],
+                                                         if_connect_obss=True)
         ))
 
     filename_validation = 'outputs/fig_trajs/calibration.png'
