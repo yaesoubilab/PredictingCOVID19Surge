@@ -1,74 +1,112 @@
-import pandas as pd
 import os
-from covid_prediction.DataDirectory import *
+
+import numpy as np
+import pandas as pd
 
 
-class DataEngineering:
-    def __init__(self, directory_name, calib_period, proj_period, icu_capacity_rate):
-        """ to create the dataset needed to develop the predictive models """
-        self.directory_name = directory_name
-        self.calib_period = calib_period
-        self.proj_period = proj_period
-        self.sim_duration = proj_period + calib_period
-        self.icu_capacity_rate = icu_capacity_rate
-        self.list_of_dataset_names = os.listdir(directory_name)
-        self.num_datasets = len(self.list_of_dataset_names)
-
-        # initiation
-        self.output_dic = {}
-
-    def read_datasets(self):
-        """ read all csv in the assigned dictionary and save to a dictionary """
-        i = 0
-        for name in self.list_of_dataset_names:
-            df = pd.read_csv('{}/{}'.format(self.directory_name, name))
-            self.output_dic['df_{}'.format(i)] = df
-            i += 1
-
-    def pre_processing(self):
-        """ create a combined dataset with observations from all trajectories """
-        row_list = []
-        # collect features from each of the trajectory dataset
-        for i in range(self.num_datasets):
-            # read a trajectory dataset
-            df = self.output_dic['df_{}'.format(i)]
-            # create a row based on this trajectory
-            incidence = self._get_incidence_feature(df=df)
-            vaccination = self._get_vaccine_feature(df=df)
-            icu_capacity = self._whether_surpass_capacity(df=df)
-            row = [incidence, vaccination, icu_capacity]
-            row_list.append(row)
-        # convert to DataFrame
-        df = pd.DataFrame(row_list, columns=(FEATURES + [Y_NAME]))
-        return df
-
-    def _whether_surpass_capacity(self, df):
-        """ return False if the ICU capacity rate never exceeds the threshold value, otherwise return True
-            0 represents False, 1 represent True
+class FeatureEngineering:
+    def __init__(self, directory_name, time_of_prediction, sim_duration, hosp_threshold):
+        """ create the dataset needed to develop the predictive models
+        :param directory_name: name of the trajectory directory
+        :param time_of_prediction: (year) starting time of dataset used for prediction
+        :param sim_duration: (year) simulation duration
+        :param hosp_threshold: threshold of hospital capacity
         """
-        surpass_capacity = 0
+        self.directoryName = directory_name
+        self.timeOfPrediction = time_of_prediction
+        self.simDuration = sim_duration
+        self.hospThreshold = hosp_threshold
+        self.datasetNames = os.listdir(directory_name)
+
+    def pre_process(self, names_of_incd_fs, names_of_prev_fs, names_of_parameter_fs, file_name):
+        """
+        read a trajectory in the assigned the directory and pre-process
+        :param names_of_incd_fs: names of incidence feature
+        :param names_of_prev_fs: names of prevalence feature
+        :param names_of_parameter_fs: names of epidemic feature
+        :param file_name: name of output csv
+        """
+
+        # read dataset of epidemic features
+        param_df = pd.read_csv('outputs/summary/parameter_values.csv')
+        param_col = []
+        for name in names_of_parameter_fs:
+            param_col.append(np.asarray(param_df[name]))
+
+        dataset = []
+        for i in range(len(self.datasetNames)):
+            df = pd.read_csv('{}/{}'.format(self.directoryName, self.datasetNames[i]))
+
+            # create a new row based on this trajectory
+            # features
+            incd_fs = self._get_incd_features(df=df, feature_names=names_of_incd_fs)
+            prev_fs = self._get_prev_features(df=df, feature_names=names_of_prev_fs)
+            # outcomes to predict
+            if_hosp_threshold_passed, hosp_max = self._get_if_threshold_passed_and_max(df=df)
+
+            # incidence features, prevalence features
+            traj_row = incd_fs + prev_fs
+            # add epidemic parameter values for corresponding trajectory
+            for col in param_col:
+                traj_row.append(col[i])
+            # max hospital rate and whether surpass capacity
+            traj_row.extend([hosp_max, if_hosp_threshold_passed])
+
+            dataset.append(traj_row)
+
+        # convert to DataFrame
+        outcomes_labels = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
+        df = pd.DataFrame(data=dataset,
+                          columns=(names_of_incd_fs + names_of_prev_fs + names_of_parameter_fs + outcomes_labels))
+
+        # save new dataset to file
+        df.to_csv(file_name, index=False)
+
+    def _get_if_threshold_passed_and_max(self, df):
+        """
+        :return: 'if threshold is passed' (0=no, 1=yes) and 'max hospitalization rate'
+        """
+
         observation_time_list = df['Observation Time']
-        hospitalization_rate_list = df['Obs: Hospitalization rate']
+        hospitalization_rate_list = df['Obs: New hospitalization rate']
+
+        # get maximum hospitalization rate during [calib_period, proj_period]
+        maximum = 0
         for pair in zip(observation_time_list, hospitalization_rate_list):
-            # within simulation period, check hospitalization rate
-            if self.calib_period <= pair[0] <= self.sim_duration:
-                if pair[1] > self.icu_capacity_rate:
-                    surpass_capacity = 1
-            # within calibration period or after projection period, do nothing
-        return surpass_capacity
+            if self.timeOfPrediction <= pair[0] <= self.simDuration:
+                maximum = max(pair[1], maximum)
 
-    def _get_incidence_feature(self, df):
-        """ incidence (at week D.CALIB_PERIOD * 52) """
-        incidence = None
-        for pair in zip(df['Observation Period'], df['Obs: Incidence']):
-            if pair[0] == 52 * self.calib_period:
-                incidence = pair[1]
-        return incidence
+        # decide if surpass the hospitalization threshold
+        if_surpass_threshold = 0
+        if maximum > self.hospThreshold:
+            if_surpass_threshold = 1
 
-    def _get_vaccine_feature(self, df):
-        """ vaccination (at year D.CALIB_PERIOD) """
-        vaccination = None
-        for pair in zip(df['Observation Time'], df['Obs: Cumulative vaccination']):
-            if round(pair[0], 3) == self.calib_period:
-                vaccination = pair[1]
-        return vaccination
+        return if_surpass_threshold, maximum
+
+    def _get_incd_features(self, df, feature_names):
+        """
+        get value of an incidence feature over the specified week
+        :param df: df of interest
+        :param feature_names: list of names of features that are observed over a week
+        :return: list of values for incidence features
+        """
+        incidence_f_list = []
+        for feature_name in feature_names:
+            for pair in zip(df['Observation Period'], df[feature_name]):
+                if pair[0] == 52 * self.timeOfPrediction:
+                    incidence_f_list.append(pair[1])
+        return incidence_f_list
+
+    def _get_prev_features(self, df, feature_names):
+        """
+        value of a prevalence feature at the specified time
+        :param df: df of interest
+        :param feature_names: features that are observed at the beginning of a week
+        :return:
+        """
+        prevalence_f_list = []
+        for feature_name in feature_names:
+            for pair in zip(df['Observation Time'], df[feature_name]):
+                if round(pair[0], 3) == self.timeOfPrediction:
+                    prevalence_f_list.append(pair[1])
+        return prevalence_f_list
