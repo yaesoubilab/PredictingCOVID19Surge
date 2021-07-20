@@ -90,15 +90,15 @@ MIN_HOSP_RATE = 9.4 *DOWN_FACTOR
 MAX_HOSP_RATE_BY_AGE = np.array([24.3, 9.0, 10.9, 14.1, 41.2, 66.3, 124.6, 318.0])*UP_FACTOR
 MIN_HOSP_RATE_BY_AGE = [0]*8 # np.array([2, 1.1, 1.1, 1.1, 3.8, 11.1, 24.7, 58.4]) * DOWN_FACTOR
 
-# age distribution of hospitalization
+# age distribution of hospitalization (%)
 HOSP_AGE_DIST = [
     # week, value, minimum, maximum
     [[52, 0.6]],    # 0-4
     [[52, 0.3]],    # 5-12
     [[52, 0.6]],    # 13-17
-    [[52, 6.1]],    # 18-29
-    [[52, 17.9]],   # 30-49
-    [[52, 26.6]],   # 50-64
-    [[52, 19.8]],   # 65-74
-    [[52, 28.1]],   # 75+
+    [[52, 5.8]],    # 18-29
+    [[52, 18.1]],   # 30-49
+    [[52, 26.8]],   # 50-64
+    [[52, 20.2]],   # 65-74
+    [[52, 27.5]],   # 75+
 ]
