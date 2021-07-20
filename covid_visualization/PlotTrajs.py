@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from covid_model.data import MAX_HOSP_RATE_OVERALL, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
+from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
 from definitions import AgeGroups, Profiles, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
@@ -76,7 +76,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                    y_range=(0, MAX_HOSP_RATE_OVERALL * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
                                    calibration_info=A.CalibrationTargetPlotInfo(
                                        feasible_range_info=A.FeasibleRangeInfo(
-                                           x_range=[0, CALIB_PERIOD*52], y_range=[0, MAX_HOSP_RATE_OVERALL])))
+                                           x_range=[0, CALIB_PERIOD*52],
+                                           y_range=[MIN_HOSP_RATE_OVERALL, MAX_HOSP_RATE_OVERALL])))
     obs_cum_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Cumulative hospitalization rate',
                                        title='Cumulative hospitalization rate\n(per 100,000 population)',
                                        y_range=(0, 1000*3), y_multiplier=100000, x_multiplier=prev_multiplier,
@@ -97,12 +98,12 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
 
     # summary
     filename_summary = 'outputs/fig_trajs/summary.png'
-    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
-                                  list_plot_info=[obs_inc_rate, obs_hosp_rate, obs_cum_hosp_rate,
-                                                  obs_new_hosp_novel, obs_cum_vacc_rate],
+    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
+                                  list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
+                                                  obs_cum_vacc_rate, obs_new_hosp_novel],
                                   file_name=filename_summary,
                                   show_subplot_labels=True,
-                                  figure_size=(6, 4.5)
+                                  figure_size=(4.5, 4.5)
                                   )
 
     # -----------------------------------------------------
@@ -153,7 +154,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     sim_outcomes.plot_multi_panel(n_rows=4, n_cols=len(AgeGroups),
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(11, 7))
+                                  figure_size=(11, 6.5))
 
     # --------------------------------------------------------------------
     # ------ plot information for the incidence figure  --------

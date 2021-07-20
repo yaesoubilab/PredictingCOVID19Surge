@@ -90,7 +90,7 @@ MIN_HOSP_RATE_OVERALL = 9.4 * DOWN_FACTOR
 MAX_HOSP_RATE_BY_AGE = np.array([24.3, 9.0, 10.9, 14.1, 41.2, 66.3, 124.6, 318.0])*UP_FACTOR
 MIN_HOSP_RATE_BY_AGE = [0]*8 # np.array([2, 0.9, 1.7, 2.8, 5.7, 11.1, 24.7, 71.5]) * DOWN_FACTOR
 
-CUM_HOSP_RATE_OVERALL = [[70, 570.7]]
+CUM_HOSP_RATE_OVERALL = [[70, 570.7, 232.5,	899.3]]
 CUM_HOSP_RATE_BY_AGE = [
     # week, value, minimum, maximum
     [[70, 59.8]],    # 0-4

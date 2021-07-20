@@ -104,9 +104,9 @@ def plot_sigmoid_functions(b, b_min, b_max, t_mid, t_min,
 # ---- settings ----
 
 # probability of novel strain over time
-plot_sigmoid_functions(b=7, b_min=0, b_max=0.5, t_mid=1.25, t_min=0,
+plot_sigmoid_functions(b=7, b_min=0, b_max=0.5, t_mid=1.75, t_min=0,
                        bs=[5, 7, 9], b_mins=None, b_maxs=[0.4, 0.5, 0.6],
-                       t_mids=[1, 1.25, 1.5], t_mins=None,
+                       t_mids=[1.5, 1.75, 2.0], t_mins=None,
                        y_label=r'$\gamma(t)$', fig_size=(5.5, 3))
 #
 # plot_sigmoid_functions(b=7, t0=1.25, b_min=0, b_max=0.5,
