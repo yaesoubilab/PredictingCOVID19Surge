@@ -105,20 +105,16 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   )
 
     # -----------------------------------------------------
-    # ------ plot information for the rates by age --------
+    # ------ plot information for calibration figure
     # -----------------------------------------------------
-    incd_rate_by_age = []
     hosp_rate_by_age = []
-    cum_death_rate_by_age = []
+    cum_hosp_rate_by_age = []
+    age_dist_cum_hosp = []
     cum_vaccine_rate_by_age = []
 
     for a in range(indexer.nAgeGroups):
         str_a = indexer.get_str_age(age_group=a)
 
-        incd_rate_by_age.append(A.TrajPlotInfo(
-            outcome_name='Incidence rate-{}'.format(str_a),
-            title=str_a, y_label='Incidence rate\n(per 100,000 population) ' if a == 0 else None,
-            y_range=(0, 20000), y_multiplier=100000, x_multiplier=incd_multiplier))
         hosp_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Hospitalization rate-{}'.format(str_a),
             title=str_a, y_label='Hospitalization rate\n(per 100,000 population)' if a == 0 else None,
@@ -126,10 +122,19 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             calibration_info=A.CalibrationTargetPlotInfo(
                 feasible_range_info=A.FeasibleRangeInfo(
                     x_range=[0, CALIB_PERIOD * 52], y_range=[0, MAX_HOSP_RATE_BY_AGE[a]]))))
-        cum_death_rate_by_age.append(A.TrajPlotInfo(
-            outcome_name='Cumulative death rate-{}'.format(str_a),
-            title=str_a, y_label='Cumulative deaths rate\n(per 100,000 population)' if a == 0 else None,
-            y_range=(0, 1000), y_multiplier=100000, x_multiplier=prev_multiplier))
+
+        cum_hosp_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Cumulative hospitalization rate-{}'.format(str_a),
+            title=str_a, y_label='Cumulative hospitalization rate\n(per 100,000 population)' if a == 0 else None,
+            y_range=(0, 5000), y_multiplier=100000, x_multiplier=prev_multiplier,
+            calibration_info=A.CalibrationTargetPlotInfo(rows_of_data=D.CUM_HOSP_RATE_BY_AGE[a])))
+
+        age_dist_cum_hosp.append(A.TrajPlotInfo(
+            outcome_name='Cumulative hospitalizations-{} (%)'.format(str_a),
+            title=str_a, y_label='Age-distribution of\ncumulative hospitalizations (%)' if a == 0 else None,
+            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
+            calibration_info=A.CalibrationTargetPlotInfo(rows_of_data=D.HOSP_AGE_DIST[a])))
+
         cum_vaccine_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Cumulative vaccination rate-{}'.format(str_a),
             title=str_a, y_label='Cumulative vaccination rate (%)' if a == 0 else None,
@@ -137,56 +142,54 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             calibration_info=A.CalibrationTargetPlotInfo(rows_of_data=VACCINE_COVERAGE_BY_AGE[a])
         ))
 
-    filename_validation = 'outputs/fig_trajs/rates_by_age.png'
-    list_plot_info = incd_rate_by_age
-    list_plot_info.extend(hosp_rate_by_age)
-    #list_plot_info.extend(cum_death_rate_by_age)
+    filename_validation = 'outputs/fig_trajs/calibration.png'
+    list_plot_info = hosp_rate_by_age
+    list_plot_info.extend(cum_hosp_rate_by_age)
+    list_plot_info.extend(age_dist_cum_hosp)
     list_plot_info.extend(cum_vaccine_rate_by_age)
     A.Y_LABEL_COORD_X = -0.35
-    sim_outcomes.plot_multi_panel(n_rows=3, n_cols=len(AgeGroups),
+    sim_outcomes.plot_multi_panel(n_rows=4, n_cols=len(AgeGroups),
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(11, 5))
+                                  figure_size=(11, 7))
 
     # --------------------------------------------------------------------
-    # ------ plot information for the age-distribution of outcome --------
+    # ------ plot information for the incidence figure  --------
     # --------------------------------------------------------------------
+    incd_rate_by_age = []
     age_dist_cum_incd = []
-    age_dist_cum_hosp = []
+    cum_death_rate_by_age = []
     age_dist_cum_death = []
 
     for a in range(indexer.nAgeGroups):
 
         str_a = indexer.get_str_age(age_group=a)
 
-        # calibration info for age distribution
-        calib_info = A.CalibrationTargetPlotInfo(rows_of_data=D.HOSP_AGE_DIST[a])
-        # if a in (AgeGroups.Age_65_74.value, AgeGroups.Age_75_.value):
-        #     calib_info = None
-        # else:
-        #     calib_info = A.CalibrationTargetPlotInfo(rows_of_data=HOSP_AGE_DIST[a])
-
+        incd_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Incidence rate-{}'.format(str_a),
+            title=str_a, y_label='Incidence rate\n(per 100,000 population) ' if a == 0 else None,
+            y_range=(0, 20000), y_multiplier=100000, x_multiplier=incd_multiplier))
         age_dist_cum_incd.append(A.TrajPlotInfo(
             outcome_name='Cumulative incidence-{} (%)'.format(str_a),
             title=str_a, y_label='Age-distribution of\ncumulative incident (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
-        age_dist_cum_hosp.append(A.TrajPlotInfo(
-            outcome_name='Cumulative hospitalizations-{} (%)'.format(str_a),
-            title=str_a, y_label='Age-distribution of\ncumulative hospitalizations (%)' if a == 0 else None,
-            y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
-            calibration_info=calib_info))
+        cum_death_rate_by_age.append(A.TrajPlotInfo(
+            outcome_name='Cumulative death rate-{}'.format(str_a),
+            title=str_a, y_label='Cumulative deaths rate\n(per 100,000 population)' if a == 0 else None,
+            y_range=(0, 1000), y_multiplier=100000, x_multiplier=prev_multiplier))
+
         age_dist_cum_death.append(A.TrajPlotInfo(
             outcome_name='Cumulative death-{} (%)'.format(str_a),
             title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
 
 
-    filename_validation = 'outputs/fig_trajs/age_dist.png'
-    list_plot_info = age_dist_cum_incd
-    list_plot_info.extend(age_dist_cum_hosp)
+    filename_validation = 'outputs/fig_trajs/incidence.png'
+    list_plot_info = incd_rate_by_age
+    list_plot_info.extend(age_dist_cum_incd)
     #list_plot_info.extend(age_dist_cum_death)
     A.Y_LABEL_COORD_X = -0.25
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=len(AgeGroups),
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
-                                  figure_size=(9.5, 3.6))
+                                  figure_size=(15, 4))
