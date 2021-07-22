@@ -6,6 +6,7 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc, r2_score, mean_squ
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.tree import DecisionTreeRegressor, export_graphviz
+
 import SimPy.Statistics as Stat
 
 
@@ -316,8 +317,8 @@ class BinaryPerformanceSummary(PerformanceSummary):
         self.roc_auc = auc(self.fpr, self.tpr)
 
     def print(self):
-        print("Sensitivity:", self.sen)
-        print("Specificity:", self.spe)
+        # print("Sensitivity:", self.sen)
+        # print("Specificity:", self.spe)
         print("AUC:", self.roc_auc)
 
     def plot_roc_curve(self, model_name):
@@ -341,8 +342,8 @@ class BootstrapBinaryPerformanceSummary(BootstrapPerformanceSummary):
         self.statAUC = Stat.SummaryStat(name='roc-auc', data=[performance.roc_auc for performance in self.performances])
 
     def print(self, decimal=3):
-        print('Sensitivity:', self.statSen.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
-        print('Specificity:', self.statSpe.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+        # print('Sensitivity:', self.statSen.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+        # print('Specificity:', self.statSpe.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         print('ROC-AUC:', self.statAUC.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
 
     def bootstrap_roc_curve(self):

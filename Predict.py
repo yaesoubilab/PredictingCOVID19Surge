@@ -5,8 +5,8 @@ from covid_prediction.prediction_models import *
 df = pd.read_csv('outputs/prediction_dataset/cleaned_data.csv')
 
 POLYNOMIAL_DEGREE = 2
-features = ['Obs: New hospitalizations',
-            'Obs: Cumulative vaccination rate', 'Obs: Cumulative hospitalizations',
+features = ['Obs: New hospitalization rate',
+            'Obs: Cumulative vaccination rate', 'Obs: Cumulative hospitalization rate',
             'R0s-0']
 
 y_binary = 'If hospitalization threshold passed'

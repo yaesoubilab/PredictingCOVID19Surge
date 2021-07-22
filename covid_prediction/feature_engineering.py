@@ -1,9 +1,8 @@
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
-from pathlib import Path
 
 
 class FeatureEngineering:
@@ -99,6 +98,7 @@ class FeatureEngineering:
             for pair in zip(df['Observation Period'], df[feature_name]):
                 if pair[0] == 52 * self.timeOfPrediction:
                     incidence_f_list.append(pair[1])
+                    break
         return incidence_f_list
 
     def _get_prev_features(self, df, feature_names):
@@ -111,6 +111,7 @@ class FeatureEngineering:
         prevalence_f_list = []
         for feature_name in feature_names:
             for pair in zip(df['Observation Time'], df[feature_name]):
-                if round(pair[0], 3) == self.timeOfPrediction:
+                if 52*abs(pair[0] - self.timeOfPrediction) < 0.5:
                     prevalence_f_list.append(pair[1])
+                    break
         return prevalence_f_list
