@@ -83,15 +83,17 @@ class LinearReg(Classifier):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
+    # TODO: would you please add a function to plot cross-validation figure mainly for debugging purposes?
+    #   https://scikit-learn.org/stable/auto_examples/model_selection/plot_cv_predict.html#sphx-glr-auto-examples-model-selection-plot-cv-predict-py
+
     def run(self, degree_of_polynomial, random_state, test_size=0.2,
-            lasso=False, ridge=False, alpha=0.1, if_standardize=True):
+            penalty='none', alpha=0.1, if_standardize=True):
         """
         run linear regression model
         :param degree_of_polynomial: The degree of the polynomial features.
         :param test_size: size of the test set
         :param random_state: random state number
-        :param lasso: whether use Lasso linear regression model
-        :param ridge: whether use Ridge linear regression model
+        :param penalty: 'none', 'l1', or 'l2'
         :param alpha: the degree of sparsity of the estimated coefficients for Lasso or Ridge
         :param if_standardize: whether standardize the features
         """
@@ -111,9 +113,9 @@ class LinearReg(Classifier):
         x_test_poly = poly.fit_transform(x_test)
 
         # fit model
-        if lasso:
+        if penalty == 'l1':
             reg = linear_model.Lasso(alpha=alpha).fit(X=x_train_poly, y=y_train)
-        elif ridge:
+        elif penalty == 'l2':
             reg = linear_model.Ridge(alpha=alpha).fit(X=x_train_poly, y=y_train)
         else:
             reg = linear_model.LinearRegression().fit(X=x_train_poly, y=y_train)
@@ -130,7 +132,7 @@ class MultiLinearReg(MultiClassifiers):
         super().__init__(df, features, y_name)
 
     def run_many(self, num_bootstraps, degree_of_polynomial, test_size=0.2,
-                 lasso=False, ridge=False, alpha=0.1, if_standardize=True):
+                 if_standardize=True, penalty='none', alpha=0.1):
 
         performance_test_list = []
         i = 0
@@ -139,7 +141,7 @@ class MultiLinearReg(MultiClassifiers):
         while len(performance_test_list) < num_bootstraps:
             model.run(degree_of_polynomial=degree_of_polynomial,
                       random_state=i, test_size=test_size, if_standardize=if_standardize,
-                      lasso=lasso, ridge=ridge, alpha=alpha)
+                      penalty=penalty, alpha=alpha)
             # append performance
             performance_test_list.append(model.performanceTest)
 
@@ -159,7 +161,7 @@ class LogisticReg(Classifier):
         :param degree_of_polynomial: The degree of the polynomial features
         :param l1_solver: solver that handle 'l1' penalty. 'liblinear' good for small dataset, 'sage' good for large set
         :param test_size: size of test sample
-        :param penalty: "l1" or "l2", default "l2"
+        :param penalty: 'l1','l2', or 'none' (default 'l2')
         :param display_roc_curve: whether plot roc curve
         :param if_standardize: whether standardize the features
         """
@@ -201,6 +203,9 @@ class MultiLogisticReg(MultiClassifiers):
 
     def run_many(self, num_bootstraps, degree_of_polynomial,
                  test_size=0.2, penalty='l2', l1_solver='liblinear', display_roc_curve=True, if_standardize=True):
+        """
+        :param penalty: 'l1','l2', or 'none' (default 'l2')
+        """
 
         performance_test_list = []
         i = 0
@@ -304,7 +309,7 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
-        print('MSE:', self.statMSE.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+        # print('MSE:', self.statMSE.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
 
 
 class BinaryPerformanceSummary(PerformanceSummary):
