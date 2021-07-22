@@ -26,7 +26,7 @@ def evaluate_linear_regression(data, feature_names, outcome_name, poly_degree=1,
     models = MultiLinearReg(df=data, features=feature_names, y_name=outcome_name)
     models.run_many(num_bootstraps=n_bootstraps, degree_of_polynomial=poly_degree,
                     if_standardize=if_standardize, penalty=penalty)
-    models.performancesTest.print(decimal=8)
+    models.performancesTest.print(decimal=3)
 
 
 
