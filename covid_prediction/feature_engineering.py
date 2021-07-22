@@ -3,6 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from pathlib import Path
+
 
 class FeatureEngineering:
     def __init__(self, directory_name, time_of_prediction, sim_duration, hosp_threshold):
@@ -18,13 +20,13 @@ class FeatureEngineering:
         self.hospThreshold = hosp_threshold
         self.datasetNames = os.listdir(directory_name)
 
-    def pre_process(self, names_of_incd_fs, names_of_prev_fs, names_of_parameter_fs, file_name):
+    def pre_process(self, names_of_incd_fs, names_of_prev_fs, names_of_parameter_fs, output_file):
         """
         read a trajectory in the assigned the directory and pre-process
         :param names_of_incd_fs: names of incidence feature
         :param names_of_prev_fs: names of prevalence feature
         :param names_of_parameter_fs: names of epidemic feature
-        :param file_name: name of output csv
+        :param output_file: name of output csv
         """
 
         # read dataset of epidemic features
@@ -60,7 +62,9 @@ class FeatureEngineering:
                           columns=(names_of_incd_fs + names_of_prev_fs + names_of_parameter_fs + outcomes_labels))
 
         # save new dataset to file
-        df.to_csv(file_name, index=False)
+        output_dir = Path('outputs/prediction_dataset/')
+        output_dir.mkdir(parents=True, exist_ok=True)
+        df.to_csv(output_dir / output_file, index=False)
 
     def _get_if_threshold_passed_and_max(self, df):
         """
