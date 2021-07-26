@@ -34,12 +34,16 @@ class COVIDParameters(EpiParameters):
 
         self.sizeS0 = Constant(500000)
         self.sizeE0 = UniformDiscrete(minimum=1, maximum=5)
-        self.R0s = [Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4), None]
+
+        # R0 of the dominant strain
+        self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
 
         # these duration parameters are age-independent
         self.durEByProfile = [Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
+                              Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)]
-        self.durIByProfile = [Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d), None]
+        self.durIByProfile = [Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d),
+                              None]
         self.durHospByProfile = [Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
                                  Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d)]
         self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
