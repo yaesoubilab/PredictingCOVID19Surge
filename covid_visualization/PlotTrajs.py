@@ -6,6 +6,8 @@ from definitions import AgeGroups, Profiles, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 IF_MAKE_VALIDATION_PLOTS = False
+A.Y_LABEL_COORD_X = -0.15
+A.SUBPLOT_W_SPACE = 0.0
 
 
 def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
@@ -84,10 +86,6 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                        calibration_info=A.CalibrationTargetPlotInfo(
                                            rows_of_data=CUM_HOSP_RATE_OVERALL
                                        ))
-    obs_new_hosp_novel = A.TrajPlotInfo(outcome_name='Obs: % of new hospitalizations due to Novel',
-                                        title='New hospitalizations\nwith novel strain (%)',
-                                        y_range=(0, 100), y_multiplier=100,
-                                        x_multiplier=obs_incd_multiplier)
     obs_cum_vacc_rate = A.TrajPlotInfo(outcome_name='Obs: Cumulative vaccination rate',
                                        title='Cumulative vaccination rate (%)',
                                        y_range=(0, 100), y_multiplier=100,
@@ -97,13 +95,45 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                            if_connect_obss=True))
 
     # summary
-    filename_summary = 'outputs/fig_trajs/summary.png'
-    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
+    sim_outcomes.plot_multi_panel(n_rows=1, n_cols=3,
                                   list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
-                                                  obs_cum_vacc_rate, obs_new_hosp_novel],
-                                  file_name=filename_summary,
+                                                  obs_cum_vacc_rate],
+                                  file_name='outputs/fig_trajs/summary.png',
                                   show_subplot_labels=True,
-                                  figure_size=(4.5, 4.5)
+                                  figure_size=(2.3*3, 2.4)
+                                  )
+
+    # -----------------------------------------------------
+    # ------ plot information for the novel variant plot --------
+    # -----------------------------------------------------
+
+    obs_incd_novel = A.TrajPlotInfo(outcome_name='% of incidence due to Novel',
+                                    title='Incidence associated with\n'
+                                          'novel strain among the unvaccinated\n(%)',
+                                    y_range=(0, 100), y_multiplier=100,
+                                    x_multiplier=obs_incd_multiplier)
+    obs_incd_vaccinated = A.TrajPlotInfo(outcome_name='% of incidence due to Vaccinated',
+                                         title='Incidence associated with\n'
+                                               'novel strain among the vaccinated\n(%)',
+                                         y_range=(0, 100), y_multiplier=100,
+                                         x_multiplier=obs_incd_multiplier)
+    obs_new_hosp_novel = A.TrajPlotInfo(outcome_name='Obs: % of new hospitalizations due to Novel',
+                                        title='New hospitalizations associated with\n'
+                                              'novel strain among the unvaccinated\n(%)',
+                                        y_range=(0, 100), y_multiplier=100,
+                                        x_multiplier=obs_incd_multiplier)
+    obs_new_hosp_vaccinated = A.TrajPlotInfo(outcome_name='Obs: % of new hospitalizations due to Vaccinated',
+                                             title='New hospitalizations associated with\n'
+                                                   'novel strain among the vaccinated\n(%)',
+                                             y_range=(0, 100), y_multiplier=100,
+                                             x_multiplier=obs_incd_multiplier)
+
+    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
+                                  list_plot_info=[obs_incd_novel, obs_incd_vaccinated,
+                                                  obs_new_hosp_novel, obs_new_hosp_vaccinated],
+                                  file_name='outputs/fig_trajs/novel_variant.png',
+                                  show_subplot_labels=True,
+                                  figure_size=(2.3*2, 2.3*2)
                                   )
 
     # -----------------------------------------------------
