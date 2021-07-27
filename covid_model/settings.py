@@ -1,11 +1,13 @@
 import definitions as D
+from apace.CalibrationSupport import get_survey_size
 from apace.Inputs import ModelSettings
+from covid_model.data import CUM_HOSP_RATE_OVERALL
 
 
 class COVIDSettings(ModelSettings):
     """ settings of COVID model """
 
-    def __init__(self, if_optimizing=False):
+    def __init__(self, if_calibrating=False):
 
         ModelSettings.__init__(self)
 
@@ -33,4 +35,20 @@ class COVIDSettings(ModelSettings):
         # parameter values
         self.storeParameterValues = True
 
+        # calibration targets
+        if if_calibrating:
+            self.cumHospRateMean = []
+            self.cumHospRateN = []
 
+            week = 0
+            while week / 52 < self.calibrationPeriod:
+                if week == CUM_HOSP_RATE_OVERALL[0][0]:
+                    self.cumHospRateMean.append(CUM_HOSP_RATE_OVERALL[0][1] * 0.00001)
+                    self.cumHospRateN.append(get_survey_size(mean=CUM_HOSP_RATE_OVERALL[0][1],
+                                                             l=CUM_HOSP_RATE_OVERALL[0][2],
+                                                             u=CUM_HOSP_RATE_OVERALL[0][3],
+                                                             multiplier=0.00001))
+                else:
+                    self.cumHospRateMean.append(None)
+                    self.cumHospRateN.append(None)
+                week += 1
