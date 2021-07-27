@@ -35,6 +35,7 @@ def build_covid_model(model):
     # events
     importation = [None] * age_groups_profiles.nAgeGroups
     infection_in_S = [None] * age_groups_profiles.length
+    infection_in_V = [None] * age_groups_profiles.nAgeGroups
     leaving_Es = [None] * age_groups_profiles.length
     leaving_Is = [None] * age_groups_profiles.length
     leaving_Hs = [None] * age_groups_profiles.length
@@ -50,7 +51,8 @@ def build_covid_model(model):
         Ss[a] = Compartment(name='Susceptible-'+str_a, size_par=params.sizeSByAge[a],
                             susceptibility_params=[Constant(value=1), Constant(value=1)],
                             row_index_contact_matrix=a)
-        Vs[a] = Compartment(name='Vaccinated-'+str_a, num_of_pathogens=2,
+        Vs[a] = Compartment(name='Vaccinated-'+str_a,
+                            susceptibility_params=[Constant(value=0), params.suspVaccinatedAgainstNovel],
                             row_index_contact_matrix=a)
 
         for p in range(age_groups_profiles.nProfiles):
@@ -59,21 +61,20 @@ def build_covid_model(model):
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
 
             # infectivity
-            infectivity_params = [Constant(value=0), Constant(value=0)]
-            infectivity_params[p] = params.infectivity[p]
+            infectivity_params = [Constant(value=0), Constant(value=0), Constant(value=0)]
+            infectivity_params[p] = params.infectivityByProfile[p]
 
             # -------- compartments ----------
             Es[i] = Compartment(name='Exposed-'+str_a_p,
-                                size_par=params.sizeEProfile0ByAge[a] if p == 0 else Constant(value=0),
-                                infectivity_params=infectivity_params, if_empty_to_eradicate=True,
-                                row_index_contact_matrix=a)
+                                num_of_pathogens=2, row_index_contact_matrix=a)
             Is[i] = Compartment(name='Infectious-'+str_a_p,
+                                size_par=params.sizeIProfile0ByAge[a] if p == 0 else Constant(value=0),
                                 infectivity_params=infectivity_params, if_empty_to_eradicate=True,
                                 row_index_contact_matrix=a)
-            Hs[i] = Compartment(name='Hospitalized-'+str_a_p, num_of_pathogens=2, if_empty_to_eradicate=True,
-                                row_index_contact_matrix=a)
-            Rs[i] = Compartment(name='Recovered-'+str_a_p, num_of_pathogens=2,
-                                row_index_contact_matrix=a)
+            Hs[i] = Compartment(name='Hospitalized-'+str_a_p,
+                                num_of_pathogens=2, if_empty_to_eradicate=True,row_index_contact_matrix=a)
+            Rs[i] = Compartment(name='Recovered-'+str_a_p,
+                                num_of_pathogens=2, row_index_contact_matrix=a)
             Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 
             # --------- chance nodes ---------
@@ -110,8 +111,12 @@ def build_covid_model(model):
             str_a_p = age_groups_profiles.get_str_age_profile(age_group=a, profile=p)
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
 
-            infection_in_S[i] = EpiDepEvent(
-                name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=p)
+            if p in (0, 1):
+                infection_in_S[i] = EpiDepEvent(
+                    name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=p)
+            else:
+                infection_in_V[a] = EpiDepEvent(
+                    name='Infection in V-'+str_a_p, destination=Es[i], generating_pathogen=1)
             leaving_Es[i] = EpiIndepEvent(
                 name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[p], destination=Is[i])
             leaving_Is[i] = EpiIndepEvent(
@@ -135,9 +140,12 @@ def build_covid_model(model):
         # --------- connections of events and compartments ---------
         # attached epidemic events to compartments
         i_inf_event = age_groups_profiles.get_row_index(age_group=a, profile=0)
-        Ss[a].add_events(events=[infection_in_S[i_inf_event], infection_in_S[i_inf_event+1],
-                                 vaccination_in_S[a], importation[a]])
-        Vs[a].add_event(event=losing_vaccine_immunity[a])
+        Ss[a].add_events(events=[infection_in_S[i_inf_event],  # infection with dominant
+                                 infection_in_S[i_inf_event+1],  # infection with novel
+                                 vaccination_in_S[a],
+                                 importation[a]])
+        Vs[a].add_events(events=[losing_vaccine_immunity[a],
+                                 infection_in_V[a]])
 
         for p in range(age_groups_profiles.nProfiles):
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
@@ -223,7 +231,7 @@ def build_covid_model(model):
                                                    if_surveyed=True))
     
     # incidence and new hospitalization by profile (current, novel, vaccinated)
-    incd_by_profile=[]
+    incd_by_profile = []
     new_hosp_by_profile = []
     profile_dist_incd = []
     profile_dist_new_hosp = []
