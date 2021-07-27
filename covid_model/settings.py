@@ -45,9 +45,10 @@ class COVIDSettings(ModelSettings):
                 if week == CUM_HOSP_RATE_OVERALL[0][0]:
                     self.cumHospRateMean.append(CUM_HOSP_RATE_OVERALL[0][1] * 0.00001)
                     self.cumHospRateN.append(get_survey_size(mean=CUM_HOSP_RATE_OVERALL[0][1],
-                                                             l=CUM_HOSP_RATE_OVERALL[0][2],
-                                                             u=CUM_HOSP_RATE_OVERALL[0][3],
-                                                             multiplier=0.00001))
+                                                             l=CUM_HOSP_RATE_OVERALL[0][2]*1.2,
+                                                             u=CUM_HOSP_RATE_OVERALL[0][3]*0.8,
+                                                             multiplier=0.00001,
+                                                             interval_type='c'))
                 else:
                     self.cumHospRateMean.append(None)
                     self.cumHospRateN.append(None)

@@ -113,8 +113,11 @@ plot_sigmoid_functions(b=7, b_min=0, b_max=0.5, t_mid=1.75, t_min=0,
 #                        bs=[5, 7, 9], t0s=[1, 1.25, 1.5], b_mins=[0, 0.1, 0.2], b_maxs=[0.4, 0.5, 0.6])
 
 Y_RANGE = (0, 2)
-# T0 = 1
-plot_sigmoid_functions(b=-8, b_min=0.2, b_max=1.5, t_mid=0.75, t_min=1,
-                       bs=[-10, -8, -6], b_mins=[0, 0.2, 0.4], b_maxs=[1.25, 1.5, 1.75],
-                       t_mids=[0.5, 0.75, 1.25], t_mins=[0.8, 1, 1.2],
+# rate of vaccination
+plot_sigmoid_functions(b=-8, bs=[-10, -8, -6],
+                       b_min=0.025, b_mins=[0, 0.025, 0.05],
+                       b_max=1.5, b_maxs=[1.25, 1.5, 1.75],
+                       t_mid=0.6, t_mids=[0.5, 0.6, 0.7],
+                       t_min=1, t_mins=[0.8, 1, 1.2],
+
                        y_label=r'$v(t)$', fig_size=(9, 3))

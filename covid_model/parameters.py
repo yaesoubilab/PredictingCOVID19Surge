@@ -69,8 +69,8 @@ class COVIDParameters(EpiParameters):
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-10, maximum=-5),        # b
-                               Uniform(minimum=1.5, maximum=2.5),         # t_middle
-                               Uniform(minimum=0.0, maximum=0.25),         # min
+                               Uniform(minimum=1, maximum=2),         # t_middle
+                               Uniform(minimum=0.0, maximum=0.05),         # min
                                Uniform(minimum=2, maximum=3)]     # max
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
