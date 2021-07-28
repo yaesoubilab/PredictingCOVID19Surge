@@ -156,7 +156,8 @@ def build_covid_model(model):
 
     # --------- sum time-series ------
     # population size
-    compartments = Ss
+    compartments = []
+    compartments.extend(Ss)
     compartments.extend(Vs)
     compartments.extend(Es)
     compartments.extend(Is)
@@ -186,6 +187,9 @@ def build_covid_model(model):
     # population size 
     pop_size_by_age.append(SumPrevalence(
         name='Population size', compartments=compartments))
+    # number of individuals susceptible
+    num_susp = SumPrevalence(
+        name='Individuals susceptible', compartments=Ss)
     # incidence 
     incd_by_age.append(SumIncidence(
         name='Incidence', compartments=Is, first_nonzero_obs_marks_start_of_epidemic=True, if_surveyed=True))
@@ -205,6 +209,11 @@ def build_covid_model(model):
     cum_vaccine_by_age.append(SumCumulativeIncidence(
         name='Cumulative vaccination', compartments=Vs, if_surveyed=True))
 
+    # prevalence susceptible
+    prev_susp = RatioTimeSeries(name='Prevalence susceptible',
+                                numerator_sum_time_series=num_susp,
+                                denominator_sum_time_series=pop_size_by_age[0],
+                                if_surveyed=True)
     # incidence rate
     incd_rate_by_age.append(RatioTimeSeries(name='Incidence rate',
                                             numerator_sum_time_series=incd_by_age[0],
@@ -376,6 +385,7 @@ def build_covid_model(model):
     # summation-time series
     list_of_sum_time_series = []
     list_of_sum_time_series.extend(pop_size_by_age)
+    list_of_sum_time_series.append(num_susp)
     list_of_sum_time_series.extend(incd_by_age)
     list_of_sum_time_series.extend(new_hosp_by_age)
     list_of_sum_time_series.extend(cum_incd_by_age)
@@ -388,6 +398,7 @@ def build_covid_model(model):
     # ratio time-series
     list_of_ratio_time_series = []
     list_of_ratio_time_series.extend(incd_rate_by_age)
+    list_of_ratio_time_series.append(prev_susp)
     list_of_ratio_time_series.extend(new_hosp_rate_by_age)
     list_of_ratio_time_series.extend(cum_hosp_rate_by_age)
     list_of_ratio_time_series.extend(cum_death_rate_by_age)

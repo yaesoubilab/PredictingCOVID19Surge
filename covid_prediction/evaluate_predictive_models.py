@@ -2,14 +2,14 @@ from covid_prediction.prediction_models import *
 
 
 def evaluate_logistic(data, feature_names, outcome_name, poly_degree=1, n_bootstraps=100,
-                      if_standardize=True, penalty='l2'):
+                      if_standardize=True, penalty='l2', C=1):
     """
     :param penalty: 'l1','l2', or 'none' (default 'l2')
     """
 
     models = MultiLogisticReg(df=data, features=feature_names, y_name=outcome_name)
     models.run_many(num_bootstraps=n_bootstraps, degree_of_polynomial=poly_degree,
-                    penalty=penalty, if_standardize=if_standardize)
+                    penalty=penalty, C=C, if_standardize=if_standardize)
     models.performancesTest.print(decimal=3)
 
 

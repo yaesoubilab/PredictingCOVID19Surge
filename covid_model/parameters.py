@@ -240,7 +240,7 @@ class COVIDParameters(EpiParameters):
              'Duration of infectiousness-dominant': self.durI,
 
              # prob hospitalization
-             'Prob Hosp for 5-17': self.probHosp18To29,
+             'Prob Hosp for 18-29': self.probHosp18To29,
              'Relative prob hosp by age': self.relativeProbHospByAge,
              'Ratio of hospitalization probability by profile': self.ratioProbHospByProfile,
 
@@ -267,7 +267,7 @@ class COVIDParameters(EpiParameters):
              'Prob novel strain params': self.probNovelStrainParams,
              'Prob novel strain': self.probNovelStrain,
 
-             'Vaccine effectiveness against novel': self.vacEffAgainstInfWithNovel,
+             'Vaccine effectiveness against infection with novel': self.vacEffAgainstInfWithNovel,
              'Susceptibility of vaccinated against novel': self.suspVaccinatedAgainstNovel,
              'Vaccination rate params': self.vaccRateParams,
              'Vaccination rate t_min by age': self.vaccRateTMinByAge,

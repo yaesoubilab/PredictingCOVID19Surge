@@ -154,8 +154,12 @@ class LogisticReg(Classifier):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run(self, random_state, degree_of_polynomial,
-            test_size=0.2, penalty='l2', l1_solver='liblinear', display_roc_curve=True, if_standardize=True):
+        self.coeffs = None
+        self.intercept = None
+
+    def run(self, random_state, degree_of_polynomial=1,
+            test_size=0.2, penalty='l2', l1_solver='liblinear', C=1,
+            display_roc_curve=True, if_standardize=True):
         """
         :param random_state: random state number
         :param degree_of_polynomial: The degree of the polynomial features
@@ -184,8 +188,12 @@ class LogisticReg(Classifier):
         solver = 'lbfgs'
         if penalty == 'l1':
             solver = l1_solver
-        LR = linear_model.LogisticRegression(penalty=penalty, solver=solver)
+        LR = linear_model.LogisticRegression(penalty=penalty, solver=solver, C=C)
         LR.fit(X=x_train_poly, y=y_train)
+
+        # coefficients
+        self.coeffs = LR.coef_
+        self.intercept = LR.intercept_
 
         # prediction
         y_test_hat = LR.predict(x_test_poly)
@@ -202,7 +210,7 @@ class MultiLogisticReg(MultiClassifiers):
         super().__init__(df, features, y_name)
 
     def run_many(self, num_bootstraps, degree_of_polynomial,
-                 test_size=0.2, penalty='l2', l1_solver='liblinear', display_roc_curve=True, if_standardize=True):
+                 test_size=0.2, penalty='l2', l1_solver='liblinear', C=1, display_roc_curve=True, if_standardize=True):
         """
         :param penalty: 'l1','l2', or 'none' (default 'l2')
         """
@@ -213,7 +221,7 @@ class MultiLogisticReg(MultiClassifiers):
 
         while len(performance_test_list) < num_bootstraps:
             model.run(random_state=i, test_size=test_size, if_standardize=if_standardize,
-                      penalty=penalty, l1_solver=l1_solver, display_roc_curve=False,
+                      penalty=penalty, l1_solver=l1_solver, C=C, display_roc_curve=False,
                       degree_of_polynomial=degree_of_polynomial)
             # append performance
             performance_test_list.append(model.performanceTest)
