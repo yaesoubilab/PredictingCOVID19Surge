@@ -21,7 +21,6 @@ class COVIDParameters(EpiParameters):
         hosp_relative_risk = [0.5, 0.5, 1, 1, 2, 4, 8, 20]
         prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
-        # TODO: needs to be updated
         contact_matrix = [
             [2.598, 1.401, 0.389, 2.866, 0.777, 1.254, 0.21, 0.039],
             [0.733, 6.398, 1.898, 3.105, 0.602, 0.915, 0.169, 0.044],
