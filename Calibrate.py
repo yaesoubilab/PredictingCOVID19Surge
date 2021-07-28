@@ -3,8 +3,8 @@ from SimulateMany import simulate
 from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
 
-N_OF_CALIB_SIMS = 500    # total number of trajectories to simulate as part of calibration
-N_OF_SIMS = 50   # number of trajectories to simulate using the calibrated model
+N_OF_CALIB_SIMS = 2000    # total number of trajectories to simulate as part of calibration
+N_OF_SIMS = 200   # number of trajectories to simulate using the calibrated model
 RUN_IN_PARALLEL = True
 
 

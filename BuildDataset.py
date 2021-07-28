@@ -38,7 +38,7 @@ def build_dataset(prediction_time):
                           'Obs: % of new hospitalizations due to Novel'],
         names_of_prev_fs=['Obs: Cumulative vaccination rate',
                           'Obs: Cumulative hospitalization rate'],
-        names_of_parameter_fs=['R0s-0'],
+        names_of_parameter_fs=['R0'],
         output_file='data at week {}.csv'.format(prediction_time*52))
 
 

@@ -4,7 +4,7 @@ import covid_prediction.evaluate_predictive_models as E
 
 features = ['Obs: New hospitalization rate',
             'Obs: Cumulative vaccination rate', 'Obs: Cumulative hospitalization rate',
-            'R0s-0']
+            'R0']
 OUTCOME = 'If hospitalization threshold passed'
 NUM_OF_BOOTSTRAPS = 100
 POLY_DEGREE = 1
@@ -22,7 +22,7 @@ E.evaluate_logistic(data=df, feature_names=features[1:2], outcome_name=OUTCOME,
                     poly_degree=POLY_DEGREE, n_bootstraps=NUM_OF_BOOTSTRAPS, if_standardize=IF_STANDARDIZED,
                     penalty=PENALTY)
 
-E.evaluate_logistic(data=df, feature_names=features[2:3], outcome_name=OUTCOME,
+E.evaluate_logistic(data=df, feature_names=features[1:4], outcome_name=OUTCOME,
                     poly_degree=POLY_DEGREE, n_bootstraps=NUM_OF_BOOTSTRAPS, if_standardize=IF_STANDARDIZED,
                     penalty=PENALTY)
 
