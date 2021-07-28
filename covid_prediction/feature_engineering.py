@@ -19,46 +19,62 @@ class FeatureEngineering:
         self.hospThreshold = hosp_threshold
         self.datasetNames = os.listdir(directory_name)
 
-    def pre_process(self, names_of_incd_fs, names_of_prev_fs, names_of_parameter_fs, output_file):
+    def pre_process(self, info_of_incd_fs, info_of_prev_fs, info_of_parameter_fs, output_file):
         """
         read a trajectory in the assigned the directory and pre-process
-        :param names_of_incd_fs: names of incidence feature
-        :param names_of_prev_fs: names of prevalence feature
-        :param names_of_parameter_fs: names of epidemic feature
+        :param info_of_incd_fs: names of incidence feature
+        :param info_of_prev_fs: names of prevalence feature
+        :param info_of_parameter_fs: names of epidemic feature
         :param output_file: name of output csv
         """
 
+        outcomes_labels = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
+
+        # find final feature names and outcomes
+        col_names = []
+        col_names.extend(self._get_incd_or_prev_feature_names(info_of_incd_fs))
+        col_names.extend(self._get_incd_or_prev_feature_names(info_of_prev_fs))
+        col_names.extend(info_of_parameter_fs)
+        col_names.extend(outcomes_labels)
+
         # read dataset of epidemic features
         param_df = pd.read_csv('outputs/summary/parameter_values.csv')
-        param_col = []
-        for name in names_of_parameter_fs:
-            param_col.append(np.asarray(param_df[name]))
+        # columns to store parameter values
+        param_cols = []
+        for name in info_of_parameter_fs:
+            param_cols.append(np.asarray(param_df[name]))
 
+        # columns for incidence and prevalence features
         dataset = []
         for i in range(len(self.datasetNames)):
+
+            # read trajectory file
             df = pd.read_csv('{}/{}'.format(self.directoryName, self.datasetNames[i]))
 
             # create a new row based on this trajectory
             # features
-            incd_fs = self._get_incd_features(df=df, feature_names=names_of_incd_fs)
-            prev_fs = self._get_prev_features(df=df, feature_names=names_of_prev_fs)
+            incd_fs = self._get_incd_features(df=df, feature_names=info_of_incd_fs)
+            prev_fs = self._get_prev_features(df=df, feature_names=info_of_prev_fs)
+
             # outcomes to predict
             if_hosp_threshold_passed, hosp_max = self._get_if_threshold_passed_and_max(df=df)
 
             # incidence features, prevalence features
             traj_row = incd_fs + prev_fs
+
             # add epidemic parameter values for corresponding trajectory
-            for col in param_col:
+            for col in param_cols:
                 traj_row.append(col[i])
+
             # max hospital rate and whether surpass capacity
             traj_row.extend([hosp_max, if_hosp_threshold_passed])
 
             dataset.append(traj_row)
 
         # convert to DataFrame
-        outcomes_labels = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
+
         df = pd.DataFrame(data=dataset,
-                          columns=(names_of_incd_fs + names_of_prev_fs + names_of_parameter_fs + outcomes_labels))
+                          columns=col_names)
 
         # save new dataset to file
         output_dir = Path('outputs/prediction_dataset/')
@@ -115,3 +131,26 @@ class FeatureEngineering:
                     prevalence_f_list.append(pair[1])
                     break
         return prevalence_f_list
+
+    @staticmethod
+    def _get_incd_or_prev_feature_names(info_of_incd_or_prev_fs):
+
+        feature_names = []
+        for info in info_of_incd_or_prev_fs:
+            if isinstance(info, str):
+                # feature name for last recording
+                feature_names.append(info)
+
+            elif isinstance(info, tuple):
+                # feature for last recording
+
+                for value in info:
+
+                    if isinstance(value, str):
+                        feature_names.append(info[0])
+                    else:
+                        feature_names.append('{}-{}-{}wk'.format(info[0], value[0], value[1]))
+            else:
+                raise ValueError('Invalid feature type.')
+
+        return feature_names
