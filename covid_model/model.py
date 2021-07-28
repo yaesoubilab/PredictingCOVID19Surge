@@ -344,20 +344,24 @@ def build_covid_model(model):
             numerator_sum_time_series=cum_vaccine_by_age[-1],
             denominator_sum_time_series=pop_size_by_age[-1]))
 
-    # --------- feasibility conditions ---------
-    # add feasible ranges of hospitalization rate
+    # --------- calibration and feasibility conditions ---------
     if sets.calcLikelihood:
+        # feasible ranges of hospitalization rate
         new_hosp_rate_by_age[0].add_feasible_conditions(
             feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_OVERALL / 100000,
                                                    min_threshold_to_hit=MIN_HOSP_RATE_OVERALL / 100000))
-
-        cum_hosp_rate_by_age[0].add_calibration_targets(ratios=sets.cumHospRateMean,
-                                                        survey_sizes=sets.cumHospRateN)
-
         # for a in range(indexer.nAgeGroups):
         #     new_hosp_rate_by_age[a+1].add_feasible_conditions(
         #         feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_BY_AGE[a] / 100000,
         #                                                min_threshold_to_hit=MIN_HOSP_RATE_BY_AGE[a] / 100000))
+
+        # calibration information for the overall hospitalization rate
+        cum_hosp_rate_by_age[0].add_calibration_targets(ratios=sets.cumHospRateMean,
+                                                        survey_sizes=sets.cumHospRateN)
+
+        # calibration information for the overall vaccination coverage
+        cum_vaccine_rate_by_age[0].add_calibration_targets(ratios=sets.cumVaccRateMean,
+                                                           survey_sizes=sets.cumVaccRateN)
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(

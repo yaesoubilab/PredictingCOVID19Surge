@@ -1,7 +1,7 @@
 import definitions as D
 from apace.CalibrationSupport import get_survey_size
 from apace.Inputs import ModelSettings
-from covid_model.data import CUM_HOSP_RATE_OVERALL
+from covid_model.data import CUM_HOSP_RATE_OVERALL, VACCINE_COVERAGE_OVER_TIME
 
 
 class COVIDSettings(ModelSettings):
@@ -39,17 +39,32 @@ class COVIDSettings(ModelSettings):
         if if_calibrating:
             self.cumHospRateMean = []
             self.cumHospRateN = []
+            self.cumVaccRateMean = []
+            self.cumVaccRateN = []
 
             week = 0
             while week / 52 < self.calibrationPeriod:
+                # hospitalization rate
                 if week == CUM_HOSP_RATE_OVERALL[0][0]:
                     self.cumHospRateMean.append(CUM_HOSP_RATE_OVERALL[0][1] * 0.00001)
                     self.cumHospRateN.append(get_survey_size(mean=CUM_HOSP_RATE_OVERALL[0][1],
-                                                             l=CUM_HOSP_RATE_OVERALL[0][2]*1.2,
-                                                             u=CUM_HOSP_RATE_OVERALL[0][3]*0.8,
+                                                             l=CUM_HOSP_RATE_OVERALL[0][2],
+                                                             u=CUM_HOSP_RATE_OVERALL[0][3],
                                                              multiplier=0.00001,
                                                              interval_type='c'))
                 else:
                     self.cumHospRateMean.append(None)
                     self.cumHospRateN.append(None)
+
+                # vaccination rate
+                if week == VACCINE_COVERAGE_OVER_TIME[-1][0]:
+                    self.cumVaccRateMean.append(VACCINE_COVERAGE_OVER_TIME[-1][1] * 0.01)
+                    self.cumVaccRateN.append(get_survey_size(mean=VACCINE_COVERAGE_OVER_TIME[-1][1],
+                                                             l=VACCINE_COVERAGE_OVER_TIME[-1][2],
+                                                             u=VACCINE_COVERAGE_OVER_TIME[-1][3],
+                                                             multiplier=0.01,
+                                                             interval_type='c'))
+                else:
+                    self.cumVaccRateMean.append(None)
+                    self.cumVaccRateN.append(None)
                 week += 1
