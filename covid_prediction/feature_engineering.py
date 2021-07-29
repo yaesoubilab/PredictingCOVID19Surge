@@ -17,64 +17,63 @@ class FeatureEngineering:
         self.timeOfPrediction = time_of_prediction
         self.simDuration = sim_duration
         self.hospThreshold = hosp_threshold
-        self.datasetNames = os.listdir(directory_name)
+        self.names_of_traj_files = os.listdir(directory_name)
 
     def pre_process(self, info_of_incd_fs, info_of_prev_fs, info_of_parameter_fs, output_file):
         """
         read a trajectory in the assigned the directory and pre-process
-        :param info_of_incd_fs: names of incidence feature
-        :param info_of_prev_fs: names of prevalence feature
-        :param info_of_parameter_fs: names of epidemic feature
+        :param info_of_incd_fs: information of incidence features
+        :param info_of_prev_fs: information of prevalence features
+        :param info_of_parameter_fs: names of parameter feature
         :param output_file: name of output csv
         """
 
         outcomes_labels = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
 
-        # find final feature names and outcomes
-        col_names = []
-        col_names.extend(self._get_incd_or_prev_feature_names(info_of_incd_fs))
-        col_names.extend(self._get_incd_or_prev_feature_names(info_of_prev_fs))
-        col_names.extend(info_of_parameter_fs)
-        col_names.extend(outcomes_labels)
+        # find the labels of features
+        # (note that on a trajectory these features can be defined:
+        # last recoding, average of last recordings, slope of last recordings.
+        col_labels = []
+        col_labels.extend(self._get_labels_of_incd_or_prev_features(info_of_incd_fs))
+        col_labels.extend(self._get_labels_of_incd_or_prev_features(info_of_prev_fs))
+        col_labels.extend(info_of_parameter_fs)
+        col_labels.extend(outcomes_labels)
 
-        # read dataset of epidemic features
+        # read dataset of the parameter features
         param_df = pd.read_csv('outputs/summary/parameter_values.csv')
-        # columns to store parameter values
-        param_cols = []
+        param_cols = []  # columns of parameter values
         for name in info_of_parameter_fs:
             param_cols.append(np.asarray(param_df[name]))
 
-        # columns for incidence and prevalence features
-        dataset = []
-        for i in range(len(self.datasetNames)):
+        # values of incidence, prevalence, and parameters features
+        all_feature_values = []
+        for i in range(len(self.names_of_traj_files)):
 
             # read trajectory file
-            df = pd.read_csv('{}/{}'.format(self.directoryName, self.datasetNames[i]))
+            df = pd.read_csv('{}/{}'.format(self.directoryName, self.names_of_traj_files[i]))
 
-            # create a new row based on this trajectory
-            # features
-            incd_fs = self._get_incd_features(df=df, feature_names=info_of_incd_fs)
-            prev_fs = self._get_prev_features(df=df, feature_names=info_of_prev_fs)
+            # read values of incidence and prevalence features for this trajectory
+            incd_fs = self._get_incd_features(df=df, info_of_features=info_of_incd_fs)
+            prev_fs = self._get_prev_features(df=df, feature_info=info_of_prev_fs)
 
-            # outcomes to predict
+            # values of outcomes to predict
             if_hosp_threshold_passed, hosp_max = self._get_if_threshold_passed_and_max(df=df)
 
+            # make a row of feature values
             # incidence features, prevalence features
-            traj_row = incd_fs + prev_fs
-
+            row = incd_fs + prev_fs
             # add epidemic parameter values for corresponding trajectory
             for col in param_cols:
-                traj_row.append(col[i])
-
+                row.append(col[i])
             # max hospital rate and whether surpass capacity
-            traj_row.extend([hosp_max, if_hosp_threshold_passed])
+            row.extend([hosp_max, if_hosp_threshold_passed])
 
-            dataset.append(traj_row)
+            # store this row of feature values
+            all_feature_values.append(row)
 
         # convert to DataFrame
-
-        df = pd.DataFrame(data=dataset,
-                          columns=col_names)
+        df = pd.DataFrame(data=all_feature_values,
+                          columns=col_labels)
 
         # save new dataset to file
         output_dir = Path('outputs/prediction_dataset/')
@@ -102,30 +101,70 @@ class FeatureEngineering:
 
         return if_surpass_threshold, maximum
 
-    def _get_incd_features(self, df, feature_names):
+    def _get_incd_features(self, df, info_of_features):
         """
         get value of an incidence feature over the specified week
         :param df: df of interest
-        :param feature_names: list of names of features that are observed over a week
+        :param info_of_features: list of information for features that are observed over a week
         :return: list of values for incidence features
         """
-        incidence_f_list = []
-        for feature_name in feature_names:
-            for pair in zip(df['Observation Period'], df[feature_name]):
-                if pair[0] == 52 * self.timeOfPrediction:
-                    incidence_f_list.append(pair[1])
-                    break
-        return incidence_f_list
 
-    def _get_prev_features(self, df, feature_names):
+        f_values = []   # feature values
+        for info in info_of_features:
+            # get the column in trajectory files where the data is located to define features
+            if isinstance(info, str):
+                col = df[info]
+            elif isinstance(info, tuple):
+                col = df[info[0]]
+            else:
+                raise ValueError('Invalid feature information.')
+
+            # read trajectory data until the time of prediction
+            data = []
+            for pair in zip(df['Observation Period'], col):
+                if not np.isnan(pair[0]):
+                    if pair[0] <= 52 * self.timeOfPrediction:
+                        data.append(pair[1])
+                    else:
+                        break
+
+            # calculate feature value
+            if isinstance(info, str):
+                f_values.append(data[-1])
+            elif isinstance(info, tuple):
+                for v in info:
+                    if isinstance(v, str):
+                        f_values.append(data[-1])
+                    elif isinstance(v, tuple):
+                        if v[0] == 'ave':
+                            f_values.append(np.average(data[-v[1]:]))
+                        elif v[0] == 'slope':
+                            x = np.arange(0, v[1])
+                            y = data[-v[1]:]
+                            slope = np.polyfit(x, y, deg=1)[0]
+                            raise f_values.append(slope)
+                        else:
+                            raise ValueError('Invalid.')
+            else:
+                raise ValueError('Invalid feature information.')
+
+                # # feature name for last recording
+                # for pair in zip(df['Observation Period'], df[info]):
+                #     if pair[0] == 52 * self.timeOfPrediction:
+                #         incidence_f_list.append(pair[1])
+                #         break
+
+        return f_values
+
+    def _get_prev_features(self, df, feature_info):
         """
         value of a prevalence feature at the specified time
         :param df: df of interest
-        :param feature_names: features that are observed at the beginning of a week
+        :param feature_info: features that are observed at the beginning of a week
         :return:
         """
         prevalence_f_list = []
-        for feature_name in feature_names:
+        for feature_name in feature_info:
             for pair in zip(df['Observation Time'], df[feature_name]):
                 if 52*abs(pair[0] - self.timeOfPrediction) < 0.5:
                     prevalence_f_list.append(pair[1])
@@ -133,7 +172,7 @@ class FeatureEngineering:
         return prevalence_f_list
 
     @staticmethod
-    def _get_incd_or_prev_feature_names(info_of_incd_or_prev_fs):
+    def _get_labels_of_incd_or_prev_features(info_of_incd_or_prev_fs):
 
         feature_names = []
         for info in info_of_incd_or_prev_fs:
@@ -145,7 +184,6 @@ class FeatureEngineering:
                 # feature for last recording
 
                 for value in info:
-
                     if isinstance(value, str):
                         feature_names.append(info[0])
                     else:
