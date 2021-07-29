@@ -53,8 +53,8 @@ class FeatureEngineering:
             df = pd.read_csv('{}/{}'.format(self.directoryName, self.names_of_traj_files[i]))
 
             # read values of incidence and prevalence features for this trajectory
-            incd_fs = self._get_incd_features(df=df, info_of_features=info_of_incd_fs)
-            prev_fs = self._get_prev_features(df=df, feature_info=info_of_prev_fs)
+            incd_fs = self._get_feature_values(df=df, info_of_features=info_of_incd_fs, incd_or_prev='incd')
+            prev_fs = self._get_feature_values(df=df, info_of_features=info_of_prev_fs, incd_or_prev='prev')
 
             # values of outcomes to predict
             if_hosp_threshold_passed, hosp_max = self._get_if_threshold_passed_and_max(df=df)
@@ -101,12 +101,13 @@ class FeatureEngineering:
 
         return if_surpass_threshold, maximum
 
-    def _get_incd_features(self, df, info_of_features):
+    def _get_feature_values(self, df, info_of_features, incd_or_prev):
         """
         get value of an incidence feature over the specified week
         :param df: df of interest
         :param info_of_features: list of information for features that are observed over a week
-        :return: list of values for incidence features
+        :param incd_or_prev: 'incd' or 'prev' to specify if incidence features or prevalence features are provided
+        :return: list of values for features
         """
 
         f_values = []   # feature values
@@ -121,12 +122,22 @@ class FeatureEngineering:
 
             # read trajectory data until the time of prediction
             data = []
-            for pair in zip(df['Observation Period'], col):
-                if not np.isnan(pair[0]):
-                    if pair[0] <= 52 * self.timeOfPrediction:
-                        data.append(pair[1])
-                    else:
-                        break
+            if incd_or_prev == 'incd':
+                for pair in zip(df['Observation Period'], col):
+                    if not np.isnan(pair[1]):
+                        if pair[0] <= 52 * self.timeOfPrediction:
+                            data.append(pair[1])
+                        else:
+                            break
+            elif incd_or_prev == 'prev':
+                for pair in zip(df['Observation Time'], col):
+                    if not np.isnan(pair[1]):
+                        if 52 * (pair[0] - self.timeOfPrediction) < 0.5:
+                            data.append(pair[1])
+                        else:
+                            break
+            else:
+                raise ValueError('Invalid value for the type of features.')
 
             # calculate feature value
             if isinstance(info, str):
@@ -142,7 +153,7 @@ class FeatureEngineering:
                             x = np.arange(0, v[1])
                             y = data[-v[1]:]
                             slope = np.polyfit(x, y, deg=1)[0]
-                            raise f_values.append(slope)
+                            f_values.append(slope)
                         else:
                             raise ValueError('Invalid.')
             else:
@@ -155,21 +166,6 @@ class FeatureEngineering:
                 #         break
 
         return f_values
-
-    def _get_prev_features(self, df, feature_info):
-        """
-        value of a prevalence feature at the specified time
-        :param df: df of interest
-        :param feature_info: features that are observed at the beginning of a week
-        :return:
-        """
-        prevalence_f_list = []
-        for feature_name in feature_info:
-            for pair in zip(df['Observation Time'], df[feature_name]):
-                if 52*abs(pair[0] - self.timeOfPrediction) < 0.5:
-                    prevalence_f_list.append(pair[1])
-                    break
-        return prevalence_f_list
 
     @staticmethod
     def _get_labels_of_incd_or_prev_features(info_of_incd_or_prev_fs):

@@ -18,7 +18,7 @@ class COVIDParameters(EpiParameters):
         # -------- model main parameters -------------
         # age groups: ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
         us_age_dist = [0.060, 0.100, 0.064, 0.163, 0.256, 0.192, 0.096, 0.069]
-        hosp_relative_risk = [0.5, 0.5, 1, 1, 2, 4, 8, 20]
+        hosp_relative_risk = [0.5, 0.5, 0.25, 1, 2, 4, 15, 40]
         prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
         contact_matrix = [
