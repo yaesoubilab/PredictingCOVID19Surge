@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
 
 
 class FeatureEngineering:
@@ -79,6 +80,10 @@ class FeatureEngineering:
         output_dir = Path('outputs/prediction_dataset/')
         output_dir.mkdir(parents=True, exist_ok=True)
         df.to_csv(output_dir / output_file, index=False)
+
+        # report correlations
+        report_corrs(df=df, outcomes=outcomes_labels,
+                     csv_file_name='outputs/prediction_dataset/corrs-{}.csv'.format(output_file))
 
     def _get_if_threshold_passed_and_max(self, df):
         """
@@ -188,3 +193,27 @@ class FeatureEngineering:
                 raise ValueError('Invalid feature type.')
 
         return feature_names
+
+
+def report_corrs(df, outcomes, csv_file_name):
+
+    col_labels = ['feature']
+    for o in outcomes:
+        col_labels.extend(['{} | corr'.format(o), '{} | p-value'.format(o)])
+
+    # correlation between each feature column and outcomes
+    rows = []
+    for f_name in df:
+        if f_name not in outcomes:
+            row = [f_name]
+            for o in outcomes:
+                y = df[o]
+                if f_name != o:
+                    # correlation and p-value
+                    corr, p = pearsonr(df[f_name], y)
+                    row.extend([corr, p])
+            rows.append(row)
+
+    df = pd.DataFrame(data=rows,
+                      columns=col_labels)
+    df.to_csv(csv_file_name)

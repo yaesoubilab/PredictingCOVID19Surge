@@ -50,8 +50,6 @@ def build_dataset(prediction_time, sim_duration, hosp_threshold):
             'Ratio transmissibility by profile-2',
             'Ratio of hospitalization probability by profile-1',
             'Ratio of hospitalization probability by profile-2',
-            'Ratio transmissibility by profile-1',
-            'Ratio transmissibility by profile-2',
             'Ratio of infectiousness duration by profile-1',
             'Ratio of infectiousness duration by profile-2',
             'Duration of R-0',
