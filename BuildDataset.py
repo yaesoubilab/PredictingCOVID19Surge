@@ -35,28 +35,47 @@ def build_dataset(prediction_time, sim_duration, hosp_threshold):
         # to report the recording at prediction time and
         # to calculate the average and slope of observations during past weeks
         info_of_incd_fs=[
+            ('Obs: Incidence rate', ('ave', 2), ('slope', 4)),
             ('Obs: New hospitalization rate', ('ave', 2), ('slope', 4)),
             ('Obs: % of incidence due to Novel', ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to Novel', ('ave', 2), ('slope', 4))
+            ('Obs: % of incidence due to Vaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to Novel', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to Vaccinated', ('ave', 2), ('slope', 4))
         ],
         info_of_prev_fs=[
+            'Obs: Prevalence susceptible',
             'Obs: Cumulative vaccination rate',
             'Obs: Cumulative hospitalization rate'],
         info_of_parameter_fs=[
             'R0',
             'Duration of infectiousness-dominant',
             'Prob Hosp for 18-29',
-            'Ratio transmissibility by profile-1',
-            'Ratio transmissibility by profile-2',
+            'Relative prob hosp by age-0',
+            'Relative prob hosp by age-1',
+            'Relative prob hosp by age-2',
+            'Relative prob hosp by age-4',
+            'Relative prob hosp by age-5',
+            'Relative prob hosp by age-6',
+            'Relative prob hosp by age-7',
             'Ratio of hospitalization probability by profile-1',
             'Ratio of hospitalization probability by profile-2',
+            'Ratio transmissibility by profile-1',
+            'Ratio transmissibility by profile-2',
             'Ratio of infectiousness duration by profile-1',
             'Ratio of infectiousness duration by profile-2',
             'Duration of R-0',
             'Duration of R-1',
             'Duration of R-2',
             'Duration of vaccine immunity',
-            'Vaccine effectiveness against infection with novel'],
+            'Prob novel strain params-0',
+            'Prob novel strain params-1',
+            'Prob novel strain params-2',
+            'Vaccine effectiveness against infection with novel',
+            'PD Y1 thresholds-0',
+            'PD Y1 thresholds-1',
+            'Change in contacts - PD Y1',
+            'Change in contacts - PD Y1+'
+        ],
         output_file='data at week {}.csv'.format(prediction_time*52))
 
 
