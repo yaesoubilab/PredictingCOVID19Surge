@@ -3,8 +3,8 @@ from enum import Enum
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-CALIB_PERIOD = 1.5  # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
-PROJ_PERIOD = 0.75  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
+CALIB_PERIOD = 2  # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
+PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']

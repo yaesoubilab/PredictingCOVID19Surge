@@ -372,6 +372,10 @@ def build_covid_model(model):
         cum_vaccine_rate_by_age[0].add_calibration_targets(ratios=sets.cumVaccRateMean,
                                                            survey_sizes=sets.cumVaccRateN)
 
+        # calibration information for the percentage of infection associated with the novel variant
+        profile_dist_incd[1].add_calibration_targets(ratios=sets.percInfWithNovelMean,
+                                                     survey_sizes=sets.percInfWithNovelN)
+
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
         settings=sets, params=params, in_hosp_rate=new_hosp_rate_by_age[0])

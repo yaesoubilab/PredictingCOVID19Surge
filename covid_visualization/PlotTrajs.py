@@ -111,7 +111,11 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                     title='Incidence associated with\n'
                                           'novel strain among the unvaccinated\n(%)',
                                     y_range=(0, 100), y_multiplier=100,
-                                    x_multiplier=obs_incd_multiplier)
+                                    x_multiplier=obs_incd_multiplier,
+                                    calibration_info=A.CalibrationTargetPlotInfo(
+                                        rows_of_data=D.PERC_INF_WITH_NOVEL,
+                                        if_connect_obss=False)
+                                    )
     obs_incd_vaccinated = A.TrajPlotInfo(outcome_name='% of incidence due to Vaccinated',
                                          title='Incidence associated with\n'
                                                'novel strain among the vaccinated\n(%)',

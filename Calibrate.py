@@ -1,10 +1,11 @@
 import apace.Calibration as calib
+import definitions as D
 from SimulateMany import simulate
 from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
 
 N_OF_CALIB_SIMS = 5000    # total number of trajectories to simulate as part of calibration
-N_OF_SIMS = 500   # number of trajectories to simulate using the calibrated model
+N_OF_SIMS = 100   # number of trajectories to simulate using the calibrated model
 RUN_IN_PARALLEL = True
 
 
@@ -12,7 +13,7 @@ if __name__ == "__main__":
 
     # get model settings
     sets = COVIDSettings(if_calibrating=True)
-    sets.simulationDuration = 78*7/364  # 78 weeks
+    sets.simulationDuration = D.CALIB_PERIOD
     sets.ifCollectTrajsOfCompartments = False
     sets.exportCalibrationTrajs = False
 

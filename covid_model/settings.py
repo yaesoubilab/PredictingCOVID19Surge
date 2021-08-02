@@ -1,7 +1,7 @@
 import definitions as D
 from apace.CalibrationSupport import get_survey_size
 from apace.Inputs import ModelSettings
-from covid_model.data import CUM_HOSP_RATE_OVERALL, VACCINE_COVERAGE_OVER_TIME
+from covid_model.data import CUM_HOSP_RATE_OVERALL, VACCINE_COVERAGE_OVER_TIME, PERC_INF_WITH_NOVEL
 
 
 class COVIDSettings(ModelSettings):
@@ -41,6 +41,9 @@ class COVIDSettings(ModelSettings):
             self.cumHospRateN = []
             self.cumVaccRateMean = []
             self.cumVaccRateN = []
+            self.percInfWithNovelMean = []
+            self.percInfWithNovelN = []
+            weeks_with_data_prec_inf = [v[0] for v in PERC_INF_WITH_NOVEL[3:]]
 
             week = 0
             while week / 52 < self.calibrationPeriod:
@@ -67,4 +70,19 @@ class COVIDSettings(ModelSettings):
                 else:
                     self.cumVaccRateMean.append(None)
                     self.cumVaccRateN.append(None)
+
+                # % infected with novel variant
+                if week in weeks_with_data_prec_inf:
+                    index = weeks_with_data_prec_inf.index(week) + 3
+                    self.percInfWithNovelMean.append(PERC_INF_WITH_NOVEL[index][1]*0.01)
+                    self.percInfWithNovelN.append((get_survey_size(mean=PERC_INF_WITH_NOVEL[index][1],
+                                                                   l=PERC_INF_WITH_NOVEL[index][2],
+                                                                   u=PERC_INF_WITH_NOVEL[index][3],
+                                                                   multiplier=0.01,
+                                                                   interval_type='c')))
+
+                else:
+                    self.percInfWithNovelMean.append(None)
+                    self.percInfWithNovelN.append(None)
+
                 week += 1
