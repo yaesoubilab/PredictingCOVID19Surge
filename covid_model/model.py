@@ -7,7 +7,7 @@ from apace.ModelObjects import Compartment, ChanceNode, DeathCompartment, EpiInd
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL
 from covid_model.parameters import COVIDParameters
-from definitions import AgeGroupsProfiles
+from definitions import AgeGroupsProfiles, Profiles
 
 
 def build_covid_model(model):
@@ -239,7 +239,7 @@ def build_covid_model(model):
                                                    denominator_sum_time_series=pop_size_by_age[0],
                                                    if_surveyed=True))
     
-    # incidence and new hospitalization by profile (current, novel, vaccinated)
+    # incidence and new hospitalization by profile (dominant, novel, vaccinated)
     incd_by_profile = []
     new_hosp_by_profile = []
     profile_dist_incd = []
@@ -270,7 +270,33 @@ def build_covid_model(model):
                                                      numerator_sum_time_series=new_hosp_by_profile[-1],
                                                      denominator_sum_time_series=new_hosp_by_age[0],
                                                      if_surveyed=True))
-    
+
+    # incidence and new hospitalization for novel + vaccinated
+    Is_novel_vacc = []
+    Hs_novel_vacc = []
+    for p in range(age_groups_profiles.nProfiles):
+        # find Is and Hs in this profile
+        if p in (Profiles.N.value, Profiles.V.value):
+            for a in range(age_groups_profiles.nAgeGroups):
+                i = age_groups_profiles.get_row_index(age_group=a, profile=p)
+                Is_novel_vacc.append(Is[i])
+                Hs_novel_vacc.append(Hs[i])
+
+    incd_novel_vacc = SumIncidence(
+        name='Incidence-novel and vaccinated', compartments=Is_novel_vacc)
+    new_hosp_novel_vacc = SumIncidence(
+        name='New hosp-novel and vaccinated', compartments=Hs_novel_vacc)
+    # profile-distribution of incidence
+    perc_incd_novel_vacc = RatioTimeSeries(name='% of incidence with novel variant',
+                                           numerator_sum_time_series=incd_novel_vacc,
+                                           denominator_sum_time_series=incd_by_age[0],
+                                           if_surveyed=True)
+    # profile-distribution of new hospitalization
+    perc_new_hosp_incd_novel_vacc = RatioTimeSeries(name='% of new hospitalizations with novel variant',
+                                                    numerator_sum_time_series=new_hosp_novel_vacc,
+                                                    denominator_sum_time_series=new_hosp_by_age[0],
+                                                    if_surveyed=True)
+
     # list to contain summation statistics
     for a in range(age_groups_profiles.nAgeGroups):
         str_a = age_groups_profiles.get_str_age(age_group=a)
@@ -398,6 +424,7 @@ def build_covid_model(model):
     list_of_sum_time_series.extend(cum_vaccine_by_age)
     list_of_sum_time_series.extend(incd_by_profile)
     list_of_sum_time_series.extend(new_hosp_by_profile)
+    list_of_sum_time_series.extend([incd_novel_vacc, new_hosp_novel_vacc])
 
     # ratio time-series
     list_of_ratio_time_series = []
@@ -412,6 +439,7 @@ def build_covid_model(model):
     list_of_ratio_time_series.extend(age_dist_cum_incd)
     list_of_ratio_time_series.extend(age_dist_new_hosp)
     list_of_ratio_time_series.extend(age_dist_cum_death)
+    list_of_ratio_time_series.extend([perc_incd_novel_vacc, perc_new_hosp_incd_novel_vacc])
 
     model.populate(compartments=compartments,
                    parameters=params,
