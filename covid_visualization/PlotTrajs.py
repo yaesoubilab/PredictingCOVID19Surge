@@ -1,7 +1,7 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, MAX_HOSP_RATE_BY_AGE, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
+from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
 from definitions import AgeGroups, Profiles, CALIB_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
@@ -155,9 +155,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             outcome_name='Hospitalization rate-{}'.format(str_a),
             title=str_a, y_label='Hospitalization rate\n(per 100,000 population)' if a == 0 else None,
             y_range=(0, 1000), y_multiplier=100000, x_multiplier=incd_multiplier,
-            calibration_info=A.CalibrationTargetPlotInfo(
-                feasible_range_info=A.FeasibleRangeInfo(
-                    x_range=[0, CALIB_PERIOD * 52], y_range=[0, MAX_HOSP_RATE_BY_AGE[a]]))))
+            # calibration_info=A.CalibrationTargetPlotInfo(
+            #     feasible_range_info=A.FeasibleRangeInfo(
+            #         x_range=[0, CALIB_PERIOD * 52], y_range=[0, MAX_HOSP_RATE_BY_AGE[a]]))
+        ))
 
         cum_hosp_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Cumulative hospitalization rate-{}'.format(str_a),

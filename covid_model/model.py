@@ -320,7 +320,7 @@ def build_covid_model(model):
         cum_hosp_by_age.append(SumCumulativeIncidence(
             name='Cumulative hospitalizations-' + str_a, compartments=Hs_this_age))
         # rate of cumulative hospitalizations
-        new_hosp_rate_by_age.append(RatioTimeSeries(
+        cum_hosp_rate_by_age.append(RatioTimeSeries(
             name='Cumulative hospitalization rate-' + str_a,
             numerator_sum_time_series=cum_hosp_by_age[-1],
             denominator_sum_time_series=pop_size_by_age[-1]))
@@ -359,7 +359,7 @@ def build_covid_model(model):
         new_hosp_rate_by_age[0].add_feasible_conditions(
             feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_OVERALL / 100000,
                                                    min_threshold_to_hit=MIN_HOSP_RATE_OVERALL / 100000))
-        # for a in range(indexer.nAgeGroups):
+        # for a in range(age_groups_profiles.nAgeGroups):
         #     new_hosp_rate_by_age[a+1].add_feasible_conditions(
         #         feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_BY_AGE[a] / 100000,
         #                                                min_threshold_to_hit=MIN_HOSP_RATE_BY_AGE[a] / 100000))
