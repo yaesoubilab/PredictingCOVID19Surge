@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from SimPy.Parameters import Constant, TimeDependentSigmoid
+from SimPy.Parameters import Constant, TimeDependentSigmoid, TimeDependentCosine
 
 SIM_DURATION = 2.25
 T0 = 0
@@ -10,9 +10,8 @@ Y_RANGE = (0, 1)
 SEPTEMBER_FIRST = 1.5
 
 
-def f(t, b, f_min, f_max, t_mid, t_min=0):
-    # sigmoid function f(t) = min + (max-min) * 1 / (1 + exp(-b * (t - t_mid)) if t >= t_min
-    # (0 otherwise)
+def sigmoid(t, b, f_min, f_max, t_mid, t_min=0):
+    # sigmoid function
     par = TimeDependentSigmoid(
         par_b=Constant(b),
         par_t_min=Constant(t_min),
@@ -22,11 +21,17 @@ def f(t, b, f_min, f_max, t_mid, t_min=0):
     )
     val = par.sample(time=t)
     return val if val > 0 else None
-    #
-    # if t >= t_min:
-    #     return b_min + (b_max-b_min) / (1 + np.exp(-b * (t - t_mid-t_min)))
-    # else:
-    #     return None
+
+
+def cos(t, phase, scale, f_min, f_max):
+    # cosine function
+    par = TimeDependentCosine(
+        par_phase=Constant(phase),
+        par_scale=Constant(scale),
+        par_min=Constant(f_min),
+        par_max=Constant(f_max)
+    )
+    return par.sample(time=t)
 
 
 def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
@@ -46,7 +51,7 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
         ys = []
         for v in bs:
             legs.append(r'$b=$' + str(v))
-            ys.append([f(t, b=v, t_mid=t_mid, f_min=f_min, f_max=f_max, t_min=t_min) for t in ts])
+            ys.append([sigmoid(t, b=v, t_mid=t_mid, f_min=f_min, f_max=f_max, t_min=t_min) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
@@ -57,7 +62,7 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
         ys = []
         for v in f_mins:
             legs.append(r'$b_{min}=$' + str(v))
-            ys.append([f(t, b=b, t_mid=t_mid, f_min=v, f_max=f_max, t_min=t_min) for t in ts])
+            ys.append([sigmoid(t, b=b, t_mid=t_mid, f_min=v, f_max=f_max, t_min=t_min) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
@@ -68,7 +73,7 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
         ys = []
         for v in f_maxs:
             legs.append(r'$b_{max}=$' + str(v))
-            ys.append([f(t, b=b, t_mid=t_mid, f_min=f_min, f_max=v, t_min=t_min) for t in ts])
+            ys.append([sigmoid(t, b=b, t_mid=t_mid, f_min=f_min, f_max=v, t_min=t_min) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
@@ -79,7 +84,7 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
         ys = []
         for v in t_mids:
             legs.append(r'$t_{mid}=$' + str(v))
-            ys.append([f(t, b=b, t_mid=v, f_min=f_min, f_max=f_max, t_min=t_min) for t in ts])
+            ys.append([sigmoid(t, b=b, t_mid=v, f_min=f_min, f_max=f_max, t_min=t_min) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
@@ -90,7 +95,7 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
         ys = []
         for v in t_mins:
             legs.append(r'$t_{min}=$' + str(v))
-            ys.append([f(t, b=b, t_mid=t_mid, f_min=f_min, f_max=f_max, t_min=v) for t in ts])
+            ys.append([sigmoid(t, b=b, t_mid=t_mid, f_min=f_min, f_max=f_max, t_min=v) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
@@ -112,6 +117,67 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
     plt.tight_layout()
     plt.show()
 
+
+def plot_cos_functions(phase, f_min, f_max,
+                       phases, f_mins, f_maxes,
+                       y_label, fig_size=(7.5, 3.2)):
+
+    # ------------------
+    ts = np.linspace(start=T0, stop=SIM_DURATION)
+    fs = []
+    legends = []
+    titles = []
+
+    # varying phases
+    if phases is not None:
+        titles.append('Varying '+r'$\phi$')
+        legs = [] # legends
+        ys = []
+        for v in phases:
+            legs.append(r'$\phi=$'+str(v))
+            ys.append([cos(t, phase=v, scale=1, f_min=f_min, f_max=f_max) for t in ts])
+        legends.append(legs)
+        fs.append(ys)
+
+    # varying min
+    if f_mins is not None:
+        titles.append('Varying '+r'$\sigma_{min}$')
+        legs = [] # legends
+        ys = []
+        for v in f_mins:
+            legs.append(r'$\sigma_{min}=$'+str(v))
+            ys.append([cos(t, phase=phase, scale=1, f_min=v, f_max=f_max) for t in ts])
+        legends.append(legs)
+        fs.append(ys)
+
+    # varying max
+    if f_maxes is not None:
+        titles.append('Varying '+r'$\sigma_{max}$')
+        legs = [] # legends
+        ys = []
+        for v in f_maxes:
+            legs.append(r'$\sigma_{max}=$'+str(v))
+            ys.append([cos(t, phase=phase, scale=1, f_min=f_min, f_max=v) for t in ts])
+        legends.append(legs)
+        fs.append(ys)
+
+    # plot
+    fig, axarr = plt.subplots(1, len(fs), sharey=True, figsize=fig_size)
+    for i, ax in enumerate(axarr):
+        ax.set_title(titles[i])
+
+        for j in range(len(fs[i])):
+            ax.plot(ts, fs[i][j], label=legends[i][j])  # color='b', linestyle='-')
+
+        ax.set_ylim(Y_RANGE)
+        ax.set_xlim(X_RANGE)
+        ax.axvline(x=SEPTEMBER_FIRST, c='k', linestyle='--', linewidth=0.5)
+        ax.set_xlabel('Simulation Year ' + r'$(t)$')
+        ax.legend(fontsize='x-small') # loc=2
+
+    axarr[0].set_ylabel(y_label)
+    plt.tight_layout()
+    plt.show()
 
 # ---- settings ----
 
@@ -135,3 +201,10 @@ plot_sigmoid_functions(b=-8, bs=[-10, -8, -6],
                        t_min=1, t_mins=[0.8, 1, 1.2],
                        # t_min=0, t_mins=None,
                        y_label=r'$v(t)$', fig_size=(9, 3))
+
+# seasonality
+Y_RANGE = (0, 3)
+plot_cos_functions(phase=0, phases=[-0.1, 0, 0.1],
+                   f_min=1, f_mins=None,
+                   f_max=2, f_maxes=[1.5, 2, 2.5],
+                   y_label=r'$\sigma(t)$', fig_size=(5.3, 3))
