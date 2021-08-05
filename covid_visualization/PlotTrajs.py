@@ -2,7 +2,7 @@ import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
 from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
-from definitions import AgeGroups, Profiles, CALIB_PERIOD
+from definitions import AgeGroups, Profiles, FEASIBILITY_PERIOD
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 IF_MAKE_VALIDATION_PLOTS = False
@@ -75,10 +75,11 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
     obs_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: New hospitalization rate',
                                    title='Hospitalization rate\n(per 100,000 population)',
-                                   y_range=(0, MAX_HOSP_RATE_OVERALL * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
+                                   y_range=(0, MAX_HOSP_RATE_OVERALL * 4),
+                                   y_multiplier=100000, x_multiplier=incd_multiplier,
                                    calibration_info=A.CalibrationTargetPlotInfo(
                                        feasible_range_info=A.FeasibleRangeInfo(
-                                           x_range=[0, CALIB_PERIOD*52],
+                                           x_range=[0, FEASIBILITY_PERIOD*52],
                                            y_range=[MIN_HOSP_RATE_OVERALL, MAX_HOSP_RATE_OVERALL])))
     obs_cum_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Cumulative hospitalization rate',
                                        title='Cumulative hospitalization rate\n(per 100,000 population)',
