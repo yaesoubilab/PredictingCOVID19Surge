@@ -229,9 +229,9 @@ class NNRegression(Classifier):
     def __init__(self, df, features, y_name, len_neurons=None):
         super().__init__(df, features, y_name)
 
-        self.len_neurons = len_neurons
+        self.len_neurons = len_neurons if len_neurons is not None else len(self.features) + 2
 
-    def run(self, random_state,
+    def run(self, random_state, activation='logistic', solver='adam', alpha=0.000001, max_iter=1000,
             test_size=0.2, display_roc_curve=True):
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
@@ -239,14 +239,12 @@ class NNRegression(Classifier):
                                                             random_state=random_state)
 
         # fit model
-        if self.len_neurons is None:
-            self.len_neurons = len(self.features) + 2
-        clf = MLPRegressor(alpha=0.000001,  # alpha: l2 penalty (regularization)
-                           max_iter=1000,
+        clf = MLPRegressor(alpha=alpha,  # alpha: l2 penalty (regularization)
+                           max_iter=max_iter,
                            hidden_layer_sizes=(self.len_neurons,),
                            random_state=random_state,
-                           solver='adam',  # the default 'adam' is preferred for large dataset
-                           activation='logistic')
+                           solver=solver,  # the default 'adam' is preferred for large dataset
+                           activation=activation)
         clf.fit(X=x_train, y=y_train)
 
         # prediction
@@ -261,13 +259,15 @@ class MultiNNRegression(MultiClassifiers):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run_many(self, num_bootstraps, test_size=0.2):
+    def run_many(self, num_bootstraps, activation='logistic', solver='adam',
+                 alpha=0.000001, max_iter=1000, test_size=0.2):
         performance_test_list = []
         i = 0
         model = NNRegression(df=self.df, features=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
-            model.run(random_state=i, test_size=test_size)
+            model.run(random_state=i, test_size=test_size,
+                      activation=activation, solver=solver, alpha=alpha, max_iter=max_iter)
             # append performance
             performance_test_list.append(model.performanceTest)
 
@@ -282,8 +282,7 @@ class NNClassification(Classifier):
 
         self.len_neurons = len_neurons
 
-    def run(self, random_state,
-            test_size=0.2, display_roc_curve=True):
+    def run(self, random_state, test_size=0.2, activation='logistic', solver='adam', display_roc_curve=True):
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
                                                             test_size=test_size,
@@ -296,8 +295,8 @@ class NNClassification(Classifier):
                             max_iter=10000,
                             hidden_layer_sizes=(self.len_neurons,),
                             random_state=random_state,
-                            solver='adam',     # the default 'adam' is preferred for large dataset
-                            activation='logistic')
+                            solver=solvar,     # the default 'adam' is preferred for large dataset
+                            activation=activation)
         clf.fit(X=x_train, y=y_train)
 
         # prediction
@@ -405,7 +404,9 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
         self.statR2 = Stat.SummaryStat(name="R-square", data=[performance.r2 for performance in self.performances])
         self.statMSE = Stat.SummaryStat(name='MSE', data=[performance.mse for performance in self.performances])
         self.statCV = Stat.SummaryStat(name='cross-validation',
-                                       data=[performance.cv for performance in self.performances])
+                                       data=[performance.cv.mean() for performance in self.performances])
+        # TODO: I replaced performance.cv with performance.cv.mean() in the line above.
+        #  But the problem is that all cv.mean() are the same across all iterations of linear regression models!
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
