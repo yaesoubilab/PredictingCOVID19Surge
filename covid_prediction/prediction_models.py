@@ -3,7 +3,7 @@ import numpy as np
 import pydotplus
 from sklearn import linear_model
 from sklearn.metrics import confusion_matrix, roc_curve, auc, r2_score, mean_squared_error
-from sklearn.model_selection import train_test_split, cross_val_predict
+from sklearn.model_selection import train_test_split, cross_val_predict, cross_val_score
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree import DecisionTreeRegressor, export_graphviz
 
@@ -32,9 +32,10 @@ class Classifier:
 
         self.performanceTest = None
 
-    def _update_linear_performance(self, y_test, y_test_hat, model):
+    def _update_linear_performance(self, y_test, y_test_hat, model, cv, x, y):
         """ update model performance for linear regression model & print coefficient/intercept, R-square"""
-        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, model=model)
+        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, model=model,
+                                                        cv=cv, x=x, y=y)
 
     def _update_binary_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
                                                   model_name=None, display_roc_curve=True):
@@ -127,7 +128,8 @@ class LinearReg(Classifier):
         y_test_hat = reg.predict(x_test)
 
         # update performance
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg)
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg,
+                                        cv=10, x=self.X, y=self.y)
 
         if cv:
             plot_cv_graph(reg=reg, x=self.X, y=self.y)
@@ -240,7 +242,7 @@ class NNRegression(Classifier):
         if self.len_neurons is None:
             self.len_neurons = len(self.features) + 2
         clf = MLPRegressor(alpha=0.000001,  # alpha: l2 penalty (regularization)
-                           max_iter=10000,
+                           max_iter=1000,
                            hidden_layer_sizes=(self.len_neurons,),
                            random_state=random_state,
                            solver='adam',  # the default 'adam' is preferred for large dataset
@@ -251,7 +253,8 @@ class NNRegression(Classifier):
         y_test_hat = clf.predict(X=x_test)
 
         # update model performance attributes
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=clf)
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=clf,
+                                        cv=10, x=self.X, y=self.y)
 
 
 class MultiNNRegression(MultiClassifiers):
@@ -380,10 +383,11 @@ class BootstrapPerformanceSummary:
 
 
 class LinearPerformanceSummary(PerformanceSummary):
-    def __init__(self, y_test, y_test_hat, model):
+    def __init__(self, y_test, y_test_hat, model, cv, x, y):
         super().__init__(y_test, y_test_hat)
         self.r2 = r2_score(y_true=y_test, y_pred=y_test_hat)
         self.mse = mean_squared_error(y_true=y_test, y_pred=y_test_hat)
+        self.cv = cross_val_score(estimator=model, X=x, y=y, cv=cv)
         # self.coefficient = model.coef_
         # self.intercept = model.intercept_
 
@@ -392,6 +396,7 @@ class LinearPerformanceSummary(PerformanceSummary):
         # print('Intercept:', self.intercept)
         print('R2:', self.r2)
         print('MSE:', self.mse)
+        print('cross-validation score:', self.cv.mean())
 
 
 class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
@@ -399,9 +404,12 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
         super().__init__(performance_list=performance_list)
         self.statR2 = Stat.SummaryStat(name="R-square", data=[performance.r2 for performance in self.performances])
         self.statMSE = Stat.SummaryStat(name='MSE', data=[performance.mse for performance in self.performances])
+        self.statCV = Stat.SummaryStat(name='cross-validation',
+                                       data=[performance.cv for performance in self.performances])
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+        print('CV:', self.statCV.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         # print('MSE:', self.statMSE.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
 
 

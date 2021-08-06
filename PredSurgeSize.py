@@ -45,45 +45,47 @@ features = ['Obs: Incidence rate',
             'Change in contacts - PD Y1+'
             ]
 y_name = 'Maximum hospitalization rate'
-#
-# #####################
-# # LINEAR REGRESSION #
-# #####################
-# df_lr = Dataframe(df=df, features=features, y_name=y_name)
-#
-# # pre-processing (standardization, add polynomial terms)
-# df_lr.preprocess(standardization=True, degree_of_polynomial=2)
-#
-# # feature selection
-# df_lr.feature_selection(estimator=linear_model.LinearRegression(),
-#                         method='rfe',           # method: 'rfe', or 'lasso', or 'pi'
-#                         num_fs_wanted=10)
-# print(df_lr.selected_features)
-# print('number of selected significant features', len(df_lr.selected_features))
-#
-# # train & predict
-# multi_linear_model = MultiLinearReg(df=df_lr.df, features=df_lr.selected_features, y_name=df_lr.y_name)
-# multi_linear_model.run_many(num_bootstraps=100)
-#
-# # performance
-# multi_linear_model.performancesTest.print()
 
-##################
-# Neural Network #
-##################
-df_nn = Dataframe(df=df, features=features, y_name=y_name)
-# preprocess (standardization)
-df_nn.preprocess(standardization=True)
+#####################
+# LINEAR REGRESSION #
+#####################
+df_lr = Dataframe(df=df, features=features, y_name=y_name)
+
+# pre-processing (standardization, add polynomial terms)
+df_lr.preprocess(standardization=True, degree_of_polynomial=2)
+
 # feature selection
-df_nn.feature_selection(estimator=MLPRegressor(),
-                        method='pi',    # rfe and lasso is not applicable for NN
+df_lr.feature_selection(estimator=linear_model.LinearRegression(),
+                        method='rfe',           # method: 'rfe', or 'lasso', or 'pi'
                         num_fs_wanted=10)
-print(df_nn.selected_features)
-print('number of selected significant features', len(df_nn.selected_features))
+print(df_lr.selected_features)
+print('number of selected significant features', len(df_lr.selected_features))
 
 # train & predict
-multi_nn_model = MultiNNRegression(df=df_nn.df, features=df_nn.selected_features, y_name=df_nn.y_name)
-multi_nn_model.run_many(num_bootstraps=10)
-multi_nn_model.performancesTest.print()
+multi_linear_model = MultiLinearReg(df=df_lr.df, features=df_lr.selected_features, y_name=df_lr.y_name)
+multi_linear_model.run_many(num_bootstraps=100)
+
+# performance
+multi_linear_model.performancesTest.print()
+
+# ##################
+# # Neural Network #
+# ##################
+# df_nn = Dataframe(df=df, features=features, y_name=y_name)
+# # preprocess (standardization)
+# df_nn.preprocess(standardization=True)      # I did not add polynomial terms for neural network model
+# # feature selection
+# df_nn.feature_selection(estimator=MLPRegressor(activation='logistic', hidden_layer_sizes=(len(features),)),
+#                         method='pi',    # 'rfe' and 'lasso' is not applicable for NN
+#                         num_fs_wanted=10)
+# print(df_nn.selected_features)
+# print('number of selected significant features', len(df_nn.selected_features))
+#
+# # train & predict
+# multi_nn_model = MultiNNRegression(df=df_nn.df, features=df_nn.selected_features, y_name=df_nn.y_name)
+# multi_nn_model.run_many(num_bootstraps=10)
+#
+# # performance
+# multi_nn_model.performancesTest.print()
 
 
