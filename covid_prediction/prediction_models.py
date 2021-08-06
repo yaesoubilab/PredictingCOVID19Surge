@@ -3,15 +3,23 @@ import numpy as np
 import pydotplus
 from sklearn import linear_model
 from sklearn.metrics import confusion_matrix, roc_curve, auc, r2_score, mean_squared_error
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.model_selection import train_test_split, cross_val_predict, cross_val_score
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree import DecisionTreeRegressor, export_graphviz
 
 import SimPy.Statistics as Stat
 
 
-def standardize(x):
-    return StandardScaler().fit_transform(x)
+def plot_cv_graph(reg, x, y):
+    # TODO: finish this later
+    predicted = cross_val_predict(reg, x, y, cv=10)
+    # visualization
+    fig, ax = plt.subplots()
+    ax.scatter(y, predicted, edgecolors=(0, 0, 0))
+    ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
+    ax.set_xlabel('Measured')
+    ax.set_ylabel('Predicted')
+    plt.show()
 
 
 class Classifier:
@@ -19,11 +27,15 @@ class Classifier:
         self.features = features
         self.y_name = y_name
         self.df = df
+        self.X = np.asarray(self.df[self.features])
+        self.y = np.asarray(self.df[self.y_name])
+
         self.performanceTest = None
 
-    def _update_linear_performance(self, y_test, y_test_hat, model):
+    def _update_linear_performance(self, y_test, y_test_hat, model, cv, x, y):
         """ update model performance for linear regression model & print coefficient/intercept, R-square"""
-        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, model=model)
+        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, model=model,
+                                                        cv=cv, x=x, y=y)
 
     def _update_binary_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
                                                   model_name=None, display_roc_curve=True):
@@ -83,65 +95,58 @@ class LinearReg(Classifier):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
+        self.selected_features = None
+
     # TODO: would you please add a function to plot cross-validation figure mainly for debugging purposes?
     #   https://scikit-learn.org/stable/auto_examples/model_selection/plot_cv_predict.html#sphx-glr-auto-examples-model-selection-plot-cv-predict-py
 
-    def run(self, degree_of_polynomial, random_state, test_size=0.2,
-            penalty='none', alpha=0.1, if_standardize=True):
+    def run(self, random_state, test_size=0.2,
+            penalty='none', alpha=0.1, cv=False):
         """
         run linear regression model
-        :param degree_of_polynomial: The degree of the polynomial features.
         :param test_size: size of the test set
         :param random_state: random state number
         :param penalty: 'none', 'l1', or 'l2'
         :param alpha: the degree of sparsity of the estimated coefficients for Lasso or Ridge
-        :param if_standardize: whether standardize the features
+        :param cv: whether we use cross-validation and visualize prediction errors
         """
 
-        if if_standardize:
-            X = standardize(np.asarray(self.df[self.features]))
-        else:
-            X = np.asarray(self.df[self.features])
-        y = np.asarray(self.df[self.y_name])
-
         # split train vs. test set
-        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-
-        # add polynomial terms
-        poly = PolynomialFeatures(degree_of_polynomial)
-        x_train_poly = poly.fit_transform(x_train)
-        x_test_poly = poly.fit_transform(x_test)
+        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
+                                                            test_size=test_size,
+                                                            random_state=random_state)
 
         # fit model
         if penalty == 'l1':
-            reg = linear_model.Lasso(alpha=alpha).fit(X=x_train_poly, y=y_train)
+            reg = linear_model.Lasso(alpha=alpha).fit(X=x_train, y=y_train)
         elif penalty == 'l2':
-            reg = linear_model.Ridge(alpha=alpha).fit(X=x_train_poly, y=y_train)
+            reg = linear_model.Ridge(alpha=alpha).fit(X=x_train, y=y_train)
         else:
-            reg = linear_model.LinearRegression().fit(X=x_train_poly, y=y_train)
+            reg = linear_model.LinearRegression().fit(X=x_train, y=y_train)
 
         # prediction
-        y_test_hat = reg.predict(x_test_poly)
+        y_test_hat = reg.predict(x_test)
 
         # update performance
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg)
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg,
+                                        cv=10, x=self.X, y=self.y)
+
+        if cv:
+            plot_cv_graph(reg=reg, x=self.X, y=self.y)
 
 
 class MultiLinearReg(MultiClassifiers):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run_many(self, num_bootstraps, degree_of_polynomial, test_size=0.2,
-                 if_standardize=True, penalty='none', alpha=0.1):
+    def run_many(self, num_bootstraps, test_size=0.2, penalty='none', alpha=0.1):
 
         performance_test_list = []
         i = 0
         model = LinearReg(df=self.df, features=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
-            model.run(degree_of_polynomial=degree_of_polynomial,
-                      random_state=i, test_size=test_size, if_standardize=if_standardize,
-                      penalty=penalty, alpha=alpha)
+            model.run(random_state=i, test_size=test_size, penalty=penalty, alpha=alpha)
             # append performance
             performance_test_list.append(model.performanceTest)
 
@@ -157,60 +162,49 @@ class LogisticReg(Classifier):
         self.coeffs = None
         self.intercept = None
 
-    def run(self, random_state, degree_of_polynomial=1,
-            test_size=0.2, penalty='l2', l1_solver='liblinear', C=1,
-            display_roc_curve=True, if_standardize=True):
+    def run(self, random_state,
+            test_size=0.2, penalty='l2', l1_solver='liblinear', C=0.1, display_roc_curve=True):
         """
         :param random_state: random state number
-        :param degree_of_polynomial: The degree of the polynomial features
         :param l1_solver: solver that handle 'l1' penalty. 'liblinear' good for small dataset, 'sage' good for large set
+        :param C: inverse of regularization strength, must be positive
         :param test_size: size of test sample
         :param penalty: 'l1','l2', or 'none' (default 'l2')
         :param display_roc_curve: whether plot roc curve
-        :param if_standardize: whether standardize the features
         """
 
-        if if_standardize:
-            X = standardize(np.asarray(self.df[self.features]))
-        else:
-            X = np.asarray(self.df[self.features])
-        y = np.asarray(self.df[self.y_name])
-
         # split train vs. test set
-        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-
-        # add polynomial terms
-        poly = PolynomialFeatures(degree_of_polynomial)
-        x_train_poly = poly.fit_transform(x_train)
-        x_test_poly = poly.fit_transform(x_test)
+        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
+                                                            test_size=test_size,
+                                                            random_state=random_state)
 
         # fit model
         solver = 'lbfgs'
         if penalty == 'l1':
             solver = l1_solver
         LR = linear_model.LogisticRegression(penalty=penalty, solver=solver, C=C)
-        LR.fit(X=x_train_poly, y=y_train)
+        LR.fit(X=x_train, y=y_train)
 
         # coefficients
         self.coeffs = LR.coef_
         self.intercept = LR.intercept_
 
         # prediction
-        y_test_hat = LR.predict(x_test_poly)
-        y_test_hat_prob = LR.predict_proba(x_test_poly)
+        y_test_hat = LR.predict(x_test)
+        y_test_hat_prob = LR.predict_proba(x_test)
 
         # update model performance attributes
         self._update_binary_performance_plot_roc_curve(
             y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
-            model_name='Logistic Regression', display_roc_curve=display_roc_curve)
+            model_name='logistic regression', display_roc_curve=display_roc_curve)
 
 
 class MultiLogisticReg(MultiClassifiers):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run_many(self, num_bootstraps, degree_of_polynomial,
-                 test_size=0.2, penalty='l2', l1_solver='liblinear', C=1, display_roc_curve=True, if_standardize=True):
+    def run_many(self, num_bootstraps,
+                 test_size=0.2, penalty='l2', l1_solver='liblinear', C=0.1, display_roc_curve=True):
         """
         :param penalty: 'l1','l2', or 'none' (default 'l2')
         """
@@ -220,9 +214,8 @@ class MultiLogisticReg(MultiClassifiers):
         model = LogisticReg(df=self.df, features=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
-            model.run(random_state=i, test_size=test_size, if_standardize=if_standardize,
-                      penalty=penalty, l1_solver=l1_solver, C=C, display_roc_curve=False,
-                      degree_of_polynomial=degree_of_polynomial)
+            model.run(random_state=i, test_size=test_size,
+                      penalty=penalty, l1_solver=l1_solver, C=C, display_roc_curve=False)
             # append performance
             performance_test_list.append(model.performanceTest)
 
@@ -230,6 +223,100 @@ class MultiLogisticReg(MultiClassifiers):
 
         self._update_binary_performances_plot_roc_curve(performance_list=performance_test_list,
                                                         display_roc_curve=display_roc_curve)
+
+
+class NNRegression(Classifier):
+    def __init__(self, df, features, y_name, len_neurons=None):
+        super().__init__(df, features, y_name)
+
+        self.len_neurons = len_neurons if len_neurons is not None else len(self.features) + 2
+
+    def run(self, random_state, activation='logistic', solver='adam', alpha=0.000001, max_iter=1000,
+            test_size=0.2, display_roc_curve=True):
+        # split train vs. test set
+        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
+                                                            test_size=test_size,
+                                                            random_state=random_state)
+
+        # fit model
+        clf = MLPRegressor(alpha=alpha,  # alpha: l2 penalty (regularization)
+                           max_iter=max_iter,
+                           hidden_layer_sizes=(self.len_neurons,),
+                           random_state=random_state,
+                           solver=solver,  # the default 'adam' is preferred for large dataset
+                           activation=activation)
+        clf.fit(X=x_train, y=y_train)
+
+        # prediction
+        y_test_hat = clf.predict(X=x_test)
+
+        # update model performance attributes
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=clf,
+                                        cv=10, x=self.X, y=self.y)
+
+
+class MultiNNRegression(MultiClassifiers):
+    def __init__(self, df, features, y_name):
+        super().__init__(df, features, y_name)
+
+    def run_many(self, num_bootstraps, activation='logistic', solver='adam',
+                 alpha=0.000001, max_iter=1000, test_size=0.2):
+        performance_test_list = []
+        i = 0
+        model = NNRegression(df=self.df, features=self.features, y_name=self.y_name)
+
+        while len(performance_test_list) < num_bootstraps:
+            model.run(random_state=i, test_size=test_size,
+                      activation=activation, solver=solver, alpha=alpha, max_iter=max_iter)
+            # append performance
+            performance_test_list.append(model.performanceTest)
+
+            i += 1
+
+        self._update_linear_performances(performance_list=performance_test_list)
+
+
+class NNClassification(Classifier):
+    def __init__(self, df, features, y_name, len_neurons=None):
+        super().__init__(df, features, y_name)
+
+        self.len_neurons = len_neurons
+
+    def run(self, random_state, test_size=0.2, activation='logistic', solver='adam', display_roc_curve=True):
+        # split train vs. test set
+        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
+                                                            test_size=test_size,
+                                                            random_state=random_state)
+
+        # fit model
+        if self.len_neurons is None:
+            self.len_neurons = len(self.features) + 2
+        clf = MLPClassifier(alpha=0.000001,         # alpha: l2 penalty (regularization)
+                            max_iter=10000,
+                            hidden_layer_sizes=(self.len_neurons,),
+                            random_state=random_state,
+                            solver=solvar,     # the default 'adam' is preferred for large dataset
+                            activation=activation)
+        clf.fit(X=x_train, y=y_train)
+
+        # prediction
+        y_test_hat = clf.predict(X=x_test)
+        y_test_hat_prob = clf.predict_proba(X=x_test)
+
+        # update model performance attributes
+        self._update_binary_performance_plot_roc_curve(
+            y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
+            model_name='neural network', display_roc_curve=display_roc_curve)
+
+        # TODO: check for over-fitting
+        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
+        print('test sen', tp / (tp + fn))
+        print('test spe', tn / (tn + fp))
+
+        y_train_hat = clf.predict(X=x_train)
+        tn, fp, fn, tp = confusion_matrix(y_true=y_train, y_pred=y_train_hat).ravel()
+        print('train sen', tp / (tp + fn))
+        print('train spe', tn / (tn + fp))
 
 
 class DecisionTree(Classifier):
@@ -295,18 +382,20 @@ class BootstrapPerformanceSummary:
 
 
 class LinearPerformanceSummary(PerformanceSummary):
-    def __init__(self, y_test, y_test_hat, model):
+    def __init__(self, y_test, y_test_hat, model, cv, x, y):
         super().__init__(y_test, y_test_hat)
         self.r2 = r2_score(y_true=y_test, y_pred=y_test_hat)
         self.mse = mean_squared_error(y_true=y_test, y_pred=y_test_hat)
-        self.coefficient = model.coef_
-        self.intercept = model.intercept_
+        self.cv = cross_val_score(estimator=model, X=x, y=y, cv=cv)
+        # self.coefficient = model.coef_
+        # self.intercept = model.intercept_
 
     def print(self):
         # print('Coefficients:', self.coefficient)
         # print('Intercept:', self.intercept)
         print('R2:', self.r2)
         print('MSE:', self.mse)
+        print('cross-validation score:', self.cv.mean())
 
 
 class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
@@ -314,9 +403,14 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
         super().__init__(performance_list=performance_list)
         self.statR2 = Stat.SummaryStat(name="R-square", data=[performance.r2 for performance in self.performances])
         self.statMSE = Stat.SummaryStat(name='MSE', data=[performance.mse for performance in self.performances])
+        self.statCV = Stat.SummaryStat(name='cross-validation',
+                                       data=[performance.cv.mean() for performance in self.performances])
+        # TODO: I replaced performance.cv with performance.cv.mean() in the line above.
+        #  But the problem is that all cv.mean() are the same across all iterations of linear regression models!
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+        print('CV-R2:', self.statCV.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         # print('MSE:', self.statMSE.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
 
 
