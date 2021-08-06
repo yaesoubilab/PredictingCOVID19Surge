@@ -24,6 +24,11 @@ class Dataframe:
     def _standardize(self):
         """ standardize feature values """
         self.X = standardize(np.asarray(self.df[self.features]))
+        self.y = standardize(np.asarray(self.df[self.y_name]).reshape(-1, 1))
+
+        # updating dataframe
+        self.df = pd.DataFrame(self.X, columns=self.features)
+        self.df[self.y_name] = self.y
 
     def _add_polynomial_term(self, degree_of_polynomial):
         """

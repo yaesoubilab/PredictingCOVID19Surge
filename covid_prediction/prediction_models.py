@@ -32,10 +32,9 @@ class Classifier:
 
         self.performanceTest = None
 
-    def _update_linear_performance(self, y_test, y_test_hat, model, cv, x, y):
+    def _update_linear_performance(self, y_test, y_test_hat, cv_score):
         """ update model performance for linear regression model & print coefficient/intercept, R-square"""
-        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, model=model,
-                                                        cv=cv, x=x, y=y)
+        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
     def _update_binary_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
                                                   model_name=None, display_roc_curve=True):
@@ -116,21 +115,26 @@ class LinearReg(Classifier):
                                                             test_size=test_size,
                                                             random_state=random_state)
 
-        # fit model
+        # specify model
         if penalty == 'l1':
-            reg = linear_model.Lasso(alpha=alpha).fit(X=x_train, y=y_train)
+            reg = linear_model.Lasso(alpha=alpha)
         elif penalty == 'l2':
-            reg = linear_model.Ridge(alpha=alpha).fit(X=x_train, y=y_train)
+            reg = linear_model.Ridge(alpha=alpha)
         else:
-            reg = linear_model.LinearRegression().fit(X=x_train, y=y_train)
+            reg = linear_model.LinearRegression()
 
+        # fit model
+        reg.fit(X=x_train, y=y_train)
         # prediction
         y_test_hat = reg.predict(x_test)
 
-        # update performance
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg,
-                                        cv=10, x=self.X, y=self.y)
+        # cross validation
+        cv_score = cross_val_score(estimator=reg, X=self.X, y=self.y)
 
+        # update performance
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
+
+        # TODO: CV_graph, update later
         if cv:
             plot_cv_graph(reg=reg, x=self.X, y=self.y)
 
@@ -233,10 +237,16 @@ class NNRegression(Classifier):
 
     def run(self, random_state, activation='logistic', solver='adam', alpha=0.000001, max_iter=1000,
             test_size=0.2, display_roc_curve=True):
-        # split train vs. test set
-        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
-                                                            test_size=test_size,
-                                                            random_state=random_state)
+        if test_size == 0:
+            x_train = self.X
+            x_test = self.X
+            y_train = self.y
+            y_test = self.y
+        else:
+            # split train vs. test set
+            x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
+                                                                test_size=test_size,
+                                                                random_state=random_state)
 
         # fit model
         clf = MLPRegressor(alpha=alpha,  # alpha: l2 penalty (regularization)
@@ -250,9 +260,11 @@ class NNRegression(Classifier):
         # prediction
         y_test_hat = clf.predict(X=x_test)
 
+        # cross validation
+        cv_score = cross_val_score(estimator=clf, X=self.X, y=self.y)
+
         # update model performance attributes
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=clf,
-                                        cv=10, x=self.X, y=self.y)
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
 
 class MultiNNRegression(MultiClassifiers):
@@ -382,11 +394,12 @@ class BootstrapPerformanceSummary:
 
 
 class LinearPerformanceSummary(PerformanceSummary):
-    def __init__(self, y_test, y_test_hat, model, cv, x, y):
+    def __init__(self, y_test, y_test_hat, cv_score):
         super().__init__(y_test, y_test_hat)
         self.r2 = r2_score(y_true=y_test, y_pred=y_test_hat)
         self.mse = mean_squared_error(y_true=y_test, y_pred=y_test_hat)
-        self.cv = cross_val_score(estimator=model, X=x, y=y, cv=cv)
+        self.cv = cv_score
+        print(self.cv.mean())
         # self.coefficient = model.coef_
         # self.intercept = model.intercept_
 
