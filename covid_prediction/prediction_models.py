@@ -409,7 +409,7 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
-        print('CV:', self.statCV.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+        print('CV-R2:', self.statCV.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         # print('MSE:', self.statMSE.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
 
 
