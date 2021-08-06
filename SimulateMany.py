@@ -4,7 +4,7 @@ from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.PlotTrajs import plot
 
-N = 16   # number of trajectories to simulate
+N = 500   # number of trajectories to simulate
 IF_PARALLEL = True
 USE_CALIBRATED_MODEL = True
 
@@ -35,10 +35,11 @@ def simulate(n=25, calibrated=True, seeds=None, weights=None, sample_seeds_by_we
     multi_model.print_summary_stats()
 
     # plot trajectories
-    plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
-         incd_multiplier=sets.simulationOutputPeriod * 52, # to show weeks on the x-axis of incidence data
-         obs_incd_multiplier=sets.observationPeriod*52
-         )
+    if n < 200:
+        plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
+             incd_multiplier=sets.simulationOutputPeriod * 52, # to show weeks on the x-axis of incidence data
+             obs_incd_multiplier=sets.observationPeriod*52
+             )
 
 
 if __name__ == "__main__":

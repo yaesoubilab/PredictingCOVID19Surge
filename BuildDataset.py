@@ -37,10 +37,10 @@ def build_dataset(prediction_time, sim_duration, hosp_threshold):
         info_of_incd_fs=[
             ('Obs: Incidence rate', ('ave', 2), ('slope', 4)),
             ('Obs: New hospitalization rate', ('ave', 2), ('slope', 4)),
-            ('Obs: % of incidence due to Novel', ('ave', 2), ('slope', 4)),
-            ('Obs: % of incidence due to Vaccinated', ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to Novel', ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to Vaccinated', ('ave', 2), ('slope', 4))
+            ('Obs: % of incidence due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of incidence due to Novel-Vaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to Novel-Vaccinated', ('ave', 2), ('slope', 4))
         ],
         info_of_prev_fs=[
             'Obs: Prevalence susceptible',
@@ -80,6 +80,6 @@ def build_dataset(prediction_time, sim_duration, hosp_threshold):
 
 
 # create datasets for different prediction times
-for week_in_fall in (0, 4, 8):
+for week_in_fall in (4, 8, 12, 16):
     build_dataset(prediction_time=PREDICTION_TIME + week_in_fall/52,
                   sim_duration=SIM_DURATION, hosp_threshold=HOSPITALIZATION_THRESHOLD)
