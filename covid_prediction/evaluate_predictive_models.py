@@ -8,9 +8,13 @@ def evaluate_logistic(data, feature_names, outcome_name, poly_degree=1, n_bootst
     :param penalty: 'l1','l2', or 'none' (default 'l2')
     """
 
+    # preprocessing
+    data_lr = Dataframe(df=data, features=feature_names, y_name=outcome_name)
+    data_lr.preprocess(if_standardize=if_standardize, degree_of_polynomial=poly_degree)
+
+    # feed the model
     models = MultiLogisticReg(df=data, features=feature_names, y_name=outcome_name)
-    models.run_many(num_bootstraps=n_bootstraps, degree_of_polynomial=poly_degree,
-                    penalty=penalty, C=C, if_standardize=if_standardize)
+    models.run_many(num_bootstraps=n_bootstraps, penalty=penalty, C=C)
     models.performancesTest.print(decimal=3)
 
 
@@ -22,7 +26,7 @@ def evaluate_tree(data, feature_names, outcome_name, n_bootstraps=100,
 
 
 def evaluate_linear_regression(data, feature_names, outcome_name,
-                               feature_selection_method=None, n_fs=None, estimator=None,    # if add feature selection
+                               feature_selection_method=None, n_fs=None, estimator=None,    # add feature selection
                                poly_degree=1, n_bootstraps=100, if_standardize=True, penalty='none'
                                ):
     # preprocess
