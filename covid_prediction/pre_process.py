@@ -19,8 +19,6 @@ class Dataframe:
         self.X = np.asarray(self.df[self.features])
         self.y = np.asarray(self.df[self.y_name])
 
-        self.selected_features = None
-
     def _standardize(self):
         """ standardize feature values """
         self.X = standardize(np.asarray(self.df[self.features]))
@@ -55,14 +53,14 @@ class Dataframe:
         :param num_fs_wanted: number of significant features want to select
         """
         if method == 'rfe':
-            self.selected_features = rfe(x=self.X, y=self.y, features=self.features,
+            selected_features = rfe(x=self.X, y=self.y, features=self.features,
                                          num_wanted=num_fs_wanted, estimator=estimator)
         elif method == 'pi':
-            self.selected_features = pi(x=self.X, y=self.y, features=self.features,
+            selected_features = pi(x=self.X, y=self.y, features=self.features,
                                         num_wanted=num_fs_wanted, estimator=estimator)
         elif method == 'lasso':
-            self.selected_features = lasso(x=self.X, y=self.y, features=self.features, estimator=estimator)
+            selected_features = lasso(x=self.X, y=self.y, features=self.features, estimator=estimator)
         else:
             raise ValueError('unknown feature selection method')
 
-        return self.selected_features
+        self.features = selected_features

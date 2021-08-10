@@ -134,9 +134,8 @@ class LinearReg(Classifier):
         # update performance
         self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
-        # TODO: CV_graph, update later
-        if cv:
-            plot_cv_graph(reg=reg, x=self.X, y=self.y)
+        # if cv:
+        #     plot_cv_graph(reg=reg, x=self.X, y=self.y)
 
 
 class MultiLinearReg(MultiClassifiers):
@@ -251,11 +250,14 @@ class NNRegression(Classifier):
         # fit model
         clf = MLPRegressor(alpha=alpha,  # alpha: l2 penalty (regularization)
                            max_iter=max_iter,
-                           hidden_layer_sizes=(self.len_neurons,),
+                           hidden_layer_sizes=(self.len_neurons, ),
                            random_state=random_state,
                            solver=solver,  # the default 'adam' is preferred for large dataset
                            activation=activation)
         clf.fit(X=x_train, y=y_train)
+
+        # plt.plot(clf.loss_curve_)  # plotting by columns
+        # plt.show()
 
         # prediction
         y_test_hat = clf.predict(X=x_test)
@@ -307,7 +309,7 @@ class NNClassification(Classifier):
                             max_iter=10000,
                             hidden_layer_sizes=(self.len_neurons,),
                             random_state=random_state,
-                            solver=solvar,     # the default 'adam' is preferred for large dataset
+                            solver=solver,     # the default 'adam' is preferred for large dataset
                             activation=activation)
         clf.fit(X=x_train, y=y_train)
 
@@ -319,16 +321,6 @@ class NNClassification(Classifier):
         self._update_binary_performance_plot_roc_curve(
             y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
             model_name='neural network', display_roc_curve=display_roc_curve)
-
-        # TODO: check for over-fitting
-        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
-        print('test sen', tp / (tp + fn))
-        print('test spe', tn / (tn + fp))
-
-        y_train_hat = clf.predict(X=x_train)
-        tn, fp, fn, tp = confusion_matrix(y_true=y_train, y_pred=y_train_hat).ravel()
-        print('train sen', tp / (tp + fn))
-        print('train spe', tn / (tn + fp))
 
 
 class DecisionTree(Classifier):
@@ -399,7 +391,7 @@ class LinearPerformanceSummary(PerformanceSummary):
         self.r2 = r2_score(y_true=y_test, y_pred=y_test_hat)
         self.mse = mean_squared_error(y_true=y_test, y_pred=y_test_hat)
         self.cv = cv_score
-        print(self.cv.mean())
+        # print(self.cv.mean())
         # self.coefficient = model.coef_
         # self.intercept = model.intercept_
 
