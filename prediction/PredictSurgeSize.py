@@ -23,17 +23,17 @@ FEATURE_SELECTION = 'lasso'  # method: 'rfe', or 'lasso', or 'pi'
 data_lr = Dataframe(df=df, features=column_names, y_name=y_name_continues)
 
 # pre-processing (standardization, add polynomial terms)
-data_lr.preprocess(standardization=True, degree_of_polynomial=DEGREE_OF_POLYNOMIAL)
+data_lr.preprocess(if_standardize=True, degree_of_polynomial=DEGREE_OF_POLYNOMIAL)
 
 # feature selection
 data_lr.feature_selection(estimator=linear_model.LinearRegression(),
                           method=FEATURE_SELECTION,
                           num_fs_wanted=NUM_OF_FEATURES_WANTED)
-print(data_lr.selected_features)
-print('number of selected significant features', len(data_lr.selected_features))
+print(data_lr.features)
+print('number of selected significant features', len(data_lr.features))
 
 # train & predict
-multi_linear_model = MultiLinearReg(df=data_lr.df, features=data_lr.selected_features, y_name=data_lr.y_name)
+multi_linear_model = MultiLinearReg(df=data_lr.df, features=data_lr.features, y_name=data_lr.y_name)
 multi_linear_model.run_many(num_bootstraps=10)
 
 # performance
@@ -51,7 +51,7 @@ MAX_ITR = 1000
 
 data_nn = Dataframe(df=df, features=column_names, y_name=y_name_continues)
 # preprocess (standardization)
-data_nn.preprocess(standardization=True)      # I did not add polynomial terms for neural network model
+data_nn.preprocess(if_standardize=True)      # I did not add polynomial terms for neural network model
 # feature selection
 n_neurons = len(column_names) + 2 if NUM_OF_NEURONS is None else NUM_OF_NEURONS
 data_nn.feature_selection(estimator=MLPRegressor(activation=ACTIVATION,
@@ -62,11 +62,11 @@ data_nn.feature_selection(estimator=MLPRegressor(activation=ACTIVATION,
                                                  ),
                           method='pi',  # 'rfe' and 'lasso' is not applicable for NN
                           num_fs_wanted=NUM_OF_FEATURES_WANTED)
-print(data_nn.selected_features)
-print('number of selected significant features', len(data_nn.selected_features))
+print(data_nn.features)
+print('number of selected significant features', len(data_nn.features))
 
 # train & predict
-multi_nn_model = MultiNNRegression(df=data_nn.df, features=data_nn.selected_features, y_name=data_nn.y_name)
+multi_nn_model = MultiNNRegression(df=data_nn.df, features=data_nn.features, y_name=data_nn.y_name)
 multi_nn_model.run_many(num_bootstraps=100, activation=ACTIVATION, solver=SOLVER, alpha=ALPHA, max_iter=MAX_ITR)
 
 # performance

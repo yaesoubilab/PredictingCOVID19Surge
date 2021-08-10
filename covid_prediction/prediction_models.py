@@ -273,7 +273,7 @@ class MultiNNRegression(MultiClassifiers):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run_many(self, num_bootstraps, activation='logistic', solver='adam',
+    def run_many(self, num_bootstraps, activation='logistic', solver='sgd',
                  alpha=0.000001, max_iter=1000, test_size=0.2):
         performance_test_list = []
         i = 0

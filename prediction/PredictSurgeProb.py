@@ -50,7 +50,7 @@ y_name = 'If hospitalization threshold passed'
 ######################
 df_lr = Dataframe(df=df, features=features, y_name=y_name)
 # pre-processing
-df_lr.preprocess(standardization=True, degree_of_polynomial=2)
+df_lr.preprocess(if_standardize=True, degree_of_polynomial=2)
 # feature selection
 df_lr.feature_selection(method='rfe',
                         # liblinear is a good choice for small dataset, sag’ and ‘saga’ are faster for large ones.

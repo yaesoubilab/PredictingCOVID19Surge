@@ -21,7 +21,7 @@ column_names.remove(y_name_binary)
 
 # standardize
 data_nn = Dataframe(df=df, features=column_names, y_name=y_name_continues)
-data_nn.preprocess(standardization=True)
+data_nn.preprocess(if_standardize=True)
 
 # # feature selection
 # n_neurons = len(column_names) + 2 if NUM_OF_NEURONS is None else NUM_OF_NEURONS

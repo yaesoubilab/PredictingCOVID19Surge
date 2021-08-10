@@ -40,8 +40,8 @@ class Dataframe:
         self.df = pd.DataFrame(self.X, columns=self.features)
         self.df[self.y_name] = self.y
 
-    def preprocess(self, standardization=False, degree_of_polynomial=None):
-        if standardization:
+    def preprocess(self, if_standardize=False, degree_of_polynomial=None):
+        if if_standardize:
             self._standardize()
         if degree_of_polynomial is not None:
             self._add_polynomial_term(degree_of_polynomial=degree_of_polynomial)
