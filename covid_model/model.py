@@ -349,7 +349,8 @@ def build_covid_model(model):
         cum_hosp_rate_by_age.append(RatioTimeSeries(
             name='Cumulative hospitalization rate-' + str_a,
             numerator_sum_time_series=cum_hosp_by_age[-1],
-            denominator_sum_time_series=pop_size_by_age[-1]))
+            denominator_sum_time_series=pop_size_by_age[-1],
+            if_surveyed=True))
         # age-distribution of cumulative hospitalizations
         age_dist_new_hosp.append(RatioTimeSeries(
             name='Cumulative hospitalizations-'+str_a+' (%)',
@@ -394,6 +395,11 @@ def build_covid_model(model):
         # calibration information for the overall hospitalization rate
         cum_hosp_rate_by_age[0].add_calibration_targets(ratios=sets.cumHospRateMean,
                                                         survey_sizes=sets.cumHospRateN)
+
+        # calibration information for hospitalization rate by age
+        for a in range(age_groups_profiles.nAgeGroups):
+            cum_hosp_rate_by_age[a+1].add_calibration_targets(ratios=sets.cumHospRateByAgeMean[a],
+                                                              survey_sizes=sets.cumHospRateByAgeN[a])
 
         # calibration information for the overall vaccination coverage
         cum_vaccine_rate_by_age[0].add_calibration_targets(ratios=sets.cumVaccRateMean,

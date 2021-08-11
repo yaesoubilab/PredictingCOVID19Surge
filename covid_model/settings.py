@@ -1,7 +1,9 @@
 import definitions as D
 from apace.CalibrationSupport import get_survey_size
 from apace.Inputs import ModelSettings
-from covid_model.data import CUM_HOSP_RATE_OVERALL, VACCINE_COVERAGE_OVER_TIME, PERC_INF_WITH_NOVEL
+from covid_model.data import CUM_HOSP_RATE_OVERALL, CUM_HOSP_RATE_BY_AGE, \
+    VACCINE_COVERAGE_OVER_TIME, PERC_INF_WITH_NOVEL
+from definitions import AgeGroups
 
 
 class COVIDSettings(ModelSettings):
@@ -39,6 +41,8 @@ class COVIDSettings(ModelSettings):
         if if_calibrating:
             self.cumHospRateMean = []
             self.cumHospRateN = []
+            self.cumHospRateByAgeMean = [[] for i in range(len(AgeGroups))]
+            self.cumHospRateByAgeN = [[] for i in range(len(AgeGroups))]
             self.cumVaccRateMean = []
             self.cumVaccRateN = []
             self.percInfWithNovelMean = []
@@ -49,7 +53,7 @@ class COVIDSettings(ModelSettings):
 
             week = 0
             while week / 52 < self.calibrationPeriod:
-                # hospitalization rate
+                # cumulative hospitalization rate
                 if week == CUM_HOSP_RATE_OVERALL[0][0]:
                     self.cumHospRateMean.append(CUM_HOSP_RATE_OVERALL[0][1] * 0.00001)
                     self.cumHospRateN.append(get_survey_size(mean=CUM_HOSP_RATE_OVERALL[0][1],
@@ -60,6 +64,19 @@ class COVIDSettings(ModelSettings):
                 else:
                     self.cumHospRateMean.append(None)
                     self.cumHospRateN.append(None)
+
+                # cumulative hospitalization rate by age
+                for a in range(len(AgeGroups)):
+                    if week == CUM_HOSP_RATE_BY_AGE[a][0][0]:
+                        self.cumHospRateByAgeMean[a].append(CUM_HOSP_RATE_BY_AGE[a][0][1])
+                        self.cumHospRateByAgeN[a].append(get_survey_size(mean=CUM_HOSP_RATE_BY_AGE[a][0][1],
+                                                                         l=CUM_HOSP_RATE_BY_AGE[a][0][1]*0.5,
+                                                                         u=CUM_HOSP_RATE_BY_AGE[a][0][1]*1.5,
+                                                                         multiplier=0.00001,
+                                                                         interval_type='p'))
+                    else:
+                        self.cumHospRateByAgeMean[a].append(None)
+                        self.cumHospRateByAgeN[a].append(None)
 
                 # vaccination rate
                 if week == VACCINE_COVERAGE_OVER_TIME[-1][0]:
