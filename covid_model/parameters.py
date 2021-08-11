@@ -67,16 +67,16 @@ class COVIDParameters(EpiParameters):
         self.vacEffAgainstInfWithNovel = Uniform(0, 1)
 
         # vaccination rate is age-dependent
-        self.vaccRateParams = [Uniform(minimum=-10, maximum=-5),    # b
-                               Uniform(minimum=0.5, maximum=1.5),       # t_middle
-                               Uniform(minimum=0.0, maximum=0.05),  # min
+        self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
+                               Uniform(minimum=0.25, maximum=0.75),       # t_middle
+                               Uniform(minimum=0.0, maximum=0.0),  # min
                                Uniform(minimum=2, maximum=3)]       # max
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
             Uniform(minimum=1.5, maximum=2),    # 5-12
             Uniform(minimum=1.0, maximum=1.4),  # 13-17
-            Uniform(minimum=1.0, maximum=1.4),  # 18-20
-            Uniform(minimum=1.0, maximum=1.4),  # 30-49
+            Uniform(minimum=1.0, maximum=1.4),  # 18-29
+            Uniform(minimum=0.9, maximum=1.3),  # 30-49
             Uniform(minimum=0.9, maximum=1.3),  # 50-64
             Uniform(minimum=0.8, maximum=1.2),  # 65-75
             Uniform(minimum=0.7, maximum=1.1)   # 75+

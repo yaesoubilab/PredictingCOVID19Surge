@@ -460,16 +460,16 @@ def get_interventions_features_conditions(settings, params, in_hosp_rate):
     # features
     feature_on_surveyed_hosp = None
     feature_on_epi_time = None
-    feature_on_pd_y1 = None
+    feature_on_pd = None
 
     # conditions
-    pass_y1 = None
+    pass_feas_period = None
     on_condition_during_y1 = None
     off_condition = None
     off_condition_during_y1 = None
 
     # interventions
-    pd_year_1 = None
+    physical_dist = None
 
     # --------- features ---------
     # defined on surveyed in hospital
@@ -478,38 +478,38 @@ def get_interventions_features_conditions(settings, params, in_hosp_rate):
     # feature on time
     feature_on_epi_time = FeatureEpidemicTime(name='epidemic time')
 
-    # if year 1 has passed
-    pass_y1 = ConditionOnFeatures(
-        name='if year 1.5 has passed',
+    # if feasibility period has passed
+    pass_feas_period = ConditionOnFeatures(
+        name='if year {} has passed'.format(FEASIBILITY_PERIOD),
         features=[feature_on_epi_time],
         signs=['ge'],
-        thresholds=[1.5])
+        thresholds=[FEASIBILITY_PERIOD])
 
-    # use of physical distancing during year 1
+    # use of physical distancing during FEASIBILITY_PERIOD
     if settings.ifPDInCalibrationPeriod:
         # ---------- intervention -------
-        pd_year_1 = InterventionAffectingContacts(
-            name='Physical distancing Y1',
+        physical_dist = InterventionAffectingContacts(
+            name='Physical distancing during calibration period',
             par_perc_change_in_contact_matrix=params.matrixOfPercChangeInContactsY1)
 
         # --------- features ---------
         # feature defined on the intervention
-        feature_on_pd_y1 = FeatureIntervention(name='Status of pd Y1',
-                                               intervention=pd_year_1)
+        feature_on_pd = FeatureIntervention(name='Status of pd',
+                                            intervention=physical_dist)
         # --------- conditions ---------
         on_condition_during_y1 = ConditionOnFeatures(
-            name='turn on pd Y1',
-            features=[feature_on_epi_time, feature_on_pd_y1, feature_on_surveyed_hosp],
+            name='turn on pd',
+            features=[feature_on_epi_time, feature_on_pd, feature_on_surveyed_hosp],
             signs=['l', 'e', 'ge'],
-            thresholds=[1.5, 0, params.pdY1Thresholds[0]])
+            thresholds=[FEASIBILITY_PERIOD, 0, params.pdY1Thresholds[0]])
         off_condition = ConditionOnFeatures(
             name='turn off pd',
-            features=[feature_on_pd_y1, feature_on_surveyed_hosp],
+            features=[feature_on_pd, feature_on_surveyed_hosp],
             signs=['e', 'l'],
             thresholds=[1, params.pdY1Thresholds[1]])
         off_condition_during_y1 = ConditionOnConditions(
             name='turn off pd Y1',
-            conditions=[pass_y1, off_condition],
+            conditions=[pass_feas_period, off_condition],
             logic='or')
 
         # --------- decision rule ---------
@@ -517,12 +517,12 @@ def get_interventions_features_conditions(settings, params, in_hosp_rate):
             default_switch_value=0,
             condition_to_turn_on=on_condition_during_y1,
             condition_to_turn_off=off_condition_during_y1)
-        pd_year_1.add_decision_rule(decision_rule=decision_rule)
+        physical_dist.add_decision_rule(decision_rule=decision_rule)
 
     # make the list of features, conditions, and interventions
-    features = [feature_on_surveyed_hosp, feature_on_epi_time, feature_on_pd_y1]
-    conditions = [pass_y1, on_condition_during_y1, off_condition, off_condition_during_y1]
+    features = [feature_on_surveyed_hosp, feature_on_epi_time, feature_on_pd]
+    conditions = [pass_feas_period, on_condition_during_y1, off_condition, off_condition_during_y1]
 
-    interventions = [pd_year_1]
+    interventions = [physical_dist]
 
     return interventions, features, conditions

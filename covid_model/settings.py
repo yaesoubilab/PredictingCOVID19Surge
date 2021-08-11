@@ -43,7 +43,8 @@ class COVIDSettings(ModelSettings):
             self.cumVaccRateN = []
             self.percInfWithNovelMean = []
             self.percInfWithNovelN = []
-            weeks_with_data_prec_inf = [v[0] for v in PERC_INF_WITH_NOVEL[3:]]
+
+            weeks_with_data_prec_inf = [v[0] for v in PERC_INF_WITH_NOVEL[0:4]]
 
             week = 0
             while week / 52 < self.calibrationPeriod:
@@ -73,7 +74,7 @@ class COVIDSettings(ModelSettings):
 
                 # % infected with novel variant
                 if week in weeks_with_data_prec_inf:
-                    index = weeks_with_data_prec_inf.index(week) + 3
+                    index = weeks_with_data_prec_inf.index(week) # + 4
                     self.percInfWithNovelMean.append(PERC_INF_WITH_NOVEL[index][1]*0.01)
                     self.percInfWithNovelN.append((get_survey_size(mean=PERC_INF_WITH_NOVEL[index][1],
                                                                    l=PERC_INF_WITH_NOVEL[index][2],
