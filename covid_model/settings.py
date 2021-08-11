@@ -44,7 +44,8 @@ class COVIDSettings(ModelSettings):
             self.percInfWithNovelMean = []
             self.percInfWithNovelN = []
 
-            weeks_with_data_prec_inf = [v[0] for v in PERC_INF_WITH_NOVEL[0:4]]
+            n_perc_novel_used = 5
+            weeks_with_data_prec_inf = [v[0] for v in PERC_INF_WITH_NOVEL[0:n_perc_novel_used]]
 
             week = 0
             while week / 52 < self.calibrationPeriod:
