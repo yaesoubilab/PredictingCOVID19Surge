@@ -323,7 +323,8 @@ def build_covid_model(model):
         incd_rate_by_age.append(RatioTimeSeries(
             name='Incidence rate-'+str_a,
             numerator_sum_time_series=incd_by_age[-1],
-            denominator_sum_time_series=pop_size_by_age[-1]))
+            denominator_sum_time_series=pop_size_by_age[-1],
+            if_surveyed=True))
         # cumulative incidence
         cum_incd_by_age.append(SumCumulativeIncidence(
             name='Cumulative incidence-' + str_a, compartments=Is_this_age))
@@ -331,7 +332,8 @@ def build_covid_model(model):
         age_dist_cum_incd.append(RatioTimeSeries(
             name='Cumulative incidence-'+str_a+' (%)',
             numerator_sum_time_series=cum_incd_by_age[-1],
-            denominator_sum_time_series=cum_incd_by_age[0]))
+            denominator_sum_time_series=cum_incd_by_age[0],
+            if_surveyed=True))
 
         # new hospitalizations
         new_hosp_by_age.append(SumIncidence(
@@ -340,7 +342,8 @@ def build_covid_model(model):
         new_hosp_rate_by_age.append(RatioTimeSeries(
             name='Hospitalization rate-'+str_a,
             numerator_sum_time_series=new_hosp_by_age[-1],
-            denominator_sum_time_series=pop_size_by_age[-1]))
+            denominator_sum_time_series=pop_size_by_age[-1],
+            if_surveyed=True))
 
         # cumulative hospitalizations
         cum_hosp_by_age.append(SumCumulativeIncidence(
@@ -378,7 +381,8 @@ def build_covid_model(model):
         cum_vaccine_rate_by_age.append(RatioTimeSeries(
             name='Cumulative vaccination rate-' + str_a,
             numerator_sum_time_series=cum_vaccine_by_age[-1],
-            denominator_sum_time_series=pop_size_by_age[-1]))
+            denominator_sum_time_series=pop_size_by_age[-1],
+            if_surveyed=True))
 
     # --------- calibration and feasibility conditions ---------
     if sets.calcLikelihood:
