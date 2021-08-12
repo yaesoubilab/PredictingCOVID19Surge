@@ -68,7 +68,7 @@ class COVIDSettings(ModelSettings):
                 # cumulative hospitalization rate by age
                 for a in range(len(AgeGroups)):
                     if week == CUM_HOSP_RATE_BY_AGE[a][0][0]:
-                        self.cumHospRateByAgeMean[a].append(CUM_HOSP_RATE_BY_AGE[a][0][1])
+                        self.cumHospRateByAgeMean[a].append(CUM_HOSP_RATE_BY_AGE[a][0][1] * 0.00001)
                         self.cumHospRateByAgeN[a].append(get_survey_size(mean=CUM_HOSP_RATE_BY_AGE[a][0][1],
                                                                          l=CUM_HOSP_RATE_BY_AGE[a][0][1]*0.5,
                                                                          u=CUM_HOSP_RATE_BY_AGE[a][0][1]*1.5,
