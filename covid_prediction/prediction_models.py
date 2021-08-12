@@ -234,8 +234,8 @@ class NNRegression(Classifier):
 
         self.len_neurons = len_neurons if len_neurons is not None else len(self.features) + 2
 
-    def run(self, random_state, activation='logistic', solver='adam', alpha=0.000001, max_iter=1000,
-            test_size=0.2, display_roc_curve=True):
+    def run(self, random_state,
+            activation='logistic', solver='sgd', alpha=0.0001, max_iter=1000, test_size=0.2):
         if test_size == 0:
             x_train = self.X
             x_test = self.X
@@ -274,7 +274,7 @@ class MultiNNRegression(MultiClassifiers):
         super().__init__(df, features, y_name)
 
     def run_many(self, num_bootstraps, activation='logistic', solver='sgd',
-                 alpha=0.000001, max_iter=1000, test_size=0.2):
+                 alpha=0.0001, max_iter=1000, test_size=0.2):
         performance_test_list = []
         i = 0
         model = NNRegression(df=self.df, features=self.features, y_name=self.y_name)

@@ -13,6 +13,7 @@ def standardize(x):
 class Dataframe:
     def __init__(self, df, features, y_name):
         self.df = df
+
         self.features = features
         self.y_name = y_name
 
@@ -20,7 +21,7 @@ class Dataframe:
         self.y = np.asarray(self.df[self.y_name])
 
     def _standardize(self):
-        """ standardize feature values """
+        """ standardize feature and outcome of interest """
         self.X = standardize(np.asarray(self.df[self.features]))
         self.y = standardize(np.asarray(self.df[self.y_name]).reshape(-1, 1))
 
@@ -53,14 +54,17 @@ class Dataframe:
         :param num_fs_wanted: number of significant features want to select
         """
         if method == 'rfe':
-            selected_features = rfe(x=self.X, y=self.y, features=self.features,
-                                         num_wanted=num_fs_wanted, estimator=estimator)
+            selected_features = rfe(x=self.X, y=self.y.ravel(), features=self.features,
+                                    num_wanted=num_fs_wanted, estimator=estimator)
         elif method == 'pi':
-            selected_features = pi(x=self.X, y=self.y, features=self.features,
-                                        num_wanted=num_fs_wanted, estimator=estimator)
+            selected_features = pi(x=self.X, y=self.y.ravel(), features=self.features,
+                                   num_wanted=num_fs_wanted, estimator=estimator)
         elif method == 'lasso':
-            selected_features = lasso(x=self.X, y=self.y, features=self.features, estimator=estimator)
+            selected_features = lasso(x=self.X, y=self.y.ravel(), features=self.features, estimator=estimator)
         else:
             raise ValueError('unknown feature selection method')
 
+        # update feature names
         self.features = selected_features
+        # update predictor values
+        self.X = np.asarray(self.df[self.features])
