@@ -1,6 +1,3 @@
-import pandas as pd
-from sklearn.neural_network import MLPRegressor
-
 from covid_prediction.pre_process import *
 from covid_prediction.prediction_models import *
 
@@ -47,6 +44,7 @@ for ALPHA in list_of_alphas:
         cv_score_per_alpha.append(stat_cv.get_formatted_mean_and_interval(deci=DECIMAL, interval_type="p"))
     list_cv_score.append(cv_score_per_alpha)
 
+# format
 string_of_alphas = ['alpha_{}'.format(alpha) for alpha in list_of_alphas]
 string_of_alphas.insert(0, 'num_features')
 cv_df = pd.DataFrame(np.asarray(list_cv_score).T, columns=string_of_alphas)
@@ -54,25 +52,3 @@ cv_df = pd.DataFrame(np.asarray(list_cv_score).T, columns=string_of_alphas)
 print('\n', cv_df)
 cv_df.to_csv('../outputs/cv_score/cv_score_{}fold_week{}.csv'.format(CV, week))
 
-
-# # # feature selection
-# # data_nn.feature_selection(estimator=MLPRegressor(activation=ACTIVATION,
-# #                                                  hidden_layer_sizes=(n_neurons,),
-# #                                                  solver=SOLVER,
-# #                                                  alpha=ALPHA,
-# #                                                  max_iter=MAX_ITR),
-# #                           method='pi',
-# #                           num_fs_wanted=NUM_OF_FEATURES_WANTED)
-#
-# # 1. fit the model using all features and all data
-# multi_nn_model = MultiNNRegression(df=data_nn.df,
-#                                    features=data_nn.features,
-#                                    y_name=data_nn.y_name)
-# multi_nn_model.run_many(num_bootstraps=10,
-#                         max_iter=10000,
-#                         activation=ACTIVATION,
-#                         solver=SOLVER,
-#                         test_size=0.2)
-#
-# # 2. report the R2 using all data (no data is kept for testing)
-# multi_nn_model.performancesTest.print()
