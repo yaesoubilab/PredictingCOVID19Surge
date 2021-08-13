@@ -56,11 +56,11 @@ df_lr.feature_selection(method='rfe',
                         # liblinear is a good choice for small dataset, sag’ and ‘saga’ are faster for large ones.
                         estimator=linear_model.LogisticRegression(penalty="l1", C=0.1, solver='liblinear'),
                         num_fs_wanted=15)
-print('selected features:', df_lr.selected_features)
-print('number of selected features', len(df_lr.selected_features))
+print('selected features:', df_lr.selectedFeatures)
+print('number of selected features', len(df_lr.selectedFeatures))
 
 # construct model cohort
-multi_log_model = MultiLogisticReg(df=df_lr.df, features=df_lr.selected_features, y_name=df_lr.y_name)
+multi_log_model = MultiLogisticReg(df=df_lr.df, features=df_lr.selectedFeatures, y_name=df_lr.y_name)
 multi_log_model.run_many(num_bootstraps=10)
 
 ##################

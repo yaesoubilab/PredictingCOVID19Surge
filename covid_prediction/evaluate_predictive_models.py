@@ -1,5 +1,5 @@
-from covid_prediction.prediction_models import *
 from covid_prediction.pre_process import *
+from covid_prediction.prediction_models import *
 
 
 def linear_regression_model_helper(penalty, alpha):
@@ -71,7 +71,7 @@ def evaluate_linear_regression(data, feature_names, outcome_name, cv_fold, outco
                 data_lr.feature_selection(estimator=model, method=feature_selection_method, num_fs_wanted=n_fs)
                 # cross-validation
                 cv_score_list = cross_val_score(estimator=model,
-                                                X=data_lr.selected_X,
+                                                X=data_lr.selectedX,
                                                 y=data_lr.y.ravel(),
                                                 cv=cv_fold)
                 cv_object.add_cv_performance(cv_score_list=cv_score_list, deci=outcome_deci)
@@ -115,7 +115,7 @@ def evaluate_neural_network(data, feature_names, outcome_name,
 
             # cross-validation
             cv_score_list = cross_val_score(estimator=model,
-                                            X=data_nn.selected_X,
+                                            X=data_nn.selectedX,
                                             y=data_nn.y.ravel(),
                                             cv=cv_fold)
             cv_object.add_cv_performance(cv_score_list=cv_score_list, deci=outcome_deci)
