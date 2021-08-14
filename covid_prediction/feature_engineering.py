@@ -61,7 +61,7 @@ class FeatureEngineering:
 
             # find the time when feature values should be collected
             if self.weekOfPredInFall < 0:
-                pred_week = peak_week - self.weekOfPredInFall
+                pred_week = peak_week + self.weekOfPredInFall
             else:
                 pred_week = self.predictionPeriodWeek[0] + self.weekOfPredInFall
 
