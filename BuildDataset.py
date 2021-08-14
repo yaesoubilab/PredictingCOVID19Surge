@@ -21,8 +21,8 @@ SIM_DURATION = 2.25
 def build_dataset(prediction_time, sim_duration, hosp_threshold):
     # read dataset
     feature_engineer = FeatureEngineering(
-        directory_name='outputs/trajectories',
-        time_of_prediction=prediction_time,
+        dir_of_trajs='outputs/trajectories',
+        week_of_prediction=prediction_time,
         sim_duration=sim_duration,
         hosp_threshold=hosp_threshold)
 
