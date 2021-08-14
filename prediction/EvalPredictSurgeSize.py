@@ -3,7 +3,7 @@ import pandas as pd
 import covid_prediction.evaluate_predictive_models as E
 
 # read dataset
-df = pd.read_csv('../outputs/prediction_dataset/data at week 82.0.csv')
+df = pd.read_csv('../outputs/prediction_datasets/data at week 82.0.csv')
 # y_names
 y_name_continues = 'Maximum hospitalization rate'
 y_name_binary = 'If hospitalization threshold passed'

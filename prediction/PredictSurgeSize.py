@@ -4,7 +4,7 @@ from covid_prediction.prediction_models import *
 # use the entire dataset to predict the size of surge using linear regression and neural network
 
 # read dataset
-df = pd.read_csv('../outputs/prediction_dataset/data at week 82.0.csv')
+df = pd.read_csv('../outputs/prediction_datasets/data at week 82.0.csv')
 # y_names
 y_name_continues = 'Maximum hospitalization rate'
 y_name_binary = 'If hospitalization threshold passed'

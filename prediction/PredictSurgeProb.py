@@ -4,7 +4,7 @@ from covid_prediction.prediction_models import *
 # use the entire dataset to predict the probability of surge using logistic regression and neural network
 
 # read dataset
-df = pd.read_csv('../outputs/prediction_dataset/data at week 78.0.csv')
+df = pd.read_csv('../outputs/prediction_datasets/data at week 78.0.csv')
 features = ['Obs: Incidence rate',
             'Obs: New hospitalization rate',
             'Obs: % of incidence due to Novel',

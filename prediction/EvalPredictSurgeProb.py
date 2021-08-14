@@ -27,7 +27,7 @@ IF_STANDARDIZED = True
 PENALTY = 'l2' # 'l1', 'l2', or 'none'
 
 # read dataset
-df = pd.read_csv('../outputs/prediction_dataset/data at week 78.0.csv')
+df = pd.read_csv('../outputs/prediction_datasets/data at week 78.0.csv')
 
 # model = LogisticReg(df=df, features=features, y_name=OUTCOME)
 # model.run(random_state=RandomState(0), degree_of_polynomial=POLY_DEGREE, C=C)
