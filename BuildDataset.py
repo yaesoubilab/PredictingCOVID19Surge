@@ -70,11 +70,11 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold):
             'Change in contacts - PD Y1',
             'Change in contacts - PD Y1+'
         ],
-        output_file='data at week {}.csv'.format(week_of_prediction_in_fall * 52))
+        output_file='data at week {}.csv'.format(week_of_prediction_in_fall))
 
 
 # create datasets for different prediction times
-for week_in_fall in (4, 8, 12, 16):
+for week_in_fall in (4, 8):#, 12, 16):
     build_dataset(week_of_prediction_in_fall=week_in_fall,
                   pred_period=(TIME_OF_FALL, SIM_DURATION),
                   hosp_threshold=HOSPITALIZATION_THRESHOLD)

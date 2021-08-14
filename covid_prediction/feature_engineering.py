@@ -19,7 +19,7 @@ class FeatureEngineering:
         """
         self.directoryName = dir_of_trajs
         self.weekOfPredInFall = week_of_prediction_in_fall
-        self.predictionPeriod = pred_period
+        self.predictionPeriodWeek = (int(pred_period[0]*52), int(pred_period[1]*52))
         self.hospThreshold = hosp_threshold
         self.namesOfTrajFiles = os.listdir(dir_of_trajs)
 
@@ -63,11 +63,13 @@ class FeatureEngineering:
             if self.weekOfPredInFall < 0:
                 pred_week = peak_week - self.weekOfPredInFall
             else:
-                pred_week = int(52*self.predictionPeriod[0]) + self.weekOfPredInFall
+                pred_week = self.predictionPeriodWeek[0] + self.weekOfPredInFall
 
             # read values of incidence and prevalence features for this trajectory
-            incd_fs = self._get_feature_values(df=df, info_of_features=info_of_incd_fs, incd_or_prev='incd')
-            prev_fs = self._get_feature_values(df=df, info_of_features=info_of_prev_fs, incd_or_prev='prev')
+            incd_fs = self._get_feature_values(df=df, week=pred_week,
+                                               info_of_features=info_of_incd_fs, incd_or_prev='incd')
+            prev_fs = self._get_feature_values(df=df, week=pred_week,
+                                               info_of_features=info_of_prev_fs, incd_or_prev='prev')
 
             # make a row of feature values
             # incidence features, prevalence features
@@ -107,7 +109,7 @@ class FeatureEngineering:
         maximum = 0
         week = None
         for pair in zip(obs_times, obs_weeks, hosp_rates):
-            if self.predictionPeriod[0] <= pair[0] <= self.predictionPeriod[1]:
+            if self.predictionPeriodWeek[0] <= pair[1] <= self.predictionPeriodWeek[1]:
                 if pair[2] > maximum:
                     week = pair[1]
                     maximum = pair[2]
