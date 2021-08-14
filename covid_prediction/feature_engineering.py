@@ -9,16 +9,16 @@ OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold 
 
 
 class FeatureEngineering:
-    def __init__(self, dir_of_trajs, week_of_prediction, pred_period, hosp_threshold):
+    def __init__(self, dir_of_trajs, week_of_prediction_in_fall, pred_period, hosp_threshold):
         """ create the dataset needed to develop the predictive models
         :param dir_of_trajs: (string) the name of directory where trajectories are located
-        :param week_of_prediction: (int) a positive int for number of weeks into fall and
-                                         a negative int for number of weeks before the peak
+        :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
+                                                 a negative int for number of weeks before the peak
         :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
         :param hosp_threshold: threshold of hospitalization capacity
         """
         self.directoryName = dir_of_trajs
-        self.weekOfPrediction = week_of_prediction
+        self.weekOfPredInFall = week_of_prediction_in_fall
         self.predictionPeriod = pred_period
         self.hospThreshold = hosp_threshold
         self.namesOfTrajFiles = os.listdir(dir_of_trajs)
@@ -60,10 +60,10 @@ class FeatureEngineering:
                 self._get_if_threshold_passed_and_max_and_week_of_peak(df=df)
 
             # find the time when feature values should be collected
-            if self.weekOfPrediction < 0:
-                pred_week = peak_week - self.weekOfPrediction
+            if self.weekOfPredInFall < 0:
+                pred_week = peak_week - self.weekOfPredInFall
             else:
-                pred_week = self.weekOfPrediction
+                pred_week = int(52*self.predictionPeriod[0]) + self.weekOfPredInFall
 
             # read values of incidence and prevalence features for this trajectory
             incd_fs = self._get_feature_values(df=df, info_of_features=info_of_incd_fs, incd_or_prev='incd')
@@ -119,10 +119,11 @@ class FeatureEngineering:
 
         return if_surpass_threshold, maximum, week
 
-    def _get_feature_values(self, df, info_of_features, incd_or_prev):
+    def _get_feature_values(self, df, week, info_of_features, incd_or_prev):
         """
         get value of an incidence feature over the specified week
         :param df: df of interest
+        :param week: (int) week when feature values should be collected
         :param info_of_features: list of information for features that are observed over a week
         :param incd_or_prev: 'incd' or 'prev' to specify if incidence features or prevalence features are provided
         :return: list of values for features
@@ -143,14 +144,14 @@ class FeatureEngineering:
             if incd_or_prev == 'incd':
                 for pair in zip(df['Observation Period'], col):
                     if not np.isnan(pair[1]):
-                        if pair[0] <= self.weekOfPrediction:
+                        if pair[0] <= week:
                             data.append(pair[1])
                         else:
                             break
             elif incd_or_prev == 'prev':
                 for pair in zip(df['Observation Time'], col):
                     if not np.isnan(pair[1]):
-                        if 52 * pair[0] - self.weekOfPrediction < 0.5:
+                        if 52 * pair[0] - week < 0.5:
                             data.append(pair[1])
                         else:
                             break
