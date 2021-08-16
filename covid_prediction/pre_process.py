@@ -9,7 +9,7 @@ def standardize(x):
     return StandardScaler().fit_transform(x)
 
 
-class Dataframe:
+class PreProcessor:
     def __init__(self, df, features, y_name):
 
         self._df = df

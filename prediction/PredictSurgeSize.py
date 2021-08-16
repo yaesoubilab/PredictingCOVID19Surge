@@ -20,7 +20,7 @@ DEGREE_OF_POLYNOMIAL = 1
 NUM_OF_FEATURES_WANTED = 10
 FEATURE_SELECTION = 'lasso'  # method: 'rfe', or 'lasso', or 'pi'
 
-data_lr = Dataframe(df=df, features=column_names, y_name=y_name_continues)
+data_lr = PreProcessor(df=df, features=column_names, y_name=y_name_continues)
 
 # pre-processing (standardization, add polynomial terms)
 data_lr.preprocess(if_standardize=True, degree_of_polynomial=DEGREE_OF_POLYNOMIAL)
@@ -49,7 +49,7 @@ SOLVER = 'adam'
 ALPHA = 0.0001  # L2 penalty (regularization term) parameter.
 MAX_ITR = 1000
 
-data_nn = Dataframe(df=df, features=column_names, y_name=y_name_continues)
+data_nn = PreProcessor(df=df, features=column_names, y_name=y_name_continues)
 # preprocess (standardization)
 data_nn.preprocess(if_standardize=True)      # I did not add polynomial terms for neural network model
 # feature selection

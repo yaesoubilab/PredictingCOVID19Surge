@@ -22,14 +22,12 @@ feature_names.remove(y_name_continues)
 feature_names.remove(y_name_binary)
 
 # preprocess (standardize)
-data = Dataframe(df=df, features=feature_names, y_name=y_name_continues)
+data = PreProcessor(df=df, features=feature_names, y_name=y_name_continues)
+# randomize rows
+df = df.sample(frac=1, random_state=1)
+# standardize columns
 data.preprocess(if_standardize=True)
 
-# TODO: after you check all other TODOs, it might make sense to move this block under
-#   the Datafram class. You can call it do_cv_neural_net
-#   it could take list_n_neurons, list_n_features, and list_alphas.
-#   And you can structure the csv file with these columns
-#   # features, # neurons, alpha, R2
 # CV to choose alpha + number of features
 n_neurons = len(feature_names) + 2 if NUM_OF_NEURONS is None else NUM_OF_NEURONS
 list_cv_score = [list_of_num_features_wanted]

@@ -15,7 +15,7 @@ def linear_regression_model_helper(penalty, alpha):
 def create_result_df(cv_object_list, column_name_list):
     object_outcome_list = []
     for cv_object in cv_object_list:
-        object_outcome_list.append([cv_object.penalty, cv_object.poly_degree, cv_object.n_fs, cv_object.cv_mean_PI])
+        object_outcome_list.append([cv_object.penalty, cv_object.poly_degree, cv_object.n_fs, cv_object.formattedMeanPI])
     df = pd.DataFrame(object_outcome_list, columns=column_name_list)
     return df
 
@@ -27,7 +27,7 @@ def evaluate_logistic(data, feature_names, outcome_name, poly_degree=1, n_bootst
     """
 
     # preprocessing
-    data_lr = Dataframe(df=data, features=feature_names, y_name=outcome_name)
+    data_lr = PreProcessor(df=data, features=feature_names, y_name=outcome_name)
     data_lr.preprocess(if_standardize=if_standardize, degree_of_polynomial=poly_degree)
 
     # feed the model
@@ -44,7 +44,7 @@ def evaluate_tree(data, feature_names, outcome_name, n_bootstraps=100,
 
 
 def evaluate_linear_regression(data, feature_names, outcome_name, cv_fold, outcome_deci, week,
-                               feature_selection_method, list_of_num_fs_wanted,  # feature selection
+                               feature_selection_method, list_of_num_fs_wanted,
                                list_of_penalties, list_of_poly_degrees,  # penalty, polynomial
                                if_standardize=True, save_to_file=True
                                ):
@@ -52,7 +52,7 @@ def evaluate_linear_regression(data, feature_names, outcome_name, cv_fold, outco
         list_of_num_fs_wanted = ['constant']
 
     # preprocess
-    data_lr = Dataframe(df=data, features=feature_names, y_name=outcome_name)
+    data_lr = PreProcessor(df=data, features=feature_names, y_name=outcome_name)
     data_lr.preprocess(if_standardize=if_standardize)
 
     # find the best combination
@@ -74,14 +74,14 @@ def evaluate_linear_regression(data, feature_names, outcome_name, cv_fold, outco
                                                 X=data_lr.selectedX,
                                                 y=data_lr.y.ravel(),
                                                 cv=cv_fold)
-                cv_object.add_cv_performance(cv_score_list=cv_score_list, deci=outcome_deci)
+                cv_object.add_cv_performance(scores=cv_score_list, deci=outcome_deci)
                 cv_object_list.append(cv_object)
 
     # print outcome and save to csv file
     object_outcome_list = []
     for cv_object in cv_object_list:
         object_outcome_list.append([cv_object.penalty, cv_object.poly_degree,
-                                    cv_object.f_s_method, cv_object.n_fs, cv_object.cv_mean_PI])
+                                    cv_object.f_s_method, cv_object.n_fs, cv_object.formattedMeanPI])
     cv_df = pd.DataFrame(object_outcome_list, columns=['penalty', 'poly_degree',
                                                        'feature_selection_method', 'num_features',
                                                        'performance'])
@@ -91,60 +91,73 @@ def evaluate_linear_regression(data, feature_names, outcome_name, cv_fold, outco
 
 
 def evaluate_neural_network(data, feature_names, outcome_name,
-                            list_of_alphas,
-                            list_of_num_fs_wanted, feature_selection_method,  # feature selection
-                            cv_fold, outcome_deci, week,
-                            if_standardize=True, num_of_neurons=None, save_to_file=True
-                            ):
+                            list_of_num_fs_wanted, list_of_alphas, list_of_n_neurons,
+                            feature_selection_method, cv_fold, if_standardize=True, save_to_file='file.csv'):
+    """
+    :param data:
+    :param feature_names:
+    :param outcome_name:
+    :param list_of_num_fs_wanted:
+    :param list_of_alphas:
+    :param list_of_n_neurons:
+    :param feature_selection_method:
+    :param cv_fold:
+    :param if_standardize:
+    :param save_to_file:
+    :return (dict) the information of the best specifications: '# features', 'alpha', '# neurons', 'R2', 'R2 CI'
+    """
+
     # preprocess
-    data_nn = Dataframe(df=data, features=feature_names, y_name=outcome_name)
+    data_nn = PreProcessor(df=data, features=feature_names, y_name=outcome_name)
     data_nn.preprocess(if_standardize=if_standardize)
 
     # find the best combination of alpha/subset of features
-    n_neurons = len(feature_names) + 2 if num_of_neurons is None else num_of_neurons
-    cv_object_list = []
-    for penalty in list_of_alphas:
-        for n_fs in list_of_num_fs_wanted:
-            # print('alpha:', ALPHA, '; num_features:', NUM_FEATURES)
-            cv_object = NNCVPerformance(alpha=penalty, n_fs=n_fs)
-            # construct model
-            model = MLPRegressor(alpha=penalty, hidden_layer_sizes=(n_neurons,),
-                                 max_iter=1000, solver='sgd', activation='logistic')
-            # feature selection
-            data_nn.feature_selection(estimator=model, method=feature_selection_method, num_fs_wanted=n_fs)
+    if list_of_n_neurons is None:
+        list_of_n_neurons = [len(feature_names) + 2]
 
-            # cross-validation
-            cv_score_list = cross_val_score(estimator=model,
-                                            X=data_nn.selectedX,
-                                            y=data_nn.y.ravel(),
-                                            cv=cv_fold)
-            cv_object.add_cv_performance(cv_score_list=cv_score_list, deci=outcome_deci)
-            cv_object_list.append(cv_object)
+    cv_object_list = []
+    for n_fs in list_of_num_fs_wanted:
+        for alpha in list_of_alphas:
+            for n_neurons in list_of_n_neurons:
+                # print('alpha:', ALPHA, '; num_features:', NUM_FEATURES)
+                cv_object = NNCVPerformance(alpha=alpha, n_fs=n_fs)
+                # construct model
+                model = MLPRegressor(alpha=alpha, hidden_layer_sizes=(n_neurons,),
+                                     max_iter=1000, solver='sgd', activation='logistic')
+                # feature selection
+                data_nn.feature_selection(estimator=model, method=feature_selection_method, num_fs_wanted=n_fs)
+
+                # cross-validation
+                cv_score_list = cross_val_score(estimator=model,
+                                                X=data_nn.selectedX,
+                                                y=data_nn.y.ravel(),
+                                                cv=cv_fold)
+                cv_object.add_cv_performance(scores=cv_score_list, deci=4)
+                cv_object_list.append(cv_object)
 
     # print outcome and save to csv file
     object_outcome_list = []
     for cv_object in cv_object_list:
-        object_outcome_list.append([cv_object.alpha, cv_object.n_fs, cv_object.cv_mean_PI])
+        object_outcome_list.append([cv_object.alpha, cv_object.n_fs, cv_object.formattedMeanPI])
     cv_df = pd.DataFrame(object_outcome_list, columns=['penalty', 'num_features', 'performance'])
     print(cv_df)
-    if save_to_file:
-        cv_df.to_csv('../outputs/cv_score/week{}_nn_{}fold.csv'.format(week, cv_fold))
+    if save_to_file is not None:
+        cv_df.to_csv(save_to_file)
 
 
 class CVPerformance:
     def __init__(self, n_fs):
+
         self.n_fs = n_fs
+        self.scores = None
+        self.summaryStat = None
+        self.formattedMeanPI = None
 
-        # initial
-        self.cv_score_list = None
-        self.cvStat = None
-        self.cv_mean_PI = None
-
-    def add_cv_performance(self, cv_score_list, deci):
-        self.cv_score_list = cv_score_list
-        self.cvStat = Stat.SummaryStat(name='cross-validation score for each parameter combination',
-                                       data=cv_score_list)
-        self.cv_mean_PI = self.cvStat.get_formatted_mean_and_interval(deci=deci, interval_type="p")
+    def add_cv_performance(self, scores, deci):
+        self.scores = scores
+        self.summaryStat = Stat.SummaryStat(name='cross-validation scores',
+                                            data=scores)
+        self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type="p")
 
 
 class LRCVPerformance(CVPerformance):
@@ -158,7 +171,8 @@ class LRCVPerformance(CVPerformance):
 
 
 class NNCVPerformance(CVPerformance):
-    def __init__(self, alpha, n_fs):
+    def __init__(self, n_fs, alpha, n_neurons):
         """ neural network cross-validation performances """
         super().__init__(n_fs=n_fs)
         self.alpha = alpha
+        self.nNeurons = n_neurons
