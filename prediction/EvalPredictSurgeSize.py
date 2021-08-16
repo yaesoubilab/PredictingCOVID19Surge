@@ -2,8 +2,10 @@ import pandas as pd
 
 import covid_prediction.evaluate_predictive_models as E
 
+root_path = '/Users/shiyingyou/PycharmProjects/PredictingCOVID19Surge'
+
 # read dataset
-df = pd.read_csv('../outputs/prediction_datasets/data at week 82.0.csv')
+df = pd.read_csv('{}/outputs/prediction_datasets/data at week 4.csv'.format(root_path))
 # y_names
 y_name_continues = 'Maximum hospitalization rate'
 y_name_binary = 'If hospitalization threshold passed'
@@ -26,12 +28,12 @@ list_of_num_features_wanted = [10, 20, 30, 40]
 list_of_alphas = [0.0001, 0.001, 0.01, 1]
 
 # make prediction at different weeks
-for week in ('82.0', '86.0', '90.0'):
+for week in ('4', '8', '12'):
 
     print('Week: ', week)
 
     # read dataset
-    df = pd.read_csv('../outputs/prediction_dataset/data at week {}.csv'.format(week))
+    df = pd.read_csv('{}/outputs/prediction_datasets/data at week {}.csv'.format(root_path, week))
     # randomize rows
     df = df.sample(frac=1, random_state=10)
 
@@ -44,12 +46,12 @@ for week in ('82.0', '86.0', '90.0'):
                                  feature_selection_method='rfe',      # pi/rfe, did not include lasso
                                  if_standardize=IF_STANDARDIZED, save_to_file=True)
 
-    # print('Neural network models:')
-    # E.evaluate_neural_network(data=df, feature_names=feature_names, outcome_name=OUTCOME,
-    #                           list_of_alphas=[0.0001, 0.001],
-    #                           list_of_num_fs_wanted=[10, 20],
-    #                           feature_selection_method='pi',
-    #                           cv_fold=cv_fold, outcome_deci=decimal, week=week,
-    #                           if_standardize=IF_STANDARDIZED, num_of_neurons=None, save_to_file=True)
+    print('Neural network models:')
+    E.evaluate_neural_network(data=df, feature_names=feature_names, outcome_name=OUTCOME,
+                              list_of_alphas=[0.0001, 0.001],
+                              list_of_num_fs_wanted=[10, 20],
+                              feature_selection_method='pi',
+                              cv_fold=cv_fold, outcome_deci=decimal, week=week,
+                              if_standardize=IF_STANDARDIZED, num_of_neurons=None, save_to_file=True)
 
     print('\n')

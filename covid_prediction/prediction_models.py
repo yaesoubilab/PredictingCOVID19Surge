@@ -11,7 +11,6 @@ import SimPy.Statistics as Stat
 
 
 def plot_cv_graph(reg, x, y):
-    # TODO: finish this later
     predicted = cross_val_predict(reg, x, y, cv=10)
     # visualization
     fig, ax = plt.subplots()
@@ -95,9 +94,6 @@ class LinearReg(Classifier):
         super().__init__(df, features, y_name)
 
         self.selected_features = None
-
-    # TODO: would you please add a function to plot cross-validation figure mainly for debugging purposes?
-    #   https://scikit-learn.org/stable/auto_examples/model_selection/plot_cv_predict.html#sphx-glr-auto-examples-model-selection-plot-cv-predict-py
 
     def run(self, random_state, test_size=0.2,
             penalty='none', alpha=0.1, cv=False):
@@ -410,8 +406,6 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
         self.statMSE = Stat.SummaryStat(name='MSE', data=[performance.mse for performance in self.performances])
         self.statCV = Stat.SummaryStat(name='cross-validation',
                                        data=[performance.cv.mean() for performance in self.performances])
-        # TODO: I replaced performance.cv with performance.cv.mean() in the line above.
-        #  But the problem is that all cv.mean() are the same across all iterations of linear regression models!
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
