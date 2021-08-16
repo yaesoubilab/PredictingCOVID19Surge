@@ -121,7 +121,8 @@ class FeatureEngineering:
 
         return if_surpass_threshold, maximum, week
 
-    def _get_feature_values(self, df, week, info_of_features, incd_or_prev):
+    @staticmethod
+    def _get_feature_values(df, week, info_of_features, incd_or_prev):
         """
         get value of an incidence feature over the specified week
         :param df: df of interest

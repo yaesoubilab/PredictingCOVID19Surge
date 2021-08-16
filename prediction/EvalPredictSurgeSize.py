@@ -8,20 +8,19 @@ IF_STANDARDIZED = True
 FEATURE_SELECTION = 'pi' # could be 'rfe', 'lasso', or 'pi'
 CV_FOLD = 10         # num of splits for cross validation
 
-# read dataset
-df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets/data at week 4.csv')
-# feature names (all columns are considered)
-feature_names = df.columns.tolist()
-feature_names.remove('Maximum hospitalization rate')
-feature_names.remove('If hospitalization threshold passed')
-
 # make prediction at different weeks
-for week in ('4', '8', '12'):
+for week in ('8', '12'):
 
     print('Week: ', week)
 
     # read dataset
     df = pd.read_csv('{}/outputs/prediction_datasets/data at week {}.csv'.format(ROOT_DIR, week))
+
+    # feature names (all columns are considered)
+    feature_names = df.columns.tolist()
+    feature_names.remove('Maximum hospitalization rate')
+    feature_names.remove('If hospitalization threshold passed')
+
     # randomize rows
     df = df.sample(frac=1, random_state=1)
 
