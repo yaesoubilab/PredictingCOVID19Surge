@@ -1,4 +1,3 @@
-import SimPy.Statistics as Stat
 from covid_prediction.pre_process import *
 from covid_prediction.prediction_models import *
 from definitions import ROOT_DIR
@@ -6,12 +5,12 @@ from definitions import ROOT_DIR
 NUM_OF_NEURONS = None
 DECIMAL = 4     # decimal place for cross-validation scores
 CV = 10          # num of splits for cross validation
-week = '86'
+week = '16'
 list_of_num_features_wanted = [10, 20]  # [10, 20, 30, 40]
 list_of_alphas = [0.001, 0.01]  # [0.0001, 0.001, 0.01, 1]
 
 # read dataset
-df = pd.read_csv('../outputs/prediction_dataset/data at week {}.0.csv'.format(week))
+df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets/data at week {}.csv'.format(week))
 # randomize rows
 df = df.sample(frac=1, random_state=1)
 # y_names
@@ -44,9 +43,6 @@ for alpha in list_of_alphas:
         # feature selection
         data.feature_selection(estimator=model, method='pi', num_fs_wanted=n_features)
         # cross-validation
-        # TODO: you are using data.X and data.y below but this could be problematic because for
-        #   the polynomial model you are storing X values in data.poly_X so I made some changes in the
-        #   Dataframe class to avoid this issue. Would you please remove?
         cv_data = cross_val_score(estimator=model, X=data.X, y=data.y, cv=CV)
         stat_cv = Stat.SummaryStat(name='cross-validation score for one alpha-feature combination',
                                    data=cv_data)
