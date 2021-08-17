@@ -2,28 +2,22 @@ from covid_prediction.feature_engineering import *
 
 
 HOSPITALIZATION_THRESHOLD = 0.0001  # per 100,000 population
-PREDICTION_TIME = 1.5   # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
+TIME_OF_FALL = 1.5   # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
 SIM_DURATION = 2.25
 
-# our goal is to use the data during [0, PREDICTION_TIME]
-# to predict 1) if the hospitalization would be surpassed and and 2) the maximum hospitalization rate
-# during [PREDICTION_TIME, SIM_DURATION]
 
-# all trajectories are located in 'outputs/trajectories'
-# column 'Observation Time' represent year and column 'Observation Period' represent the period (week)
-# Hospitalization over time is in column 'Obs: Hospitalization rate'
-
-# to determine if surge has occurred for a trajectory, we check if the
-# value of column 'Obs: Hospitalization rate' passes
-# HOSPITALIZATION_THRESHOLD during [PREDICTION_TIME, SIM_DURATION].
-
-
-def build_dataset(prediction_time, sim_duration, hosp_threshold):
+def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold):
+    """ create the dataset needed to develop the predictive models
+    :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
+                                             a negative int for number of weeks before the peak
+    :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
+    :param hosp_threshold: threshold of hospitalization capacity
+    """
     # read dataset
     feature_engineer = FeatureEngineering(
-        directory_name='outputs/trajectories',
-        time_of_prediction=prediction_time,
-        sim_duration=sim_duration,
+        dir_of_trajs='outputs/trajectories',
+        week_of_prediction_in_fall=week_of_prediction_in_fall,
+        pred_period=pred_period,
         hosp_threshold=hosp_threshold)
 
     # create new dataset based on raw data
@@ -40,7 +34,9 @@ def build_dataset(prediction_time, sim_duration, hosp_threshold):
             ('Obs: % of incidence due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
             ('Obs: % of incidence due to Novel-Vaccinated', ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to Novel-Vaccinated', ('ave', 2), ('slope', 4))
+            ('Obs: % of new hospitalizations due to Novel-Vaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of incidence with novel variant', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations with novel variant', ('ave', 2), ('slope', 4)),
         ],
         info_of_prev_fs=[
             'Obs: Prevalence susceptible',
@@ -76,10 +72,16 @@ def build_dataset(prediction_time, sim_duration, hosp_threshold):
             'Change in contacts - PD Y1',
             'Change in contacts - PD Y1+'
         ],
-        output_file='data at week {}.csv'.format(prediction_time*52))
+        output_file='data at week {}.csv'.format(week_of_prediction_in_fall))
 
 
 # create datasets for different prediction times
-for week_in_fall in (4, 8, 12, 16):
-    build_dataset(prediction_time=PREDICTION_TIME + week_in_fall/52,
-                  sim_duration=SIM_DURATION, hosp_threshold=HOSPITALIZATION_THRESHOLD)
+for week_in_fall in (8, 12, 16):
+    build_dataset(week_of_prediction_in_fall=week_in_fall,
+                  pred_period=(TIME_OF_FALL, SIM_DURATION),
+                  hosp_threshold=HOSPITALIZATION_THRESHOLD)
+
+for week_in_fall in (-4, -8, -12):
+    build_dataset(week_of_prediction_in_fall=week_in_fall,
+                  pred_period=(TIME_OF_FALL, SIM_DURATION),
+                  hosp_threshold=HOSPITALIZATION_THRESHOLD)

@@ -11,7 +11,6 @@ import SimPy.Statistics as Stat
 
 
 def plot_cv_graph(reg, x, y):
-    # TODO: finish this later
     predicted = cross_val_predict(reg, x, y, cv=10)
     # visualization
     fig, ax = plt.subplots()
@@ -32,10 +31,9 @@ class Classifier:
 
         self.performanceTest = None
 
-    def _update_linear_performance(self, y_test, y_test_hat, model, cv, x, y):
+    def _update_linear_performance(self, y_test, y_test_hat, cv_score):
         """ update model performance for linear regression model & print coefficient/intercept, R-square"""
-        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, model=model,
-                                                        cv=cv, x=x, y=y)
+        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
     def _update_binary_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
                                                   model_name=None, display_roc_curve=True):
@@ -97,9 +95,6 @@ class LinearReg(Classifier):
 
         self.selected_features = None
 
-    # TODO: would you please add a function to plot cross-validation figure mainly for debugging purposes?
-    #   https://scikit-learn.org/stable/auto_examples/model_selection/plot_cv_predict.html#sphx-glr-auto-examples-model-selection-plot-cv-predict-py
-
     def run(self, random_state, test_size=0.2,
             penalty='none', alpha=0.1, cv=False):
         """
@@ -116,23 +111,27 @@ class LinearReg(Classifier):
                                                             test_size=test_size,
                                                             random_state=random_state)
 
-        # fit model
+        # specify model
         if penalty == 'l1':
-            reg = linear_model.Lasso(alpha=alpha).fit(X=x_train, y=y_train)
+            reg = linear_model.Lasso(alpha=alpha)
         elif penalty == 'l2':
-            reg = linear_model.Ridge(alpha=alpha).fit(X=x_train, y=y_train)
+            reg = linear_model.Ridge(alpha=alpha)
         else:
-            reg = linear_model.LinearRegression().fit(X=x_train, y=y_train)
+            reg = linear_model.LinearRegression()
 
+        # fit model
+        reg.fit(X=x_train, y=y_train)
         # prediction
         y_test_hat = reg.predict(x_test)
 
-        # update performance
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=reg,
-                                        cv=10, x=self.X, y=self.y)
+        # cross validation
+        cv_score = cross_val_score(estimator=reg, X=self.X, y=self.y)
 
-        if cv:
-            plot_cv_graph(reg=reg, x=self.X, y=self.y)
+        # update performance
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
+
+        # if cv:
+        #     plot_cv_graph(reg=reg, x=self.X, y=self.y)
 
 
 class MultiLinearReg(MultiClassifiers):
@@ -231,36 +230,47 @@ class NNRegression(Classifier):
 
         self.len_neurons = len_neurons if len_neurons is not None else len(self.features) + 2
 
-    def run(self, random_state, activation='logistic', solver='adam', alpha=0.000001, max_iter=1000,
-            test_size=0.2, display_roc_curve=True):
-        # split train vs. test set
-        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
-                                                            test_size=test_size,
-                                                            random_state=random_state)
+    def run(self, random_state,
+            activation='logistic', solver='sgd', alpha=0.0001, max_iter=1000, test_size=0.2):
+        if test_size == 0:
+            x_train = self.X
+            x_test = self.X
+            y_train = self.y
+            y_test = self.y
+        else:
+            # split train vs. test set
+            x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
+                                                                test_size=test_size,
+                                                                random_state=random_state)
 
         # fit model
         clf = MLPRegressor(alpha=alpha,  # alpha: l2 penalty (regularization)
                            max_iter=max_iter,
-                           hidden_layer_sizes=(self.len_neurons,),
+                           hidden_layer_sizes=(self.len_neurons, ),
                            random_state=random_state,
                            solver=solver,  # the default 'adam' is preferred for large dataset
                            activation=activation)
         clf.fit(X=x_train, y=y_train)
 
+        # plt.plot(clf.loss_curve_)  # plotting by columns
+        # plt.show()
+
         # prediction
         y_test_hat = clf.predict(X=x_test)
 
+        # cross validation
+        cv_score = cross_val_score(estimator=clf, X=self.X, y=self.y)
+
         # update model performance attributes
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, model=clf,
-                                        cv=10, x=self.X, y=self.y)
+        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
 
 class MultiNNRegression(MultiClassifiers):
     def __init__(self, df, features, y_name):
         super().__init__(df, features, y_name)
 
-    def run_many(self, num_bootstraps, activation='logistic', solver='adam',
-                 alpha=0.000001, max_iter=1000, test_size=0.2):
+    def run_many(self, num_bootstraps, activation='logistic', solver='sgd',
+                 alpha=0.0001, max_iter=1000, test_size=0.2):
         performance_test_list = []
         i = 0
         model = NNRegression(df=self.df, features=self.features, y_name=self.y_name)
@@ -295,7 +305,7 @@ class NNClassification(Classifier):
                             max_iter=10000,
                             hidden_layer_sizes=(self.len_neurons,),
                             random_state=random_state,
-                            solver=solvar,     # the default 'adam' is preferred for large dataset
+                            solver=solver,     # the default 'adam' is preferred for large dataset
                             activation=activation)
         clf.fit(X=x_train, y=y_train)
 
@@ -307,16 +317,6 @@ class NNClassification(Classifier):
         self._update_binary_performance_plot_roc_curve(
             y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
             model_name='neural network', display_roc_curve=display_roc_curve)
-
-        # TODO: check for over-fitting
-        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
-        print('test sen', tp / (tp + fn))
-        print('test spe', tn / (tn + fp))
-
-        y_train_hat = clf.predict(X=x_train)
-        tn, fp, fn, tp = confusion_matrix(y_true=y_train, y_pred=y_train_hat).ravel()
-        print('train sen', tp / (tp + fn))
-        print('train spe', tn / (tn + fp))
 
 
 class DecisionTree(Classifier):
@@ -382,11 +382,12 @@ class BootstrapPerformanceSummary:
 
 
 class LinearPerformanceSummary(PerformanceSummary):
-    def __init__(self, y_test, y_test_hat, model, cv, x, y):
+    def __init__(self, y_test, y_test_hat, cv_score):
         super().__init__(y_test, y_test_hat)
         self.r2 = r2_score(y_true=y_test, y_pred=y_test_hat)
         self.mse = mean_squared_error(y_true=y_test, y_pred=y_test_hat)
-        self.cv = cross_val_score(estimator=model, X=x, y=y, cv=cv)
+        self.cv = cv_score
+        # print(self.cv.mean())
         # self.coefficient = model.coef_
         # self.intercept = model.intercept_
 
@@ -405,8 +406,6 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
         self.statMSE = Stat.SummaryStat(name='MSE', data=[performance.mse for performance in self.performances])
         self.statCV = Stat.SummaryStat(name='cross-validation',
                                        data=[performance.cv.mean() for performance in self.performances])
-        # TODO: I replaced performance.cv with performance.cv.mean() in the line above.
-        #  But the problem is that all cv.mean() are the same across all iterations of linear regression models!
 
     def print(self, decimal=3):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))

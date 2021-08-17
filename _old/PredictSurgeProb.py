@@ -4,7 +4,7 @@ from covid_prediction.prediction_models import *
 # use the entire dataset to predict the probability of surge using logistic regression and neural network
 
 # read dataset
-df = pd.read_csv('../outputs/prediction_dataset/data at week 78.0.csv')
+df = pd.read_csv('../outputs/prediction_datasets/data at week 78.0.csv')
 features = ['Obs: Incidence rate',
             'Obs: New hospitalization rate',
             'Obs: % of incidence due to Novel',
@@ -48,19 +48,19 @@ y_name = 'If hospitalization threshold passed'
 ######################
 # LOGISTIC REGRESSION #
 ######################
-df_lr = Dataframe(df=df, features=features, y_name=y_name)
+df_lr = PreProcessor(df=df, feature_names=features, y_name=y_name)
 # pre-processing
-df_lr.preprocess(standardization=True, degree_of_polynomial=2)
+df_lr.preprocess(if_standardize=True, degree_of_polynomial=2)
 # feature selection
 df_lr.feature_selection(method='rfe',
                         # liblinear is a good choice for small dataset, sag’ and ‘saga’ are faster for large ones.
                         estimator=linear_model.LogisticRegression(penalty="l1", C=0.1, solver='liblinear'),
                         num_fs_wanted=15)
-print('selected features:', df_lr.selected_features)
-print('number of selected features', len(df_lr.selected_features))
+print('selected features:', df_lr.selectedFeatureNames)
+print('number of selected features', len(df_lr.selectedFeatureNames))
 
 # construct model cohort
-multi_log_model = MultiLogisticReg(df=df_lr.df, features=df_lr.selected_features, y_name=df_lr.y_name)
+multi_log_model = MultiLogisticReg(df=df_lr.df, features=df_lr.selectedFeatureNames, y_name=df_lr.y_name)
 multi_log_model.run_many(num_bootstraps=10)
 
 ##################
