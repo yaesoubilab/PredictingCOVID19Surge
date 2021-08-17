@@ -24,7 +24,7 @@ class _CrossValidSummary:
         self.summaryStat = SummaryStat(name='cross-validation scores',
                                        data=scores)
         self.meanScore = self.summaryStat.get_mean()
-        self.PI = self.summaryStat.get_PI()
+        self.PI = self.summaryStat.get_PI(alpha=0.05)
         self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type="p")
 
 
@@ -151,16 +151,16 @@ class NeuNetSepecOptimizer:
 
         # find the best specification
         best_spec = None
-        max_r2 = float('int')
+        max_r2 = float('-inf')
         summary = []
         for s in self.crossValidationSummaries:
             summary.append([s.nFeatures, s.alpha, s.nNeurons, s.meanScore, s.formattedMeanPI])
-            if s.manScor > max_r2:
+            if s.meanScore > max_r2:
                 best_spec = s
-                max_r2 = s.manScor
+                max_r2 = s.meanScore
 
         # print score of each specification
-        cv_df = pd.DataFrame(s, columns=['# features', 'alpha', '# neurons', 'R2', 'R2 and PI'])
+        cv_df = pd.DataFrame(summary, columns=['# features', 'alpha', '# neurons', 'R2', 'R2 and PI'])
         if save_to_file is not None:
             cv_df.to_csv(save_to_file)
 
