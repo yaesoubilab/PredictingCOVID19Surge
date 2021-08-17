@@ -10,22 +10,24 @@ ALPHAS = [0.0001, 0.001]
 IF_STANDARDIZED = True
 FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
 
-# make prediction at different weeks
-rows = [['Week', 'Model', 'R2', 'R2 (PI)']]
 
-for week in WEEKS:
-    for model in (FULL, A):
+if __name__ == '__main__':
 
-        print('Evaluating model {} at week {}.'.format(model.name, week))
+    # make prediction at different weeks
+    rows = [['Week', 'Model', 'R2', 'R2 (PI)']]
 
-        # find the best model specification
-        best_spec = get_nue_net_best_performance(
-            week=week, model_definition=model,
-            list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
-            if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
+    for week in WEEKS:
+        for model in (FULL, A):
 
-        # store outcomes
-        rows.append([week, model.name, best_spec.meanScore, best_spec.PI])
+            print('Evaluating model {} at week {}.'.format(model.name, week))
 
+            # find the best model specification
+            best_spec = get_nue_net_best_performance(
+                week=week, model_definition=model,
+                list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
+                if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
-write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary.csv')
+            # store outcomes
+            rows.append([week, model.name, best_spec.meanScore, best_spec.PI])
+
+    write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary.csv')
