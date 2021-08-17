@@ -22,7 +22,7 @@ feature_names.remove(y_name_continues)
 feature_names.remove(y_name_binary)
 
 # preprocess (standardize)
-data = PreProcessor(df=df, features=feature_names, y_name=y_name_continues)
+data = PreProcessor(df=df, feature_names=feature_names, y_name=y_name_continues)
 # randomize rows
 df = df.sample(frac=1, random_state=1)
 # standardize columns

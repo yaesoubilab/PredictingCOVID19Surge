@@ -52,44 +52,28 @@ class NeuNetCVSummary(_CrossValidSummary):
 
 class NeuralNetCrossValidator:
 
-    def __init__(self, data, feature_names, outcome_name,
+    def __init__(self, preprocessed_data,
                  n_features_wanted, alpha, n_neurons,
-                 feature_selection_method, cv_fold, if_standardize=True, save_to_file='file.csv'):
+                 feature_selection_method, cv_fold):
         """
-        :param data: (panda DataFrame)
-        :param feature_names:
-        :param outcome_name:
+        :param preprocessed_data: (PreProcessor)
         :param n_features_wanted:
         :param alpha:
         :param n_neurons:
         :param feature_selection_method:
         :param cv_fold:
-        :param if_standardize:
-        :param save_to_file:
-        :return (dict) the information of the best specifications: '# features', 'alpha', '# neurons', 'R2', 'R2 CI'
         """
 
-        self.data = data
-        self.featureNames = feature_names
-        self.outcomeNames = outcome_name
+        self.preProcessedData = preprocessed_data
         self.nFeatures = n_features_wanted
         self.alpha = alpha
         self.nNeurons = n_neurons
-        self.ifStandardized = if_standardize
         self.featureSelection = feature_selection_method
         self.cvFold = cv_fold
 
         self.performanceSummary = None
 
     def go(self):
-
-        # preprocess
-        data_nn = PreProcessor(df=self.data, features=self.featureNames, y_name=self.outcomeNames)
-        data_nn.preprocess(if_standardize=self.ifStandardized)
-
-        # find the number of neurons if not provided
-        if self.nNeurons is None:
-            self.nNeurons = len(self.featureNames) + 2
 
         # make a performance object
         self.performanceSummary = NeuNetCVSummary(n_features=self.nFeatures, alpha=self.alpha, n_neurons=self.nNeurons)
@@ -99,12 +83,13 @@ class NeuralNetCrossValidator:
                              max_iter=1000, solver='sgd', activation='logistic')
 
         # feature selection
-        data_nn.feature_selection(estimator=model, method=self.featureSelection, num_fs_wanted=self.nFeatures)
+        self.preProcessedData.feature_selection(
+            estimator=model, method=self.featureSelection, num_fs_wanted=self.nFeatures)
 
         # cross-validation
         cv_score_list = cross_val_score(estimator=model,
-                                        X=data_nn.selectedX,
-                                        y=data_nn.y.ravel(),
+                                        X=self.preProcessedData.selectedX,
+                                        y=self.preProcessedData.y,
                                         cv=self.cvFold)
 
         # store the performance of this specification
@@ -128,6 +113,10 @@ class NeuNetSepecOptimizer:
         self.crossValidators = []
         self.crossValidationSummaries = []
 
+        # preprocess
+        preprocessed_data = PreProcessor(df=data, feature_names=feature_names, y_name=outcome_name)
+        preprocessed_data.preprocess(if_standardize=if_standardize)
+
         # find the number of neurons if not provided
         if list_of_n_neurons is None:
             list_of_n_neurons = [len(feature_names) + 2]
@@ -137,10 +126,9 @@ class NeuNetSepecOptimizer:
                 for n_neurons in list_of_n_neurons:
                     self.crossValidators.append(
                         NeuralNetCrossValidator(
-                            data=data, feature_names=feature_names, outcome_name=outcome_name,
+                            preprocessed_data=preprocessed_data,
                             n_features_wanted=n_fs, alpha=alpha, n_neurons=n_neurons,
-                            feature_selection_method=feature_selection_method, cv_fold=cv_fold,
-                            if_standardize=if_standardize))
+                            feature_selection_method=feature_selection_method, cv_fold=cv_fold))
 
     def find_best_spec(self, run_in_parallel=False, save_to_file=None):
 

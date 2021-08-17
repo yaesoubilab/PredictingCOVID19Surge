@@ -48,7 +48,7 @@ y_name = 'If hospitalization threshold passed'
 ######################
 # LOGISTIC REGRESSION #
 ######################
-df_lr = PreProcessor(df=df, features=features, y_name=y_name)
+df_lr = PreProcessor(df=df, feature_names=features, y_name=y_name)
 # pre-processing
 df_lr.preprocess(if_standardize=True, degree_of_polynomial=2)
 # feature selection
@@ -56,11 +56,11 @@ df_lr.feature_selection(method='rfe',
                         # liblinear is a good choice for small dataset, sag’ and ‘saga’ are faster for large ones.
                         estimator=linear_model.LogisticRegression(penalty="l1", C=0.1, solver='liblinear'),
                         num_fs_wanted=15)
-print('selected features:', df_lr.selectedFeatures)
-print('number of selected features', len(df_lr.selectedFeatures))
+print('selected features:', df_lr.selectedFeatureNames)
+print('number of selected features', len(df_lr.selectedFeatureNames))
 
 # construct model cohort
-multi_log_model = MultiLogisticReg(df=df_lr.df, features=df_lr.selectedFeatures, y_name=df_lr.y_name)
+multi_log_model = MultiLogisticReg(df=df_lr.df, features=df_lr.selectedFeatureNames, y_name=df_lr.y_name)
 multi_log_model.run_many(num_bootstraps=10)
 
 ##################

@@ -29,7 +29,7 @@ def evaluate_logistic(data, feature_names, outcome_name, poly_degree=1, n_bootst
     """
 
     # preprocessing
-    data_lr = PreProcessor(df=data, features=feature_names, y_name=outcome_name)
+    data_lr = PreProcessor(df=data, feature_names=feature_names, y_name=outcome_name)
     data_lr.preprocess(if_standardize=if_standardize, degree_of_polynomial=poly_degree)
 
     # feed the model
@@ -54,7 +54,7 @@ def evaluate_linear_regression(data, feature_names, outcome_name, cv_fold, outco
         list_of_num_fs_wanted = ['constant']
 
     # preprocess
-    data_lr = PreProcessor(df=data, features=feature_names, y_name=outcome_name)
+    data_lr = PreProcessor(df=data, feature_names=feature_names, y_name=outcome_name)
     data_lr.preprocess(if_standardize=if_standardize)
 
     # find the best combination
@@ -110,7 +110,7 @@ def evaluate_neural_network(data, feature_names, outcome_name,
     """
 
     # preprocess
-    data_nn = PreProcessor(df=data, features=feature_names, y_name=outcome_name)
+    data_nn = PreProcessor(df=data, feature_names=feature_names, y_name=outcome_name)
     data_nn.preprocess(if_standardize=if_standardize)
 
     # find the number of neurons if not provided

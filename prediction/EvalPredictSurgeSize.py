@@ -1,5 +1,6 @@
 import pandas as pd
 
+import covid_prediction.cross_validation as CV
 import covid_prediction.evaluate_predictive_models as E
 from definitions import ROOT_DIR
 
@@ -34,6 +35,17 @@ for week in ('8', '12'):
     #                              if_standardize=IF_STANDARDIZED, save_to_file=True)
 
     print('Neural network models:')
+
+    cv = CV.NeuNetSepecOptimizer(data=df, feature_names=feature_names,
+                                 outcome_name='Maximum hospitalization rate',
+                                 list_of_num_fs_wanted=[10, 20],
+                                 list_of_alphas=[0.0001, 0.001],
+                                 list_of_n_neurons=[10, 20],
+                                 feature_selection_method=FEATURE_SELECTION,
+                                 cv_fold=CV_FOLD, if_standardize=IF_STANDARDIZED)
+
+    cv.find_best_spec(run_in_parallel=False, save_to_file='NN eval-{}.csv'.format(week))
+
     E.evaluate_neural_network(data=df, feature_names=feature_names,
                               outcome_name='Maximum hospitalization rate',
                               list_of_num_fs_wanted=[10, 20],

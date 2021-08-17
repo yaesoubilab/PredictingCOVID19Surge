@@ -10,22 +10,22 @@ def standardize(x):
 
 
 class PreProcessor:
-    def __init__(self, df, features, y_name):
+    def __init__(self, df, feature_names, y_name):
 
         self._df = df
-        self._features = features
+        self._feature_names = feature_names
         self._yName = y_name
-        self._X = np.asarray(self._df[self._features])
+        self._X = np.asarray(self._df[self._feature_names])
         self._y = np.asarray(self._df[self._yName])
 
         # x, df, features after preprocess
         self.df = self._df
         self.X = self._X        # X after standardization
         self.y = self._y.ravel()
-        self.features = self._features
+        self.feature_name = self._feature_names
 
         # selected features and X after feature selection
-        self.selectedFeatures = None
+        self.selectedFeatureNames = None
         self.selectedX = None
 
     def preprocess(self, if_standardize=False, degree_of_polynomial=None):
@@ -42,10 +42,10 @@ class PreProcessor:
             poly = PolynomialFeatures(degree_of_polynomial)
             # polynomial is always done after standardization, so we work with X here
             self.X = poly.fit_transform(self.X)  # updating feature values
-            self.features = poly.get_feature_names(self._features)  # updating feature names
+            self.feature_name = poly.get_feature_names(self._feature_names)  # updating feature names
 
         # updating dataframe
-        self.df = pd.DataFrame(self.X, columns=self.features)
+        self.df = pd.DataFrame(self.X, columns=self.feature_name)
         self.df[self._yName] = self.y
 
     def feature_selection(self, estimator, method, num_fs_wanted=10):
@@ -56,18 +56,18 @@ class PreProcessor:
         """
 
         if method == 'rfe':
-            selected_features = rfe(x=self.X, y=self.y, features=self.features,
+            selected_features = rfe(x=self.X, y=self.y, features=self.feature_name,
                                     num_wanted=num_fs_wanted, estimator=estimator)
         elif method == 'pi':
-            selected_features = pi(x=self.X, y=self.y, features=self.features,
+            selected_features = pi(x=self.X, y=self.y, features=self.feature_name,
                                    num_wanted=num_fs_wanted, estimator=estimator)
         elif method == 'lasso':
-            selected_features = lasso(x=self.X, y=self.y, features=self.features,
+            selected_features = lasso(x=self.X, y=self.y, features=self.feature_name,
                                       estimator=estimator)
         else:
             raise ValueError('unknown feature selection method')
 
         # update feature names
-        self.selectedFeatures = selected_features
+        self.selectedFeatureNames = selected_features
         # update predictor values
-        self.selectedX = np.asarray(self.df[self.selectedFeatures])
+        self.selectedX = np.asarray(self.df[self.selectedFeatureNames])
