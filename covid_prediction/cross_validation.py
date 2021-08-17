@@ -1,5 +1,6 @@
 import multiprocessing as mp
 
+from SimPy.InOutFunctions import write_csv
 from SimPy.Statistics import SummaryStat
 from covid_prediction.pre_process import *
 from covid_prediction.prediction_models import *
@@ -80,7 +81,8 @@ class NeuralNetCrossValidator:
 
         # construct model
         model = MLPRegressor(alpha=self.alpha, hidden_layer_sizes=(self.nNeurons,),
-                             max_iter=1000, solver='sgd', activation='logistic')
+                             max_iter=1000, solver='sgd', activation='logistic',
+                             random_state=0)
 
         # feature selection
         self.preProcessedData.feature_selection(
@@ -96,7 +98,7 @@ class NeuralNetCrossValidator:
         self.performanceSummary.add_cv_performance(scores=cv_score_list, deci=4)
 
 
-def run_this_cross_validator(cross_validator):
+def run_this_cross_validator(cross_validator, i):
     """ helper function for parallelization  """
 
     # simulate and return the cohort
@@ -107,7 +109,7 @@ def run_this_cross_validator(cross_validator):
 class NeuNetSepecOptimizer:
 
     def __init__(self, data, feature_names, outcome_name,
-                 list_of_num_fs_wanted, list_of_alphas, list_of_n_neurons,
+                 list_of_n_features_wanted, list_of_alphas, list_of_n_neurons,
                  feature_selection_method, cv_fold, if_standardize=True):
 
         self.crossValidators = []
@@ -121,7 +123,7 @@ class NeuNetSepecOptimizer:
         if list_of_n_neurons is None:
             list_of_n_neurons = [len(feature_names) + 2]
 
-        for n_fs in list_of_num_fs_wanted:
+        for n_fs in list_of_n_features_wanted:
             for alpha in list_of_alphas:
                 for n_neurons in list_of_n_neurons:
                     self.crossValidators.append(
@@ -135,7 +137,7 @@ class NeuNetSepecOptimizer:
         if run_in_parallel:
 
             # create a list of arguments
-            args = [cv for cv in self.crossValidators]
+            args = [(cv, 0) for cv in self.crossValidators]
 
             # run all
             with mp.Pool(MAX_PROCESSES) as pl:
@@ -152,7 +154,7 @@ class NeuNetSepecOptimizer:
         # find the best specification
         best_spec = None
         max_r2 = float('-inf')
-        summary = []
+        summary = [['# features', 'alpha', '# neurons', 'R2', 'R2 and PI']]
         for s in self.crossValidationSummaries:
             summary.append([s.nFeatures, s.alpha, s.nNeurons, s.meanScore, s.formattedMeanPI])
             if s.meanScore > max_r2:
@@ -160,9 +162,8 @@ class NeuNetSepecOptimizer:
                 max_r2 = s.meanScore
 
         # print score of each specification
-        cv_df = pd.DataFrame(summary, columns=['# features', 'alpha', '# neurons', 'R2', 'R2 and PI'])
         if save_to_file is not None:
-            cv_df.to_csv(save_to_file)
+            write_csv(rows=summary, file_name=save_to_file)
 
         return best_spec
 
