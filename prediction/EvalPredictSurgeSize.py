@@ -14,7 +14,7 @@ FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
 if __name__ == '__main__':
 
     # make prediction at different weeks
-    rows = [['Week', 'Model', 'R2', 'R2 (PI)']]
+    rows = [['Week', 'Model', 'R2', 'error', 'PI']]
 
     for week in WEEKS:
         for model in (FULL, A):
@@ -28,6 +28,6 @@ if __name__ == '__main__':
                 if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
             # store outcomes
-            rows.append([week, model.name, best_spec.meanScore, best_spec.PI])
+            rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.PI])
 
     write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary.csv')
