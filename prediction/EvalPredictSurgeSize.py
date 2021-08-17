@@ -3,7 +3,7 @@ from covid_prediction.model_definitions import *
 from covid_prediction.optimize_parameters import get_nue_net_best_performance
 from definitions import ROOT_DIR
 
-WEEKS = (8, 12)
+WEEKS = (-12, -8, -4)
 CV_FOLD = 10         # num of splits for cross validation
 IF_PARALLEL = True
 ALPHAS = [0.0001, 0.001]
