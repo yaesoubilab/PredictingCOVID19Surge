@@ -48,9 +48,17 @@ def plot_performance():
 
     i = 0
     for key, value in dict_of_figs.items():
+
+        x_labels = []
+        for v in value:
+            if type(v[0]) == float:
+                x_labels.append(str(int(v[0])))
+            else:
+                x_labels.append(v[0])
+
         add_to_ax(ax=axes[i],
                   title=key,
-                  x_labels=[v[0] for v in value],
+                  x_labels=x_labels,
                   ys=[v[1] for v in value],
                   errs=[v[2] for v in value],
                   colors=X_LABEL_COLORS[:len(value)],
