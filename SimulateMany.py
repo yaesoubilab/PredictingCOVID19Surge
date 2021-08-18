@@ -2,7 +2,7 @@ import apace.Calibration as calib
 from apace.MultiEpidemics import MultiEpidemics
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
-from covid_visualization.PlotTrajs import plot
+from covid_visualization.plot_trajs import plot
 
 N = 8   # number of trajectories to simulate
 IF_PARALLEL = True

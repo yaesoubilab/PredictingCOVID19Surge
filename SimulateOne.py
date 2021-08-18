@@ -1,7 +1,7 @@
 from apace.Epidemic import EpiModel
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
-from covid_visualization.PlotTrajs import plot
+from covid_visualization.plot_trajs import plot
 
 
 def simulate():

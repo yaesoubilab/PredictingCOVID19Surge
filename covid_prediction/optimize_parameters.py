@@ -18,6 +18,8 @@ def get_nue_net_best_performance(week, model_definition,
         model_definition.features.remove('Maximum hospitalization rate')
         model_definition.features.remove('If hospitalization threshold passed')
 
+    # number of features
+    print('Number of features:', len(model_definition.features))
     # randomize rows
     df = df.sample(frac=1, random_state=1)
 
