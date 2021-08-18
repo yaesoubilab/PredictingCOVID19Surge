@@ -1,8 +1,10 @@
 import apace.analysis.Trajectories as A
 import covid_model.data as D
 import definitions as Def
-from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, VACCINE_COVERAGE_BY_AGE, CUM_HOSP_RATE_OVERALL
-from definitions import AgeGroups, Profiles, FEASIBILITY_PERIOD
+from covid_model.data import MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, VACCINE_COVERAGE_BY_AGE, \
+    CUM_HOSP_RATE_OVERALL
+from covid_model.settings import COVIDSettings
+from definitions import AgeGroups, Profiles, FEASIBILITY_PERIOD, ROOT_DIR
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
 IF_MAKE_VALIDATION_PLOTS = False
@@ -17,7 +19,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     :return:
     """
 
-    directory = 'outputs/trajectories'
+    directory = ROOT_DIR + '/outputs/trajectories'
     sim_outcomes = A.SimOutcomeTrajectories(csv_directory=directory)
 
     # defaults
@@ -59,7 +61,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                          y_range=(0, 500), x_multiplier=prev_multiplier))
 
             # validation
-            filename_validation = 'outputs/fig_trajs/{}.png'.format(str_a)
+            filename_validation = ROOT_DIR+'/outputs/figures/{}.png'.format(str_a)
             sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
                                           list_plot_info=[Es[0], Is[0], Hs[0], Rs[0], Rs[0],
                                                           Es[1], Is[1], Hs[1], Rs[1], Rs[1],
@@ -94,14 +96,30 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                        calibration_info=A.CalibrationTargetPlotInfo(
                                            rows_of_data=D.VACCINE_COVERAGE_OVER_TIME,
                                            if_connect_obss=True))
+    obs_incd_novel = A.TrajPlotInfo(
+        outcome_name='Obs: % of incidence with novel variant',
+        title='Incidence associated with\n'
+              'novel strain (%)',
+        y_range=(0, 100), y_multiplier=100,
+        x_multiplier=obs_incd_multiplier,
+        calibration_info=A.CalibrationTargetPlotInfo(
+            rows_of_data=D.PERC_INF_WITH_NOVEL,
+            if_connect_obss=False))
 
     # summary
     sim_outcomes.plot_multi_panel(n_rows=1, n_cols=3,
                                   list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
                                                   obs_cum_vacc_rate],
-                                  file_name='outputs/fig_trajs/summary.png',
+                                  file_name=ROOT_DIR+'/outputs/figures/summary3.png',
                                   show_subplot_labels=True,
                                   figure_size=(2.3*3, 2.4)
+                                  )
+    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
+                                  list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
+                                                  obs_cum_vacc_rate, obs_incd_novel],
+                                  file_name=ROOT_DIR+'/outputs/figures/summary.png',
+                                  show_subplot_labels=True,
+                                  figure_size=(2.3*2, 2.4*2)
                                   )
 
     # -----------------------------------------------------
@@ -150,7 +168,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
                                   list_plot_info=[obs_incd_novel, obs_incd_novel_unvacc, obs_incd_novl_vacc,
                                                   obs_new_hosp_novel, obs_new_hosp_novel_unvacc, obs_new_hosp_novel_vacc],
-                                  file_name='outputs/fig_trajs/novel_variant.png',
+                                  file_name=ROOT_DIR+'/outputs/figures/novel_variant.png',
                                   show_subplot_labels=True,
                                   figure_size=(2.3*3, 2.4*2)
                                   )
@@ -195,7 +213,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                                          if_connect_obss=True)
         ))
 
-    filename_validation = 'outputs/fig_trajs/calibration.png'
+    filename_validation = ROOT_DIR+'/outputs/figures/calibration.png'
     list_plot_info = hosp_rate_by_age
     list_plot_info.extend(cum_hosp_rate_by_age)
     list_plot_info.extend(age_dist_cum_hosp)
@@ -236,8 +254,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
             title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
 
-
-    filename_validation = 'outputs/fig_trajs/incidence.png'
+    filename_validation = ROOT_DIR+'/outputs/figures/incidence.png'
     list_plot_info = incd_rate_by_age
     list_plot_info.extend(age_dist_cum_incd)
     #list_plot_info.extend(age_dist_cum_death)
@@ -246,3 +263,14 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                   list_plot_info=list_plot_info,
                                   file_name=filename_validation,
                                   figure_size=(15, 4))
+
+
+if __name__ == "__main__":
+
+    # get model settings
+    sets = COVIDSettings()
+
+    plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
+         incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
+         obs_incd_multiplier=sets.observationPeriod * 52
+         )
