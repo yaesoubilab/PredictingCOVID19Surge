@@ -28,7 +28,7 @@ class _CrossValidSummary:
         self.meanScore = self.summaryStat.get_mean()
         self.PI = self.summaryStat.get_PI(alpha=0.05)
         self.error = 0.5*(self.PI[1] - self.PI[0])
-        self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type="p")
+        self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type='c')
 
 
 class LinRegCVSummary(_CrossValidSummary):

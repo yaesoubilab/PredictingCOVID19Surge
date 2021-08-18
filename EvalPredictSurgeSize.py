@@ -5,7 +5,7 @@ from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
 
 WEEKS = (-12, -8, -4)
-CV_FOLD = 25         # num of splits for cross validation
+CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = True
 ALPHAS = [0.001]
 IF_STANDARDIZED = True
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     rows = [['Week', 'Model', 'R2', 'error', 'PI']]
 
     for week in WEEKS:
-        for model in (FULL, A):
+        for model in (Zero, A, B, C, D):
 
             print('Evaluating model {} at week {}.'.format(
                 model.name, week))
