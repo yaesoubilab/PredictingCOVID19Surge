@@ -7,7 +7,7 @@ from definitions import ROOT_DIR
 X_LABEL_COLORS = ['purple', 'blue', 'green', 'red', 'orange']
 
 
-def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label):
+def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values):
 
     x_pos = np.arange(len(x_labels))
     ax.scatter(x_pos, ys, c=colors)
@@ -16,16 +16,20 @@ def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label):
 
     if show_y_label:
         ax.set_ylabel('$R^{2}$ Score')
+    else:
+        ax.set_ylabel(' ')
+    if not show_y_values:
+        ax.set_yticklabels([])
     ax.set_xlabel('Predictive Models')
     ax.set_xticks(x_pos)
     ax.set_xticklabels(x_labels)
     ax.set_ylim((0, 1))
     ax.set_xlim((-0.5, len(x_labels) - 0.5))
-    ax.set_title(title)
+    ax.set_title(title, fontsize=10, fontweight='bold')
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance():
+def plot_performance(fig_size=(7.5, 4)):
     # read data
     data = read_csv_rows(file_name=ROOT_DIR+'/outputs/prediction_summary/summary.csv',
                          if_ignore_first_row=True, if_convert_float=True)
@@ -44,7 +48,7 @@ def plot_performance():
             dict_of_figs[title] = [[row[1], row[2], row[3]]]
 
     # make the figure
-    fig, axes = plt.subplots(1, len(dict_of_figs), figsize=(7.5, 4))
+    fig, axes = plt.subplots(1, len(dict_of_figs), figsize=fig_size)
 
     i = 0
     for key, value in dict_of_figs.items():
@@ -62,7 +66,8 @@ def plot_performance():
                   ys=[v[1] for v in value],
                   errs=[v[2] for v in value],
                   colors=X_LABEL_COLORS[:len(value)],
-                  show_y_label=True if i == 0 else False)
+                  show_y_label=True if i == 0 else False,
+                  show_y_values=True if i == 0 else False)
 
         i += 1
 
@@ -73,4 +78,4 @@ def plot_performance():
 
 
 if __name__ == '__main__':
-    plot_performance()
+    plot_performance(fig_size=(9, 3.5))
