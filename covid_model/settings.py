@@ -40,6 +40,7 @@ class COVIDSettings(ModelSettings):
         # calibration targets
         if if_calibrating:
             self.cumHospRateMean = []
+            self.cumHospRateVar = []
             self.cumHospRateN = []
             self.cumHospRateByAgeMean = [[] for i in range(len(AgeGroups))]
             self.cumHospRateByAgeN = [[] for i in range(len(AgeGroups))]
@@ -56,6 +57,10 @@ class COVIDSettings(ModelSettings):
                 # cumulative hospitalization rate
                 if week == CUM_HOSP_RATE_OVERALL[0][0]:
                     self.cumHospRateMean.append(CUM_HOSP_RATE_OVERALL[0][1] * 0.00001)
+                    self.cumHospRateVar.append(
+                        0.25*(CUM_HOSP_RATE_OVERALL[0][3]-CUM_HOSP_RATE_OVERALL[0][2])*0.00001
+                    )
+
                     self.cumHospRateN.append(get_survey_size(mean=CUM_HOSP_RATE_OVERALL[0][1],
                                                              l=CUM_HOSP_RATE_OVERALL[0][2],
                                                              u=CUM_HOSP_RATE_OVERALL[0][3],
@@ -63,6 +68,7 @@ class COVIDSettings(ModelSettings):
                                                              interval_type='c'))
                 else:
                     self.cumHospRateMean.append(None)
+                    self.cumHospRateVar.append(None)
                     self.cumHospRateN.append(None)
 
                 # cumulative hospitalization rate by age

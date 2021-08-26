@@ -398,7 +398,9 @@ def build_covid_model(model):
 
         # calibration information for the overall hospitalization rate
         cum_hosp_rate_by_age[0].add_calibration_targets(ratios=sets.cumHospRateMean,
-                                                        survey_sizes=sets.cumHospRateN)
+                                                        variances=sets.cumHospRateVar,
+                                                        # survey_sizes=sets.cumHospRateN
+                                                        )
 
         # calibration information for hospitalization rate by age
         for a in range(age_groups_profiles.nAgeGroups):
