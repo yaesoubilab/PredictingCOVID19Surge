@@ -6,7 +6,7 @@ from covid_model.settings import COVIDSettings
 
 N_OF_CALIB_SIMS = 2000    # total number of trajectories to simulate as part of calibration
 N_OF_SIMS = 100   # number of trajectories to simulate using the calibrated model
-RUN_IN_PARALLEL = True
+RUN_IN_PARALLEL = False
 
 
 if __name__ == "__main__":
