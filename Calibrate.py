@@ -25,6 +25,8 @@ if __name__ == "__main__":
         num_of_iterations=N_OF_CALIB_SIMS,
         if_run_in_parallel=RUN_IN_PARALLEL)
 
+    print('Calibration duration:', calibration.runTime)
+
     # save calibration results
     calibration.save_results(filename='outputs/summary/calibration_summary.csv')
 
