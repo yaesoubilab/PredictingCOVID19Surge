@@ -9,7 +9,7 @@ MAX_PROCESSES = mp.cpu_count()  # maximum number of processors
 
 
 class _CrossValidSummary:
-    # cross validation and specification information
+    """ cross validation and specification information """
     def __init__(self, n_features):
 
         self.nFeatures = n_features
@@ -22,6 +22,11 @@ class _CrossValidSummary:
         self.formattedMeanPI = None
 
     def add_cv_performance(self, scores, deci=4):
+        """
+        gets the list of scores to calculate summary statistics (mean, percentile intervals, and error length)
+        :param scores: (list) of scores from cross validation
+        :param deci: (int) number of digits to round the summary statistics to
+        """
         self.scores = scores
         self.summaryStat = SummaryStat(name='cross-validation scores',
                                        data=scores)
@@ -43,7 +48,7 @@ class LinRegCVSummary(_CrossValidSummary):
         self.f_s_method = f_s_method    # feature selection method
 
 
-class NeuNetCVSummary(_CrossValidSummary):
+class NeuralNetCVSummary(_CrossValidSummary):
     """ neural network cross-validation performance summary """
 
     def __init__(self, n_features, alpha, n_neurons):
@@ -54,6 +59,7 @@ class NeuNetCVSummary(_CrossValidSummary):
 
 
 class NeuralNetCrossValidator:
+    """ class to run cross validation on a neural network model """
 
     def __init__(self, preprocessed_data,
                  n_features_wanted, alpha, n_neurons,
@@ -66,6 +72,7 @@ class NeuralNetCrossValidator:
         :param feature_selection_method:
         :param cv_fold:
         """
+        assert isinstance(preprocessed_data, PreProcessor)
 
         self.preProcessedData = preprocessed_data
         self.nFeatures = n_features_wanted
@@ -77,11 +84,13 @@ class NeuralNetCrossValidator:
         self.performanceSummary = None
 
     def go(self):
+        """ performs cross validation and calculates the R2 scores """
 
         # make a performance object
-        self.performanceSummary = NeuNetCVSummary(n_features=self.nFeatures, alpha=self.alpha, n_neurons=self.nNeurons)
+        self.performanceSummary = NeuralNetCVSummary(
+            n_features=self.nFeatures, alpha=self.alpha, n_neurons=self.nNeurons)
 
-        # construct model
+        # construct a neural network model
         model = MLPRegressor(alpha=self.alpha, hidden_layer_sizes=(self.nNeurons,),
                              max_iter=1000, solver='sgd', activation='logistic',
                              random_state=0)
@@ -108,7 +117,8 @@ def run_this_cross_validator(cross_validator, i):
     return cross_validator
 
 
-class NeuNetSepecOptimizer:
+class NeuralNetSepecOptimizer:
+    """ class to find the optimal specification for a neural network using cross validation """
 
     def __init__(self, data, feature_names, outcome_name,
                  list_of_n_features_wanted, list_of_alphas, list_of_n_neurons,
@@ -121,7 +131,8 @@ class NeuNetSepecOptimizer:
         preprocessed_data = PreProcessor(df=data, feature_names=feature_names, y_name=outcome_name)
         preprocessed_data.preprocess(if_standardize=if_standardize)
 
-        # find the number of neurons if not provided
+        # send the number of neurons to (number of features + 2)
+        # if the number of neurons is not provided
         if list_of_n_neurons is None:
             list_of_n_neurons = [len(feature_names) + 2]
 
@@ -135,6 +146,11 @@ class NeuNetSepecOptimizer:
                             feature_selection_method=feature_selection_method, cv_fold=cv_fold))
 
     def find_best_spec(self, run_in_parallel=False, save_to_file=None):
+        """ find the best specification for the neural network model
+        :param run_in_parallel: (bool) set to True to run the cross validation in parallel
+        :param save_to_file: (string) filename where the results should be saved.
+        :return: the best specification
+        """
 
         if run_in_parallel:
 

@@ -1,6 +1,6 @@
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_definitions import *
-from covid_prediction.optimize_parameters import get_nue_net_best_performance
+from covid_prediction.optimize_parameters import get_neural_net_best_spec
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
 
@@ -24,8 +24,8 @@ if __name__ == '__main__':
                 model.name, week))
 
             # find the best model specification
-            best_spec = get_nue_net_best_performance(
-                week=week, model_definition=model,
+            best_spec = get_neural_net_best_spec(
+                week=week, model_spec=model,
                 list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
                 if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 

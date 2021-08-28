@@ -88,7 +88,7 @@ class FeatureEngineering:
                           columns=col_labels)
 
         # save new dataset to file
-        output_dir = Path('outputs/prediction_dataset/')
+        output_dir = Path('outputs/prediction_datasets/')
         output_dir.mkdir(parents=True, exist_ok=True)
         df.to_csv(output_dir / output_file, index=False)
 
