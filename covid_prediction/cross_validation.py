@@ -16,20 +16,23 @@ class _CrossValidSummary:
 
         self.scores = None
         self.summaryStat = None
+        self.selectedFeatures = None
         self.meanScore = None
         self.error = None
         self.PI = None
         self.formattedMeanPI = None
 
-    def add_cv_performance(self, scores, deci=4):
+    def add_cv_performance(self, scores, deci=4, selected_features=None):
         """
         gets the list of scores to calculate summary statistics (mean, percentile intervals, and error length)
         :param scores: (list) of scores from cross validation
         :param deci: (int) number of digits to round the summary statistics to
+        :param selected_features: (list) of selected features
         """
         self.scores = scores
         self.summaryStat = SummaryStat(name='cross-validation scores',
                                        data=scores)
+        self.selectedFeatures = selected_features
         self.meanScore = self.summaryStat.get_mean()
         self.PI = self.summaryStat.get_PI(alpha=0.05)
         self.error = 0.5*(self.PI[1] - self.PI[0])
@@ -106,7 +109,9 @@ class NeuralNetCrossValidator:
                                         cv=self.cvFold)
 
         # store the performance of this specification
-        self.performanceSummary.add_cv_performance(scores=cv_score_list, deci=4)
+        self.performanceSummary.add_cv_performance(scores=cv_score_list,
+                                                   deci=4,
+                                                   selected_features=self.preProcessedData.selectedFeatureNames)
 
 
 def run_this_cross_validator(cross_validator, i):
@@ -145,10 +150,11 @@ class NeuralNetSepecOptimizer:
                             n_features_wanted=n_fs, alpha=alpha, n_neurons=n_neurons,
                             feature_selection_method=feature_selection_method, cv_fold=cv_fold))
 
-    def find_best_spec(self, run_in_parallel=False, save_to_file=None):
+    def find_best_spec(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
         """ find the best specification for the neural network model
         :param run_in_parallel: (bool) set to True to run the cross validation in parallel
-        :param save_to_file: (string) filename where the results should be saved.
+        :param save_to_file_performance: (string) filename where the performance results should be saved.
+        :param save_to_file_features: (string) filename where the selected features should be saved
         :return: the best specification
         """
 
@@ -180,8 +186,11 @@ class NeuralNetSepecOptimizer:
                 max_r2 = s.meanScore
 
         # print score of each specification
-        if save_to_file is not None:
-            write_csv(rows=summary, file_name=save_to_file)
+        if save_to_file_performance is not None:
+            write_csv(rows=summary, file_name=save_to_file_performance)
+
+        if save_to_file_features is not None:
+            write_csv(rows=best_spec.selectedFeatures, file_name=save_to_file_features)
 
         return best_spec
 
