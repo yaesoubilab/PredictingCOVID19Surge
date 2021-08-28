@@ -45,10 +45,10 @@ def get_neural_net_best_spec(week, model_spec,
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,
-        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/NN eval-wk {}-model {}.csv'.format(
-            week, model_spec.name),
-        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/NN features-wk {}-model {}.csv'.format(
-            week, model_spec.name)
+        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-wk {}-model {}.csv'
+            .format(week, model_spec.name),
+        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-wk {}-model {}.csv'
+            .format(week, model_spec.name)
     )
 
     return best_spec
