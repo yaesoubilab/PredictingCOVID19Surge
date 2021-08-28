@@ -85,7 +85,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1):
                                            y_range=[MIN_HOSP_RATE_OVERALL, MAX_HOSP_RATE_OVERALL])))
     obs_cum_hosp_rate = A.TrajPlotInfo(outcome_name='Obs: Cumulative hospitalization rate',
                                        title='Cumulative hospitalization rate\n(per 100,000 population)',
-                                       y_range=(0, 1000*3), y_multiplier=100000, x_multiplier=prev_multiplier,
+                                       y_range=(0, 1000*3),
+                                       y_multiplier=100000, x_multiplier=prev_multiplier,
                                        calibration_info=A.CalibrationTargetPlotInfo(
                                            rows_of_data=CUM_HOSP_RATE_OVERALL
                                        ))
