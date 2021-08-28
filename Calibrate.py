@@ -25,12 +25,13 @@ if __name__ == "__main__":
         num_of_iterations=N_OF_CALIB_SIMS,
         if_run_in_parallel=RUN_IN_PARALLEL)
 
-    print('Calibration duration:', calibration.runTime)
+    print('Calibration duration: {} seconds.'.format(round(calibration.runTime, 1)))
 
     # save calibration results
     calibration.save_results(filename='outputs/summary/calibration_summary.csv')
 
     # simulate the calibrated model
     simulate(n=N_OF_SIMS,
+             n_to_display=min(200, N_OF_SIMS),
              calibrated=True,
              sample_seeds_by_weights=False)
