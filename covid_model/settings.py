@@ -97,7 +97,7 @@ class COVIDSettings(ModelSettings):
                 if week == VACCINE_COVERAGE_OVER_TIME[-1][0]:
                     self.cumVaccRateMean.append(VACCINE_COVERAGE_OVER_TIME[-1][1] * 0.01)
                     self.cumHospRateVar.append(
-                        0.25 * (VACCINE_COVERAGE_OVER_TIME[0][3] - VACCINE_COVERAGE_OVER_TIME[0][2]) * 0.01
+                        0.25 * (VACCINE_COVERAGE_OVER_TIME[-1][3] - VACCINE_COVERAGE_OVER_TIME[-1][2]) * 0.01
                     )
                     self.cumVaccRateN.append(get_survey_size(mean=VACCINE_COVERAGE_OVER_TIME[-1][1],
                                                              l=VACCINE_COVERAGE_OVER_TIME[-1][2],
