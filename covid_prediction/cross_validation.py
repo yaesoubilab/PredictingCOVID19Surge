@@ -190,7 +190,8 @@ class NeuralNetSepecOptimizer:
             write_csv(rows=summary, file_name=save_to_file_performance)
 
         if save_to_file_features is not None:
-            write_csv(rows=best_spec.selectedFeatures, file_name=save_to_file_features)
+            write_csv(rows=[[f] for f in best_spec.selectedFeatures],
+                      file_name=save_to_file_features)
 
         return best_spec
 
