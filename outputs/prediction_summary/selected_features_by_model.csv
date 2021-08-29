@@ -3,29 +3,29 @@ Incidence rate (last week),+,+,+,,,,,,,,,,,,
 Incidence rate (2-week average),+,+,+,,,,,,,,,,,,
 Incidence rate (4-week change),+,+,+,,,,,,,,,,,,
 New hospitalization rate (last week),+,+,+,-,+,+,+,+,+,+,+,+,+,+,+
-New hospitalization rate (2-week average),+,+,+,+,+,+,+,-,+,+,+,+,+,+,+
+New hospitalization rate (2-week average),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
 New hospitalization rate (4-week change),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
 % with novel variant among the unvaccianted infections (last week),+,+,+,,,,,,,+,-,+,-,+,+
 % with novel variant among the unvaccianted infections (2-week average),+,+,-,,,,,,,+,+,+,+,+,+
 % with novel variant among the unvaccianted infections (4-week change),+,+,+,,,,,,,+,+,+,+,+,+
-% with novel variant among the vaccianted infections (last week),-,-,-,,,,,,,-,+,+,-,-,-
-% with novel variant among the vaccianted infections (2-week average),-,-,-,,,,,,,-,-,-,-,+,+
-% with novel variant among the vaccianted infections (4-week change),+,-,+,,,,,,,+,-,-,+,-,-
+% with novel variant among the vaccianted infections (last week),-,-,-,,,,,,,+,+,+,-,+,+
+% with novel variant among the vaccianted infections (2-week average),-,-,-,,,,,,,+,-,+,-,+,+
+% with novel variant among the vaccianted infections (4-week change),+,-,+,,,,,,,+,-,+,+,+,+
 % with novel variant among the unvaccianted hospitalizations (last week),-,+,-,,,,,,,,,,,,
 % with novel variant among the unvaccianted hospitalizations (2-week average),+,+,-,,,,,,,,,,,,
 % with novel variant among the unvaccianted hospitalizations (4-week change),-,-,-,,,,,,,,,,,,
 % with novel variant among the vaccianted hospitalizations (last week),-,-,-,,,,,,,,,,,,
 % with novel variant among the vaccianted hospitalizations (2-week average),-,+,-,,,,,,,,,,,,
 % with novel variant among the vaccianted hospitalizations (4-week change),-,-,-,,,,,,,,,,,,
-% with novel variant among new infections (last week),-,-,+,,,,-,-,-,,,,,,
-% with novel variant among new infections (2-week average),-,-,+,,,,+,+,+,,,,,,
+% with novel variant among new infections (last week),-,-,+,,,,-,+,+,,,,,,
+% with novel variant among new infections (2-week average),-,-,+,,,,+,-,+,,,,,,
 % with novel variant among new infections (4-week change),+,+,+,,,,+,+,+,,,,,,
 % with novel variant among new hospitalizations (last week),-,+,-,,,,,,,,,,,,
 % with novel variant among new hospitalizations (2-week average),-,+,-,,,,,,,,,,,,
 % with novel variant among new hospitalizations (4-week change),-,-,+,,,,,,,,,,,,
 % of population susceptible,+,+,+,,,,,,,,,,+,+,+
-Cumulative vaccination rate,-,+,-,+,+,+,+,+,+,-,+,+,-,+,+
-Cumulative hospitalization rate,+,+,+,+,+,+,+,+,-,+,+,-,+,+,+
+Cumulative vaccination rate,-,+,-,+,+,+,+,+,+,+,+,+,-,+,+
+Cumulative hospitalization rate,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
 R0,+,+,-,,,,,,,,,,,,
 Relative infectiousness of an unvaccinated individual if infected with novel variant,-,-,-,,,,,,,,,,,,
 Relative infectiousness of a vaccinated individual if infected with novel variant,+,-,-,,,,,,,,,,,,
