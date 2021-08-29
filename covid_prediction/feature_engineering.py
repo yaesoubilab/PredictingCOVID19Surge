@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr
 
+from SimPy.InOutFunctions import write_csv
+
 OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
 
 
@@ -39,6 +41,10 @@ class FeatureEngineering:
         col_labels.extend(self._get_labels_of_incd_or_prev_features(info_of_incd_fs))
         col_labels.extend(self._get_labels_of_incd_or_prev_features(info_of_prev_fs))
         col_labels.extend(info_of_parameter_fs)
+        # print feature names
+        write_csv(rows=[[c] for c in col_labels],
+                  file_name='outputs/prediction_datasets/features.csv')
+
         col_labels.extend(OUTCOME_LABELS)
 
         # read dataset of the parameter features
