@@ -39,9 +39,9 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold):
             ('Obs: % of new hospitalizations with novel variant', ('ave', 2), ('slope', 4)),
         ],
         info_of_prev_fs=[
-            'Obs: Prevalence susceptible',
+            'Obs: Cumulative hospitalization rate',
             'Obs: Cumulative vaccination rate',
-            'Obs: Cumulative hospitalization rate'],
+            'Obs: Prevalence susceptible'],
         info_of_parameter_fs=[
             'R0',
             'Ratio transmissibility by profile-1',

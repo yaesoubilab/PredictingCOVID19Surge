@@ -1,37 +1,37 @@
 features,12 weeks until peak | model Zero,8 weeks until peak | model Zero,4 weeks until peak | model Zero,12 weeks until peak | model A,8 weeks until peak | model A,4 weeks until peak | model A,12 weeks until peak | model B,8 weeks until peak | model B,4 weeks until peak | model B,12 weeks until peak | model C,8 weeks until peak | model C,4 weeks until peak | model C,12 weeks until peak | model D,8 weeks until peak | model D,4 weeks until peak | model D
-Incidence rate (last week),+,+,+,,,,,,,,,,,,
-Incidence rate (2-week average),+,+,+,,,,,,,,,,,,
-Incidence rate (4-week change),+,+,+,,,,,,,,,,,,
-New hospitalization rate (last week),+,+,+,-,+,+,+,+,+,+,+,+,+,+,+
-New hospitalization rate (2-week average),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
-New hospitalization rate (4-week change),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
-% with novel variant among the unvaccianted infections (last week),+,+,+,,,,,,,+,-,+,-,+,+
-% with novel variant among the unvaccianted infections (2-week average),+,+,-,,,,,,,+,+,+,+,+,+
-% with novel variant among the unvaccianted infections (4-week change),+,+,+,,,,,,,+,+,+,+,+,+
-% with novel variant among the vaccianted infections (last week),-,-,-,,,,,,,+,+,+,-,+,+
-% with novel variant among the vaccianted infections (2-week average),-,-,-,,,,,,,+,-,+,-,+,+
-% with novel variant among the vaccianted infections (4-week change),+,-,+,,,,,,,+,-,+,+,+,+
-% with novel variant among the unvaccianted hospitalizations (last week),-,+,-,,,,,,,,,,,,
-% with novel variant among the unvaccianted hospitalizations (2-week average),+,+,-,,,,,,,,,,,,
-% with novel variant among the unvaccianted hospitalizations (4-week change),-,-,-,,,,,,,,,,,,
-% with novel variant among the vaccianted hospitalizations (last week),-,-,-,,,,,,,,,,,,
-% with novel variant among the vaccianted hospitalizations (2-week average),-,+,-,,,,,,,,,,,,
-% with novel variant among the vaccianted hospitalizations (4-week change),-,-,-,,,,,,,,,,,,
-% with novel variant among new infections (last week),-,-,+,,,,-,+,+,,,,,,
-% with novel variant among new infections (2-week average),-,-,+,,,,+,-,+,,,,,,
-% with novel variant among new infections (4-week change),+,+,+,,,,+,+,+,,,,,,
-% with novel variant among new hospitalizations (last week),-,+,-,,,,,,,,,,,,
-% with novel variant among new hospitalizations (2-week average),-,+,-,,,,,,,,,,,,
-% with novel variant among new hospitalizations (4-week change),-,-,+,,,,,,,,,,,,
+Incidence rate (last wk),+,+,+,,,,,,,,,,,,
+Incidence rate (2-wk average),+,+,+,,,,,,,,,,,,
+Incidence rate (4-wk change),+,+,+,,,,,,,,,,,,
+New hospitalization rate (last wk),+,+,+,-,+,+,+,+,+,+,+,+,+,+,+
+New hospitalization rate (2-wk average),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
+New hospitalization rate (4-wk change),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
+% with novel variant among unvaccinated infections (last wk),+,+,+,,,,,,,+,-,+,-,+,+
+% with novel variant among unvaccinated infections (2-wk average),+,+,-,,,,,,,+,+,+,+,+,+
+% with novel variant among unvaccinated infections (4-wk change),+,+,+,,,,,,,+,+,+,+,+,+
+% with novel variant among vaccinated infections (last wk),-,-,-,,,,,,,+,+,+,-,+,+
+% with novel variant among vaccinated infections (2-wk average),-,-,-,,,,,,,+,-,+,-,+,+
+% with novel variant among vaccinated infections (4-wk change),+,-,+,,,,,,,+,-,+,+,+,+
+% with novel variant among unvaccinated hospitalizations (last wk),-,+,-,,,,,,,,,,,,
+% with novel variant among unvaccinated hospitalizations (2-wk average),+,+,-,,,,,,,,,,,,
+% with novel variant among unvaccinated hospitalizations (4-wk change),-,-,-,,,,,,,,,,,,
+% with novel variant among vaccinated hospitalizations (last wk),-,-,-,,,,,,,,,,,,
+% with novel variant among vaccinated hospitalizations (2-wk average),-,+,-,,,,,,,,,,,,
+% with novel variant among vaccinated hospitalizations (4-wk change),-,-,-,,,,,,,,,,,,
+% with novel variant among new infections (last wk),-,-,+,,,,-,+,+,,,,,,
+% with novel variant among new infections (2-wk average),-,-,+,,,,+,-,+,,,,,,
+% with novel variant among new infections (4-wk change),+,+,+,,,,+,+,+,,,,,,
+% with novel variant among new hospitalizations (last wk),-,+,-,,,,,,,,,,,,
+% with novel variant among new hospitalizations (2-wk average),-,+,-,,,,,,,,,,,,
+% with novel variant among new hospitalizations (4-wk change),-,-,+,,,,,,,,,,,,
 % of population susceptible,+,+,+,,,,,,,,,,+,+,+
 Cumulative vaccination rate,-,+,-,+,+,+,+,+,+,+,+,+,-,+,+
 Cumulative hospitalization rate,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
 R0,+,+,-,,,,,,,,,,,,
 Relative infectiousness of an unvaccinated individual if infected with novel variant,-,-,-,,,,,,,,,,,,
 Relative infectiousness of a vaccinated individual if infected with novel variant,+,-,-,,,,,,,,,,,,
-Duration of infectiousness for the dominant strain ,-,-,-,,,,,,,,,,,,
-Relative duration of infectiousness for novel strain among the unvaccinated,-,-,-,,,,,,,,,,,,
-Relative duration of infectiousness for novel strain among the vaccinated,-,-,-,,,,,,,,,,,,
+Duration of infectiousness for dominant strain ,-,-,-,,,,,,,,,,,,
+Relative duration of infectiousness for novel strain among unvaccinated,-,-,-,,,,,,,,,,,,
+Relative duration of infectiousness for novel strain among vaccinated,-,-,-,,,,,,,,,,,,
 Prob. of hospitalization if infected for age group 18-29,-,-,-,,,,,,,,,,,,
 Relative prob. of hospitalization for age group 0-4,-,-,-,,,,,,,,,,,,
 Relative prob. of hospitalization for age group 5-12,-,-,-,,,,,,,,,,,,
@@ -40,9 +40,9 @@ Relative prob. of hospitalization for age group 30-49,-,-,-,,,,,,,,,,,,
 Relative prob. of hospitalization for age group 50-64,-,-,-,,,,,,,,,,,,
 Relative prob. of hospitalization for age group 65-74,-,-,-,,,,,,,,,,,,
 Relative prob. of hospitalization for age group 75+,-,-,-,,,,,,,,,,,,
-Relative prob. of hospitalization if infected with novel variant among the unvaccinated,-,-,-,,,,,,,,,,,,
-Relative prob. of hospitalization if infected with novel variant among the vaccinated,-,-,-,,,,,,,,,,,,
-Duration of immunity after infection with the dominant strain,-,-,-,,,,,,,,,,,,
+Relative prob. of hospitalization if infected with novel variant among unvaccinated,-,-,-,,,,,,,,,,,,
+Relative prob. of hospitalization if infected with novel variant among vaccinated,-,-,-,,,,,,,,,,,,
+Duration of immunity after infection with dominant strain,-,-,-,,,,,,,,,,,,
 Duration of immunity after infection with novel variant if unvaccinated,+,+,-,,,,,,,,,,,,
 Duration of immunity after infection with novel variant if vaccinated,-,-,-,,,,,,,,,,,,
 Vaccine effectiveness against infection with novel variant,+,-,-,,,,,,,,,,,,

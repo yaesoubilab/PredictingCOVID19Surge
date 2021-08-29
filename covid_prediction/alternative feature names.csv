@@ -1,36 +1,36 @@
-Obs: Incidence rate,Incidence rate (last week)
-Obs: Incidence rate-ave-2wk,Incidence rate (2-week average)
-Obs: Incidence rate-slope-4wk,Incidence rate (4-week change)
-Obs: New hospitalization rate,New hospitalization rate (last week)
-Obs: New hospitalization rate-ave-2wk,New hospitalization rate (2-week average)
-Obs: New hospitalization rate-slope-4wk,New hospitalization rate (4-week change)
-Obs: % of incidence due to Novel-Unvaccinated,% with novel variant among the unvaccianted infections (last week)
-Obs: % of incidence due to Novel-Unvaccinated-ave-2wk,% with novel variant among the unvaccianted infections (2-week average)
-Obs: % of incidence due to Novel-Unvaccinated-slope-4wk,% with novel variant among the unvaccianted infections (4-week change)
-Obs: % of incidence due to Novel-Vaccinated,% with novel variant among the vaccianted infections (last week)
-Obs: % of incidence due to Novel-Vaccinated-ave-2wk,% with novel variant among the vaccianted infections (2-week average)
-Obs: % of incidence due to Novel-Vaccinated-slope-4wk,% with novel variant among the vaccianted infections (4-week change)
-Obs: % of new hospitalizations due to Novel-Unvaccinated,% with novel variant among the unvaccianted hospitalizations (last week)
-Obs: % of new hospitalizations due to Novel-Unvaccinated-ave-2wk,% with novel variant among the unvaccianted hospitalizations (2-week average)
-Obs: % of new hospitalizations due to Novel-Unvaccinated-slope-4wk,% with novel variant among the unvaccianted hospitalizations (4-week change)
-Obs: % of new hospitalizations due to Novel-Vaccinated,% with novel variant among the vaccianted hospitalizations (last week)
-Obs: % of new hospitalizations due to Novel-Vaccinated-ave-2wk,% with novel variant among the vaccianted hospitalizations (2-week average)
-Obs: % of new hospitalizations due to Novel-Vaccinated-slope-4wk,% with novel variant among the vaccianted hospitalizations (4-week change)
-Obs: % of incidence with novel variant,% with novel variant among new infections (last week)
-Obs: % of incidence with novel variant-ave-2wk,% with novel variant among new infections (2-week average)
-Obs: % of incidence with novel variant-slope-4wk,% with novel variant among new infections (4-week change)
-Obs: % of new hospitalizations with novel variant,% with novel variant among new hospitalizations (last week)
-Obs: % of new hospitalizations with novel variant-ave-2wk,% with novel variant among new hospitalizations (2-week average)
-Obs: % of new hospitalizations with novel variant-slope-4wk,% with novel variant among new hospitalizations (4-week change)
-Obs: Prevalence susceptible,% of population susceptible
 Obs: Cumulative vaccination rate,Cumulative vaccination rate
 Obs: Cumulative hospitalization rate,Cumulative hospitalization rate
+Obs: Incidence rate,Incidence rate (last wk)
+Obs: Incidence rate-ave-2wk,Incidence rate (2-wk average)
+Obs: Incidence rate-slope-4wk,Incidence rate (4-wk change)
+Obs: New hospitalization rate,New hospitalization rate (last wk)
+Obs: New hospitalization rate-ave-2wk,New hospitalization rate (2-wk average)
+Obs: New hospitalization rate-slope-4wk,New hospitalization rate (4-wk change)
+Obs: % of incidence due to Novel-Unvaccinated,% novel variant among unvaccinated infections (last wk)
+Obs: % of incidence due to Novel-Unvaccinated-ave-2wk,% novel variant among unvaccinated infections (2-wk average)
+Obs: % of incidence due to Novel-Unvaccinated-slope-4wk,% novel variant among unvaccinated infections (4-wk change)
+Obs: % of incidence due to Novel-Vaccinated,% novel variant among vaccinated infections (last wk)
+Obs: % of incidence due to Novel-Vaccinated-ave-2wk,% novel variant among vaccinated infections (2-wk average)
+Obs: % of incidence due to Novel-Vaccinated-slope-4wk,% novel variant among vaccinated infections (4-wk change)
+Obs: % of new hospitalizations due to Novel-Unvaccinated,% novel variant among unvaccinated hospitalizations (last wk)
+Obs: % of new hospitalizations due to Novel-Unvaccinated-ave-2wk,% novel variant among unvaccinated hospitalizations (2-wk average)
+Obs: % of new hospitalizations due to Novel-Unvaccinated-slope-4wk,% novel variant among unvaccinated hospitalizations (4-wk change)
+Obs: % of new hospitalizations due to Novel-Vaccinated,% novel variant among vaccinated hospitalizations (last wk)
+Obs: % of new hospitalizations due to Novel-Vaccinated-ave-2wk,% novel variant among vaccinated hospitalizations (2-wk average)
+Obs: % of new hospitalizations due to Novel-Vaccinated-slope-4wk,% novel variant among vaccinated hospitalizations (4-wk change)
+Obs: % of incidence with novel variant,% novel variant among new infections (last wk)
+Obs: % of incidence with novel variant-ave-2wk,% novel variant among new infections (2-wk average)
+Obs: % of incidence with novel variant-slope-4wk,% novel variant among new infections (4-wk change)
+Obs: % of new hospitalizations with novel variant,% novel variant among new hospitalizations (last wk)
+Obs: % of new hospitalizations with novel variant-ave-2wk,% novel variant among new hospitalizations (2-wk average)
+Obs: % of new hospitalizations with novel variant-slope-4wk,% novel variant among new hospitalizations (4-wk change)
+Obs: Prevalence susceptible,% of population susceptible
 R0,R0
 Ratio transmissibility by profile-1,Relative infectiousness of an unvaccinated individual if infected with novel variant
 Ratio transmissibility by profile-2,Relative infectiousness of a vaccinated individual if infected with novel variant
-Duration of infectiousness-dominant,Duration of infectiousness for the dominant strain 
-Ratio of infectiousness duration by profile-1,Relative duration of infectiousness for novel strain among the unvaccinated
-Ratio of infectiousness duration by profile-2,Relative duration of infectiousness for novel strain among the vaccinated
+Duration of infectiousness-dominant,Duration of infectiousness for dominant strain 
+Ratio of infectiousness duration by profile-1,Relative duration of infectiousness for novel strain among unvaccinated
+Ratio of infectiousness duration by profile-2,Relative duration of infectiousness for novel strain among vaccinated
 Prob Hosp for 18-29,Prob. of hospitalization if infected for age group 18-29
 Relative prob hosp by age-0,Relative prob. of hospitalization for age group 0-4
 Relative prob hosp by age-1,Relative prob. of hospitalization for age group 5-12
@@ -39,9 +39,9 @@ Relative prob hosp by age-4,Relative prob. of hospitalization for age group 30-4
 Relative prob hosp by age-5,Relative prob. of hospitalization for age group 50-64
 Relative prob hosp by age-6,Relative prob. of hospitalization for age group 65-74
 Relative prob hosp by age-7,Relative prob. of hospitalization for age group 75+
-Ratio of hospitalization probability by profile-1,Relative prob. of hospitalization if infected with novel variant among the unvaccinated
-Ratio of hospitalization probability by profile-2,Relative prob. of hospitalization if infected with novel variant among the vaccinated
-Duration of R-0,Duration of immunity after infection with the dominant strain
+Ratio of hospitalization probability by profile-1,Relative prob. of hospitalization if infected with novel variant among unvaccinated
+Ratio of hospitalization probability by profile-2,Relative prob. of hospitalization if infected with novel variant among vaccinated
+Duration of R-0,Duration of immunity after infection with dominant strain
 Duration of R-1,Duration of immunity after infection with novel variant if unvaccinated
 Duration of R-2,Duration of immunity after infection with novel variant if vaccinated
 Vaccine effectiveness against infection with novel,Vaccine effectiveness against infection with novel variant
