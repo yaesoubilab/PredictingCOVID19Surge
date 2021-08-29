@@ -67,7 +67,8 @@ def print_selected_features():
         row.extend(v)
         result.append(row)
 
-    write_csv(rows=result, file_name=ROOT_DIR+'/outputs/prediction_summary/selected_features.csv')
+    write_csv(rows=result,
+              file_name=ROOT_DIR+'/outputs/prediction_summary/selected_features_by_model.csv')
 
 
 if __name__ == '__main__':

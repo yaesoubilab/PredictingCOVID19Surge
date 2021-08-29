@@ -22,19 +22,19 @@ def get_neural_net_best_spec(week, model_spec,
     df = pd.read_csv('{}/outputs/prediction_datasets/data at week {}.csv'.format(ROOT_DIR, week))
 
     # use all features if no feature name is provided
-    if model_spec.selected_features is None:
+    if model_spec.features is None:
         # feature names (all columns are considered)
-        model_spec.selected_features = df.columns.tolist()
-        model_spec.selected_features.remove('Maximum hospitalization rate')
-        model_spec.selected_features.remove('If hospitalization threshold passed')
+        model_spec.features = df.columns.tolist()
+        model_spec.features.remove('Maximum hospitalization rate')
+        model_spec.features.remove('If hospitalization threshold passed')
 
     # number of features
-    print('Number of features:', len(model_spec.selected_features))
+    print('Number of features:', len(model_spec.features))
     # randomize rows (since the dataset is ordered based on the likelihood weights)
     df = df.sample(frac=1, random_state=1)
 
     # find the best specification
-    cv = CV.NeuralNetSepecOptimizer(data=df, feature_names=model_spec.selected_features,
+    cv = CV.NeuralNetSepecOptimizer(data=df, feature_names=model_spec.features,
                                     outcome_name='Maximum hospitalization rate',
                                     list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
                                     list_of_alphas=list_of_alphas,
