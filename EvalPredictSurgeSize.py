@@ -1,6 +1,7 @@
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import get_neural_net_best_spec
+from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
 
@@ -36,3 +37,6 @@ if __name__ == '__main__':
 
     # plot
     plot_performance()
+
+    # print features by model
+    print_selected_features()
