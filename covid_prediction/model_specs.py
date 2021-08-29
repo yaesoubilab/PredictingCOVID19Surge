@@ -21,7 +21,7 @@ A = ModelSpec(name='A',
                  'Obs: New hospitalization rate-slope-4wk',
                  'Obs: Cumulative vaccination rate',
                  'Obs: Cumulative hospitalization rate',
-             ],
+              ],
               list_num_of_features_wanted=[4, 5],
               list_num_of_neurons=[5, 7])
 
@@ -35,7 +35,7 @@ B = ModelSpec(name='B',
                  'Obs: % of incidence with novel variant',
                  'Obs: % of incidence with novel variant-ave-2wk',
                  'Obs: % of incidence with novel variant-slope-4wk',
-             ],
+              ],
               list_num_of_features_wanted=[6, 7],
               list_num_of_neurons=[7, 9])
 
@@ -52,7 +52,7 @@ C = ModelSpec(name='C',
                  'Obs: % of incidence due to Novel-Vaccinated',
                  'Obs: % of incidence due to Novel-Vaccinated-ave-2wk',
                  'Obs: % of incidence due to Novel-Vaccinated-slope-4wk',
-             ],
+              ],
               list_num_of_features_wanted=[8, 10],
               list_num_of_neurons=[10, 12])
 
@@ -70,7 +70,7 @@ D = ModelSpec(name='D',
                  'Obs: % of incidence due to Novel-Vaccinated-ave-2wk',
                  'Obs: % of incidence due to Novel-Vaccinated-slope-4wk',
                  'Obs: Prevalence susceptible',
-             ],
+              ],
               list_num_of_features_wanted=[8, 10],
               list_num_of_neurons=[10, 12])
 

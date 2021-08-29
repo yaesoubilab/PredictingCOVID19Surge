@@ -1,0 +1,56 @@
+features,12 weeks until peak | model Zero,8 weeks until peak | model Zero,4 weeks until peak | model Zero,12 weeks until peak | model A,8 weeks until peak | model A,4 weeks until peak | model A,12 weeks until peak | model B,8 weeks until peak | model B,4 weeks until peak | model B,12 weeks until peak | model C,8 weeks until peak | model C,4 weeks until peak | model C,12 weeks until peak | model D,8 weeks until peak | model D,4 weeks until peak | model D
+Obs: Incidence rate,-,+,+,,,,,,,,,,,,
+Obs: Incidence rate-ave-2wk,+,+,+,,,,,,,,,,,,
+Obs: Incidence rate-slope-4wk,+,+,+,,,,,,,,,,,,
+Obs: New hospitalization rate,+,+,+,-,+,+,+,+,+,+,+,+,+,+,+
+Obs: New hospitalization rate-ave-2wk,+,+,+,+,+,+,+,-,+,+,+,+,+,+,+
+Obs: New hospitalization rate-slope-4wk,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
+Obs: % of incidence due to Novel-Unvaccinated,-,-,-,,,,,,,+,-,+,-,+,+
+Obs: % of incidence due to Novel-Unvaccinated-ave-2wk,-,-,-,,,,,,,+,+,+,+,+,+
+Obs: % of incidence due to Novel-Unvaccinated-slope-4wk,+,+,+,,,,,,,+,+,+,+,+,+
+Obs: % of incidence due to Novel-Vaccinated,-,-,-,,,,,,,-,+,+,-,-,-
+Obs: % of incidence due to Novel-Vaccinated-ave-2wk,-,-,+,,,,,,,-,-,-,-,+,+
+Obs: % of incidence due to Novel-Vaccinated-slope-4wk,+,-,-,,,,,,,+,-,-,+,-,-
+Obs: % of new hospitalizations due to Novel-Unvaccinated,-,+,-,,,,,,,,,,,,
+Obs: % of new hospitalizations due to Novel-Unvaccinated-ave-2wk,-,-,+,,,,,,,,,,,,
+Obs: % of new hospitalizations due to Novel-Unvaccinated-slope-4wk,-,-,-,,,,,,,,,,,,
+Obs: % of new hospitalizations due to Novel-Vaccinated,-,-,-,,,,,,,,,,,,
+Obs: % of new hospitalizations due to Novel-Vaccinated-ave-2wk,-,-,+,,,,,,,,,,,,
+Obs: % of new hospitalizations due to Novel-Vaccinated-slope-4wk,-,-,-,,,,,,,,,,,,
+Obs: % of incidence with novel variant,-,+,+,,,,-,-,-,,,,,,
+Obs: % of incidence with novel variant-ave-2wk,-,-,-,,,,+,+,+,,,,,,
+Obs: % of incidence with novel variant-slope-4wk,+,+,-,,,,+,+,+,,,,,,
+Obs: % of new hospitalizations with novel variant,-,-,-,,,,,,,,,,,,
+Obs: % of new hospitalizations with novel variant-ave-2wk,+,+,+,,,,,,,,,,,,
+Obs: % of new hospitalizations with novel variant-slope-4wk,-,+,-,,,,,,,,,,,,
+Obs: Prevalence susceptible,+,+,+,,,,,,,,,,+,+,+
+Obs: Cumulative vaccination rate,-,+,+,+,+,+,+,+,+,-,+,+,-,+,+
+Obs: Cumulative hospitalization rate,+,+,+,+,+,+,+,+,-,+,+,-,+,+,+
+R0,+,+,-,,,,,,,,,,,,
+Duration of infectiousness-dominant,-,-,-,,,,,,,,,,,,
+Prob Hosp for 18-29,-,-,-,,,,,,,,,,,,
+Relative prob hosp by age-0,-,-,-,,,,,,,,,,,,
+Relative prob hosp by age-1,-,-,-,,,,,,,,,,,,
+Relative prob hosp by age-2,-,-,+,,,,,,,,,,,,
+Relative prob hosp by age-4,-,-,-,,,,,,,,,,,,
+Relative prob hosp by age-5,-,-,-,,,,,,,,,,,,
+Relative prob hosp by age-6,-,-,-,,,,,,,,,,,,
+Relative prob hosp by age-7,-,+,-,,,,,,,,,,,,
+Ratio of hospitalization probability by profile-1,-,-,-,,,,,,,,,,,,
+Ratio of hospitalization probability by profile-2,-,-,-,,,,,,,,,,,,
+Ratio transmissibility by profile-1,-,-,-,,,,,,,,,,,,
+Ratio transmissibility by profile-2,-,-,-,,,,,,,,,,,,
+Ratio of infectiousness duration by profile-1,-,-,-,,,,,,,,,,,,
+Ratio of infectiousness duration by profile-2,-,-,-,,,,,,,,,,,,
+Duration of R-0,-,-,-,,,,,,,,,,,,
+Duration of R-1,+,+,+,,,,,,,,,,,,
+Duration of R-2,-,-,-,,,,,,,,,,,,
+Duration of vaccine immunity,+,+,+,,,,,,,,,,,,
+Prob novel strain params-0,-,-,-,,,,,,,,,,,,
+Prob novel strain params-1,+,-,-,,,,,,,,,,,,
+Prob novel strain params-2,-,-,+,,,,,,,,,,,,
+Vaccine effectiveness against infection with novel,-,+,+,,,,,,,,,,,,
+PD Y1 thresholds-0,-,-,-,,,,,,,,,,,,
+PD Y1 thresholds-1,-,-,-,,,,,,,,,,,,
+Change in contacts - PD Y1,-,-,-,,,,,,,,,,,,
+Change in contacts - PD Y1+,-,-,-,,,,,,,,,,,,
