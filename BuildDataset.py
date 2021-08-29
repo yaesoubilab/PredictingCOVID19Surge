@@ -44,7 +44,11 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold):
             'Obs: Cumulative hospitalization rate'],
         info_of_parameter_fs=[
             'R0',
+            'Ratio transmissibility by profile-1',
+            'Ratio transmissibility by profile-2',
             'Duration of infectiousness-dominant',
+            'Ratio of infectiousness duration by profile-1',
+            'Ratio of infectiousness duration by profile-2',
             'Prob Hosp for 18-29',
             'Relative prob hosp by age-0',
             'Relative prob hosp by age-1',
@@ -55,22 +59,17 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold):
             'Relative prob hosp by age-7',
             'Ratio of hospitalization probability by profile-1',
             'Ratio of hospitalization probability by profile-2',
-            'Ratio transmissibility by profile-1',
-            'Ratio transmissibility by profile-2',
-            'Ratio of infectiousness duration by profile-1',
-            'Ratio of infectiousness duration by profile-2',
             'Duration of R-0',
             'Duration of R-1',
             'Duration of R-2',
+            'Vaccine effectiveness against infection with novel',
             'Duration of vaccine immunity',
             'Prob novel strain params-0',
             'Prob novel strain params-1',
             'Prob novel strain params-2',
-            'Vaccine effectiveness against infection with novel',
             'PD Y1 thresholds-0',
             'PD Y1 thresholds-1',
-            'Change in contacts - PD Y1',
-            'Change in contacts - PD Y1+'
+            'Change in contacts - PD Y1'
         ],
         output_file='data at week {}.csv'.format(week_of_prediction_in_fall))
 
