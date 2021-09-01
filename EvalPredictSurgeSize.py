@@ -19,7 +19,7 @@ if __name__ == '__main__':
     rows = [['Week', 'Model', 'R2', 'error', 'PI']]
 
     for week in WEEKS:
-        for model in (Zero, A, B, C, D):
+        for model in (Zero, A, B1, B2, C):
 
             print('Evaluating model {} at week {}.'.format(
                 model.name, week))
