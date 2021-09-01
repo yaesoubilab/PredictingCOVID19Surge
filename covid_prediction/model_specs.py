@@ -92,20 +92,20 @@ B1 = ModelSpec(name='B1',
                list_num_of_features_wanted=[5, 6],
                list_num_of_neurons=[7, 8, 9])
 
-B4 = ModelSpec(name='B3',
+B2 = ModelSpec(name='B2',
                features=[
                    # 'Obs: New hospitalization rate',
                    'Obs: New hospitalization rate-ave-2wk',
                    'Obs: New hospitalization rate-slope-4wk',
                    'Obs: Cumulative hospitalization rate',
                    'Obs: Cumulative vaccination rate',
-                   'Obs: % of new hospitalizations that are unvaccinated-ave-2wk',
-                   'Obs: % of new hospitalizations that are unvaccinated-slope-4wk',
+                   'Obs: % of new hospitalizations due to Novel-Vaccinated-ave-2wk',
+                   'Obs: % of new hospitalizations due to Novel-Vaccinated-slope-4wk',
                ],
                list_num_of_features_wanted=[6, 7, 8],
                list_num_of_neurons=[8, 9, 10])
 
-B2 = ModelSpec(name='B2',
+B3 = ModelSpec(name='B3',
                features=[
                    # 'Obs: New hospitalization rate',
                    'Obs: New hospitalization rate-ave-2wk',
@@ -119,7 +119,7 @@ B2 = ModelSpec(name='B2',
                list_num_of_features_wanted=[5, 6],
                list_num_of_neurons=[7, 8, 9])
 
-B3 = ModelSpec(name='B3',
+B4 = ModelSpec(name='B4',
                features=[
                    # 'Obs: New hospitalization rate',
                    'Obs: New hospitalization rate-ave-2wk',
@@ -133,17 +133,17 @@ B3 = ModelSpec(name='B3',
                list_num_of_features_wanted=[5, 6],
                list_num_of_neurons=[7, 8, 9])
 
-C = ModelSpec(name='D',
+C = ModelSpec(name='C',
               features=[
                   # 'Obs: New hospitalization rate',
                   'Obs: New hospitalization rate-ave-2wk',
                   'Obs: New hospitalization rate-slope-4wk',
                   'Obs: Cumulative hospitalization rate',
                   'Obs: Cumulative vaccination rate',
-                  'Obs: % of new hospitalizations that are unvaccinated-ave-2wk',
-                  'Obs: % of new hospitalizations that are unvaccinated-slope-4wk',
-                  'Obs: % of new hospitalizations that are unvaccinated-ave-2wk',
-                  'Obs: % of new hospitalizations that are unvaccinated-slope-4wk',
+                  'Obs: % of new hospitalizations with novel variant-ave-2wk',
+                  'Obs: % of new hospitalizations with novel variant-slope-4wk'
+                  'Obs: % of new hospitalizations due to Novel-Vaccinated-ave-2wk',
+                  'Obs: % of new hospitalizations due to Novel-Vaccinated-slope-4wk',
               ],
               list_num_of_features_wanted=[7, 8, 9],
               list_num_of_neurons=[9, 10, 11])
