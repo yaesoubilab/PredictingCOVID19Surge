@@ -5,6 +5,9 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
 
+
+MODELS = (A, B1, B2, B3, B4, C1, C2)
+
 WEEKS = (-12, -8, -4)
 CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = True
@@ -19,7 +22,7 @@ if __name__ == '__main__':
     rows = [['Week', 'Model', 'R2', 'error', 'PI']]
 
     for week in WEEKS:
-        for model in (Zero, A, B1, B2, C):
+        for model in MODELS:
 
             print('Evaluating model {} at week {}.'.format(
                 model.name, week))

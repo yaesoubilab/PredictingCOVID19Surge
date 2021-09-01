@@ -1,9 +1,9 @@
 from SimPy.InOutFunctions import read_csv_rows, write_csv
-from covid_prediction.model_specs import Zero, A, B1, B2, C
+from covid_prediction.model_specs import *
 from definitions import ROOT_DIR
 
 WEEKS = (-12, -8, -4)
-MODELS = (Zero, A, B1, B2, C)
+MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 
 
 def print_selected_features():

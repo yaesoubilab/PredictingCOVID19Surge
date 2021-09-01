@@ -4,7 +4,7 @@ import numpy as np
 from SimPy.InOutFunctions import read_csv_rows
 from definitions import ROOT_DIR
 
-X_LABEL_COLORS = ['purple', 'blue', 'green', 'red', 'orange']
+X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'green', 'orange', 'red', 'brown']
 
 
 def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values):
@@ -78,4 +78,4 @@ def plot_performance(fig_size=(7.5, 4)):
 
 
 if __name__ == '__main__':
-    plot_performance(fig_size=(9, 3.5))
+    plot_performance(fig_size=(10, 3))
