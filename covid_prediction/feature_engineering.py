@@ -1,13 +1,35 @@
 import os
+from math import sqrt
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from numpy.random import RandomState
 from scipy.stats import pearsonr
 
 from SimPy.InOutFunctions import write_csv
 
 OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
+
+
+class ErrorModel:
+
+    def __init__(self, survey_size, bias=None):
+        self.surveySize = survey_size
+        self.bias = bias
+        self.rnd = RandomState(1)
+
+    def get_obs(self, true_value):
+        # bias
+        bias = 0
+        if self.bias is not None:
+            bias = self.bias.f(true_value)
+
+        # noise
+        st_dev = sqrt(true_value * (1 - true_value) / self.surveySize)
+        noise = self.rnd.normal(loc=0, scale=st_dev)
+
+        return min(max(true_value + bias + noise, 0), 1)
 
 
 class FeatureEngineering:
@@ -138,13 +160,20 @@ class FeatureEngineering:
         :return: list of values for features
         """
 
+
+        err_model = None # error model
         f_values = []   # feature values
         for info in info_of_features:
             # get the column in trajectory files where the data is located to define features
             if isinstance(info, str):
                 col = df[info]
             elif isinstance(info, tuple):
+                # feature name
                 col = df[info[0]]
+                # find the error model
+                for v in info:
+                    if isinstance(v, ErrorModel):
+                        err_model = v
             else:
                 raise ValueError('Invalid feature information.')
 
@@ -154,14 +183,20 @@ class FeatureEngineering:
                 for pair in zip(df['Observation Period'], col):
                     if not np.isnan(pair[1]):
                         if pair[0] <= week:
-                            data.append(pair[1])
+                            if err_model is None:
+                                data.append(pair[1])
+                            else:
+                                data.append(err_model.get_obs(true_value=pair[1]))
                         else:
                             break
             elif incd_or_prev == 'prev':
                 for pair in zip(df['Observation Time'], col):
                     if not np.isnan(pair[1]):
                         if 52 * pair[0] - week < 0.5:
-                            data.append(pair[1])
+                            if err_model is None:
+                                data.append(pair[1])
+                            else:
+                                data.append(err_model.get_obs(true_value=pair[1]))
                         else:
                             break
             else:
@@ -173,11 +208,14 @@ class FeatureEngineering:
             elif isinstance(info, tuple):
                 for v in info:
                     if isinstance(v, str):
+                        # get the last observation
                         f_values.append(data[-1])
                     elif isinstance(v, tuple):
                         if v[0] == 'ave':
+                            # get the average
                             f_values.append(np.average(data[-v[1]:]))
                         elif v[0] == 'slope':
+                            # get the slope
                             x = np.arange(0, v[1])
                             y = data[-v[1]:]
                             slope = np.polyfit(x, y, deg=1)[0]
@@ -208,7 +246,7 @@ class FeatureEngineering:
                     if isinstance(value, str):
                         # feature for last recording
                         feature_names.append(info[0])
-                    else:
+                    elif isinstance(value, tuple):
                         # feature for average or slope
                         feature_names.append('{}-{}-{}wk'.format(info[0], value[0], value[1]))
             else:

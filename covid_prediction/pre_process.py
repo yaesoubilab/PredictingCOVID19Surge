@@ -71,3 +71,4 @@ class PreProcessor:
         self.selectedFeatureNames = selected_features
         # update predictor values
         self.selectedX = np.asarray(self.df[self.selectedFeatureNames])
+
