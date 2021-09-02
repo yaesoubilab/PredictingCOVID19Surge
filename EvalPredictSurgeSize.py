@@ -5,7 +5,7 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
 
-MODELS = (B1,) #, B1, B2, B3, B4, C1, C2)
+MODELS = (Zero, B1, B3) #, B1, B2, B3, B4, C1, C2)
 WEEKS = (-12, -8) #, -8, -4)
 
 CV_FOLD = 20         # num of splits for cross validation

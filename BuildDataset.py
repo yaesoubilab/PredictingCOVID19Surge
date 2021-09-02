@@ -96,18 +96,13 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_n
         output_file=output_file)
 
 
-# create datasets for different prediction times
-# for week_in_fall in (8, 12, 16):
-#     build_dataset(week_of_prediction_in_fall=week_in_fall,
-#                   pred_period=(TIME_OF_FALL, SIM_DURATION),
-#                   hosp_threshold=HOSPITALIZATION_THRESHOLD)
+if __name__ == "__main__":
+    for week_in_fall in (-4, -8, -12):
+        build_dataset(week_of_prediction_in_fall=week_in_fall,
+                      pred_period=(TIME_OF_FALL, SIM_DURATION),
+                      hosp_threshold=HOSPITALIZATION_THRESHOLD)
 
-for week_in_fall in (-4, -8, -12):
-    build_dataset(week_of_prediction_in_fall=week_in_fall,
-                  pred_period=(TIME_OF_FALL, SIM_DURATION),
-                  hosp_threshold=HOSPITALIZATION_THRESHOLD)
-
-    build_dataset(week_of_prediction_in_fall=week_in_fall,
-                  pred_period=(TIME_OF_FALL, SIM_DURATION),
-                  hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                  add_noise=1)
+        build_dataset(week_of_prediction_in_fall=week_in_fall,
+                      pred_period=(TIME_OF_FALL, SIM_DURATION),
+                      hosp_threshold=HOSPITALIZATION_THRESHOLD,
+                      add_noise=1)

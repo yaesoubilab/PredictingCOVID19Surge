@@ -4,8 +4,8 @@ from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot
 
-N = 100   # number of trajectories to simulate
-N_TO_DISPLAY = 25 # number of trajectories to display
+N = 1000   # number of trajectories to simulate
+N_TO_DISPLAY = 200  # number of trajectories to display
 IF_PARALLEL = True
 USE_CALIBRATED_MODEL = True
 
