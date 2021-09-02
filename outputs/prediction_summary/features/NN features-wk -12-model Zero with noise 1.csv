@@ -1,0 +1,25 @@
+Obs: Cumulative hospitalization rate
+Obs: % of incidence due to Novel-Unvaccinated-slope-4wk
+Obs: % of incidence with novel variant-slope-4wk
+Obs: Prevalence susceptible
+Obs: New hospitalization rate-slope-4wk
+Obs: New hospitalization rate-ave-2wk
+Duration of R-1
+R0
+Obs: Incidence rate-slope-4wk
+Duration of vaccine immunity
+Obs: % of incidence due to Novel-Vaccinated-slope-4wk
+Obs: Incidence rate-ave-2wk
+Obs: % of new hospitalizations due to Novel-Unvaccinated-ave-2wk
+Relative prob hosp by age-2
+Obs: % of new hospitalizations due to Novel-Vaccinated-ave-2wk
+Prob novel strain params-1
+Vaccine effectiveness against infection with novel
+Ratio transmissibility by profile-2
+Relative prob hosp by age-7
+Obs: % of new hospitalizations due to Novel-Unvaccinated-slope-4wk
+Obs: % of incidence with novel variant-ave-2wk
+Obs: Cumulative vaccination rate
+Change in contacts - PD Y1
+Relative prob hosp by age-0
+PD Y1 thresholds-1
