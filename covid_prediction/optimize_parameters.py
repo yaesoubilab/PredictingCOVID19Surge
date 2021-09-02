@@ -4,13 +4,13 @@ import covid_prediction.cross_validation as CV
 from definitions import ROOT_DIR
 
 
-def get_neural_net_best_spec(label, week, model_spec,
+def get_neural_net_best_spec(week, model_spec, noise,
                              list_of_alphas, feature_selection, if_standardize,
                              cv_fold, if_parallel=False):
     """
-    :param label: (string) label of this analysis
     :param week: (int) week when the predictions should be made
     :param model_spec: (ModelSpec) model specifications
+    :param noise: (None or integer)
     :param list_of_alphas: (list) of regularization penalties
     :param feature_selection: (string) feature selection method
     :param if_standardize: (bool) set True to regularize features
@@ -20,6 +20,10 @@ def get_neural_net_best_spec(label, week, model_spec,
     """
 
     # read dataset
+    if noise is None:
+        label = 'wk {}'.format(week)
+    else:
+        label = 'wk {} with noise {}'.format(week, noise)
     df = pd.read_csv('{}/outputs/prediction_datasets/data-{}.csv'.format(ROOT_DIR, label))
 
     # use all features if no feature name is provided
@@ -43,6 +47,11 @@ def get_neural_net_best_spec(label, week, model_spec,
                                     feature_selection_method=feature_selection,
                                     cv_fold=cv_fold,
                                     if_standardize=if_standardize)
+
+    if noise is None:
+        label = 'wk {}-model {}'.format(week, model_spec.name)
+    else:
+        label = 'wk {}-model {} with noise {}'.format(week, model_spec.name, noise)
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,

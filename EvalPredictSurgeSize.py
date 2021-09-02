@@ -1,9 +1,9 @@
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import get_neural_net_best_spec
+from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
-
 
 MODELS = (A, B1, B2, B3, B4, C1, C2)
 WEEKS = (-12, -8, -4)
@@ -26,14 +26,13 @@ def evaluate(noise):
     for week in WEEKS:
         for model in MODELS:
 
-            print('Evaluating model {} at week {}.'.format(
-                model.name, week))
-
-            # find the file name
+            # find the label
             if noise is None:
                 label = 'wk {}'.format(week)
             else:
                 label = 'wk {} with noise {}'.format(week, noise)
+            print('Evaluating model {} at {}.'.format(
+                model.name, label))
 
             best_spec = get_neural_net_best_spec(
                 label=label, week=week, model_spec=model,
@@ -51,11 +50,10 @@ def evaluate(noise):
     write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label))
 
     # plot
-    plot_performance(label=label)
+    plot_performance(noise=noise)
 
     # print features by model
-    # TODO: fix this
-    # print_selected_features(label=label)
+    print_selected_features(noise=noise)
 
 
 if __name__ == '__main__':

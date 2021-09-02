@@ -6,7 +6,7 @@ WEEKS = (-12, -8, -4)
 MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 
 
-def print_selected_features():
+def print_selected_features(noise):
 
     # read feature names
     feature_names = read_csv_rows(
@@ -34,7 +34,13 @@ def print_selected_features():
     col_names = ['features']
     for model in MODELS:
         for week in WEEKS:
-            filename = '/outputs/prediction_summary/features/NN features-wk {}-model {}.csv'.format(week, model.name)
+
+            if noise is None:
+                label = 'wk {}-model {}'.format(week, model.name)
+            else:
+                label = 'wk {}-model {} with noise {}'.format(week, model.name, noise)
+
+            filename = '/outputs/prediction_summary/features/NN features-{}.csv'.format(label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
             col_names.append(col_name)
             # read file
@@ -67,9 +73,16 @@ def print_selected_features():
         row.extend(v)
         result.append(row)
 
+    if noise is None:
+        label = 'selected_features_by_model'
+    else:
+        label = 'selected_features_by_model_with_noise'
+        
     write_csv(rows=result,
-              file_name=ROOT_DIR+'/outputs/prediction_summary/selected_features_by_model.csv')
+              file_name=ROOT_DIR+'/outputs/prediction_summary/{}.csv'.format(label))
 
 
 if __name__ == '__main__':
-    print_selected_features()
+    
+    print_selected_features(noise=None)
+    print_selected_features(noise=1)
