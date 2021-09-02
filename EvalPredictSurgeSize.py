@@ -5,8 +5,8 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR
 
-MODELS = (A, B1, B2, B3, B4, C1, C2)
-WEEKS = (-12, -8, -4)
+MODELS = (B1,) #, B1, B2, B3, B4, C1, C2)
+WEEKS = (-12, -8) #, -8, -4)
 
 CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = True
@@ -35,7 +35,7 @@ def evaluate(noise):
                 model.name, label))
 
             best_spec = get_neural_net_best_spec(
-                label=label, week=week, model_spec=model,
+                week=week, model_spec=model, noise=noise,
                 list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
                 if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
@@ -53,7 +53,7 @@ def evaluate(noise):
     plot_performance(noise=noise)
 
     # print features by model
-    print_selected_features(noise=noise)
+    print_selected_features(noise=noise, weeks=WEEKS, models=MODELS)
 
 
 if __name__ == '__main__':

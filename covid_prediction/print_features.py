@@ -6,7 +6,7 @@ WEEKS = (-12, -8, -4)
 MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 
 
-def print_selected_features(noise):
+def print_selected_features(weeks, models, noise):
 
     # read feature names
     feature_names = read_csv_rows(
@@ -27,13 +27,13 @@ def print_selected_features(noise):
     # make a dictionary with all (cleaned) feature names as key
     dic_cleaned_features_and_selection_results = {}
     for r, v in dict_cleaned_feature_names.items():
-        dic_cleaned_features_and_selection_results[v] = [None] * len(WEEKS) * len(MODELS)
+        dic_cleaned_features_and_selection_results[v] = [None] * len(weeks) * len(models)
 
     # read all files with selected features
     i = 0
     col_names = ['features']
-    for model in MODELS:
-        for week in WEEKS:
+    for model in models:
+        for week in weeks:
 
             if noise is None:
                 label = 'wk {}-model {}'.format(week, model.name)
@@ -84,5 +84,5 @@ def print_selected_features(noise):
 
 if __name__ == '__main__':
     
-    print_selected_features(noise=None)
-    print_selected_features(noise=1)
+    print_selected_features(noise=None, weeks=WEEKS, models=MODELS)
+    print_selected_features(noise=1, weeks=WEEKS, models=MODELS)
