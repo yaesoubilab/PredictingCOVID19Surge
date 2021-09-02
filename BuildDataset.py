@@ -10,14 +10,15 @@ N_NOVEL_INCD = 690
 N_PREV_SUSC = 500
 
 
-def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_noise=False, add_noise_bias=False):
+def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_noise=None, add_bias=False):
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                              a negative int for number of weeks before the peak
     :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
     :param hosp_threshold: threshold of hospitalization capacity
-    :param add_noise: (bool) if noise models should be added
-    :param add_noise_bias: (bool) if noise and bias models should be added
+    :param add_noise: (None or int) if None, the noise model is not added, otherwise, the noise model is
+        added with survey size multiplied by add_noise.
+    :param add_bias: (bool) if noise and bias models should be added
     """
     # read dataset
     feature_engineer = FeatureEngineering(
@@ -29,17 +30,17 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_n
     # error models
     err_novel_incd = None   # error model for % of incidence with novel variant
     err_prev_susc = None    # error model for prevalence susceptible
-    if add_noise:
-        err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD)
-        err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC)
+    if add_noise is not None:
+        err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD*add_noise)
+        err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC*add_noise)
 
     # find output file name
-    if add_noise_bias:
-        output_file = 'data at wk {} with noise and bias.csv'.format(week_of_prediction_in_fall)
-    elif add_noise:
-        output_file = 'data at wk {} with noise.csv'.format(week_of_prediction_in_fall)
+    if add_bias and add_noise is not None:
+        output_file = 'data-wk {} with noise {} and bias.csv'.format(week_of_prediction_in_fall, add_noise)
+    elif add_noise is not None:
+        output_file = 'data-wk {} with noise {}.csv'.format(week_of_prediction_in_fall, add_noise)
     else:
-        output_file = 'data at wk {}.csv'.format(week_of_prediction_in_fall)
+        output_file = 'data-wk {}.csv'.format(week_of_prediction_in_fall)
 
     # create new dataset based on raw data
     feature_engineer.pre_process(
@@ -109,4 +110,4 @@ for week_in_fall in (-4, -8, -12):
     build_dataset(week_of_prediction_in_fall=week_in_fall,
                   pred_period=(TIME_OF_FALL, SIM_DURATION),
                   hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                  add_noise=True)
+                  add_noise=1)

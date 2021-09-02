@@ -4,10 +4,11 @@ import covid_prediction.cross_validation as CV
 from definitions import ROOT_DIR
 
 
-def get_neural_net_best_spec(week, model_spec,
+def get_neural_net_best_spec(label, week, model_spec,
                              list_of_alphas, feature_selection, if_standardize,
                              cv_fold, if_parallel=False):
     """
+    :param label: (string) label of this analysis
     :param week: (int) week when the predictions should be made
     :param model_spec: (ModelSpec) model specifications
     :param list_of_alphas: (list) of regularization penalties
@@ -19,7 +20,7 @@ def get_neural_net_best_spec(week, model_spec,
     """
 
     # read dataset
-    df = pd.read_csv('{}/outputs/prediction_datasets/data at week {}.csv'.format(ROOT_DIR, week))
+    df = pd.read_csv('{}/outputs/prediction_datasets/data-{}.csv'.format(ROOT_DIR, label))
 
     # use all features if no feature name is provided
     if model_spec.features is None:
@@ -45,10 +46,9 @@ def get_neural_net_best_spec(week, model_spec,
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,
-        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-wk {}-model {}.csv'
-            .format(week, model_spec.name),
-        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-wk {}-model {}.csv'
-            .format(week, model_spec.name)
+        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-{}.csv'.format(label),
+        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-{}.csv'
+            .format(label)
     )
 
     return best_spec

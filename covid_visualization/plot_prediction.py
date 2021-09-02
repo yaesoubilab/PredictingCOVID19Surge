@@ -29,9 +29,16 @@ def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance(fig_size=(7.5, 4)):
+def plot_performance(noise=None, fig_size=(7.5, 4)):
+
+    # find the file name
+    if noise is None:
+        label = ''
+    else:
+        label = '-with noise {}'.format(noise)
+
     # read data
-    data = read_csv_rows(file_name=ROOT_DIR+'/outputs/prediction_summary/summary.csv',
+    data = read_csv_rows(file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label),
                          if_ignore_first_row=True, if_convert_float=True)
 
     dict_of_figs = {}
@@ -73,9 +80,11 @@ def plot_performance(fig_size=(7.5, 4)):
 
     # Save the figure and show
     plt.tight_layout()
-    plt.savefig(ROOT_DIR+'/outputs/figures/performance.png')
+    plt.savefig(ROOT_DIR+'/outputs/figures/performance{}.png'.format(label))
     plt.show()
 
 
 if __name__ == '__main__':
-    plot_performance(fig_size=(10, 3))
+
+    # noise could be None, 1, or 2
+    plot_performance(noise=None, fig_size=(10, 3))

@@ -1,7 +1,10 @@
 
 class ModelSpec:
-    # specifications of predictive models based on the features included,
-    # number of features wanted, and number of neurons
+    """
+    specifications of predictive models based on the features included,
+    number of features wanted, and number of neurons
+    """
+
     def __init__(self, name, features, list_num_of_features_wanted, list_num_of_neurons):
         self.name = name
         self.features = features
