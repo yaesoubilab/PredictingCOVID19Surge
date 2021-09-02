@@ -7,7 +7,7 @@ SIM_DURATION = 2.25
 
 # survey sizes
 N_NOVEL_INCD = 690
-N_PREV_SUSC =
+N_PREV_SUSC = 500
 
 
 def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_noise=False, add_noise_bias=False):
@@ -52,8 +52,8 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_n
         info_of_incd_fs=[
             ('Obs: Incidence rate', ('ave', 2), ('slope', 4)),
             ('Obs: New hospitalization rate', ('ave', 2), ('slope', 4)),
-            ('Obs: % of incidence due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
-            ('Obs: % of incidence due to Novel-Vaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of incidence due to Novel-Unvaccinated', err_novel_incd, ('ave', 2), ('slope', 4)),
+            ('Obs: % of incidence due to Novel-Vaccinated', err_novel_incd, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to Novel-Vaccinated', ('ave', 2), ('slope', 4)),
             ('Obs: % of incidence with novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
