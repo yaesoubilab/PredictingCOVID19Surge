@@ -41,16 +41,19 @@ class COVIDParameters(EpiParameters):
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
         self.probHosp18To29 = Uniform(0.001, 0.01)  # age group 18-29 as the reference
 
-        # these duration parameters are age-independent
+        # parameters related to duration of E, hospitalizations, and R
         self.durEByProfile = [Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)]
         self.durHospByProfile = [Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
                                  Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
                                  Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d)]
-        self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
-                              Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
-                              Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
+        # self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
+        #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
+        #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
+        self.durRByProfile = [Uniform(0.25, 1.5),
+                              Uniform(0.25, 1.5),
+                              Uniform(0.25, 1.5)]
 
         # [dominant, novel, vaccinated]
         self.ratioTransmByProfile = [Constant(1), Uniform(1, 2), Uniform(0, 0.5)]

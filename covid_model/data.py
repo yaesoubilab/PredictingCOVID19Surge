@@ -121,7 +121,16 @@ CUM_HOSP_RATE_BY_AGE = [
 ]
 
 # TODO: to update
-PREV_IMMUNE_FROM_INF = [[76, 20.6, 10, 30]]
+MAX_PREV_IMMUNE_FROM_INF = 40
+PREV_IMMUNE_FROM_INF = [
+    [24, 5.9, 5.5, 6.3],
+    [32, 6.8, 6.5, 7.2],
+    [42, 11.5, 11.1, 11.8],
+    [50, 20, 19.5, 20.5],
+    [58, 21.8, 21.2, 22.2],
+    [66, 21.6, 21.2, 22.2],
+    [76, 20.6, 10, 30]
+]
 
 # age distribution of hospitalization (%)
 HOSP_AGE_DIST = [
