@@ -396,36 +396,40 @@ def build_covid_model(model):
     if sets.calcLikelihood:
         # feasible ranges of hospitalization rate
         new_hosp_rate_by_age[0].add_feasible_conditions(
-            feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_OVERALL / 100000,
-                                                   min_threshold_to_hit=MIN_HOSP_RATE_OVERALL / 100000,
-                                                   period=[0, FEASIBILITY_PERIOD]))
+            feasible_conditions=FeasibleConditions(
+                feasible_max=MAX_HOSP_RATE_OVERALL / 100000,
+                min_threshold_to_hit=MIN_HOSP_RATE_OVERALL / 100000,
+                period=[0, FEASIBILITY_PERIOD]))
         # for a in range(age_groups_profiles.nAgeGroups):
         #     new_hosp_rate_by_age[a+1].add_feasible_conditions(
         #         feasible_conditions=FeasibleConditions(feasible_max=MAX_HOSP_RATE_BY_AGE[a] / 100000,
         #                                                min_threshold_to_hit=MIN_HOSP_RATE_BY_AGE[a] / 100000))
 
+        # feasibility range of prevalence of population with immunity after infection
         prev_immune_from_inf.add_feasible_conditions(
-            feasible_conditions=FeasibleConditions(feasible_max=MAX_PREV_IMMUNE_FROM_INF/100,
-                                                   period=[0, FEASIBILITY_PERIOD])
-        )
+            feasible_conditions=FeasibleConditions(
+                feasible_max=MAX_PREV_IMMUNE_FROM_INF/100,
+                period=[0, FEASIBILITY_PERIOD]))
+
+        prev_immune_from_inf.add_calibration_targets(
+            ratios=sets.prevImmFromInfMean, variances=sets.prevImmFromInfVar)
+
         # calibration information for the overall hospitalization rate
-        cum_hosp_rate_by_age[0].add_calibration_targets(ratios=sets.cumHospRateMean,
-                                                        variances=sets.cumHospRateVar,
-                                                        # survey_sizes=sets.cumHospRateN
-                                                        )
+        cum_hosp_rate_by_age[0].add_calibration_targets(
+            ratios=sets.cumHospRateMean, variances=sets.cumHospRateVar)
 
         # calibration information for hospitalization rate by age
         for a in range(age_groups_profiles.nAgeGroups):
-            cum_hosp_rate_by_age[a+1].add_calibration_targets(ratios=sets.cumHospRateByAgeMean[a],
-                                                              survey_sizes=sets.cumHospRateByAgeN[a])
+            cum_hosp_rate_by_age[a+1].add_calibration_targets(
+                ratios=sets.cumHospRateByAgeMean[a], survey_sizes=sets.cumHospRateByAgeN[a])
 
         # calibration information for the overall vaccination coverage
-        cum_vaccine_rate_by_age[0].add_calibration_targets(ratios=sets.cumVaccRateMean,
-                                                           survey_sizes=sets.cumVaccRateN)
+        cum_vaccine_rate_by_age[0].add_calibration_targets(
+            ratios=sets.cumVaccRateMean, survey_sizes=sets.cumVaccRateN)
 
         # calibration information for the percentage of infection associated with the novel variant
-        profile_dist_incd[1].add_calibration_targets(ratios=sets.percInfWithNovelMean,
-                                                     survey_sizes=sets.percInfWithNovelN)
+        profile_dist_incd[1].add_calibration_targets(
+            ratios=sets.percInfWithNovelMean, survey_sizes=sets.percInfWithNovelN)
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(

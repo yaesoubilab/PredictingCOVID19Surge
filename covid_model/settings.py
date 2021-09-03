@@ -1,8 +1,7 @@
 import definitions as D
 from apace.CalibrationSupport import get_survey_size
 from apace.Inputs import ModelSettings
-from covid_model.data import CUM_HOSP_RATE_OVERALL, CUM_HOSP_RATE_BY_AGE, \
-    VACCINE_COVERAGE_OVER_TIME, PERC_INF_WITH_NOVEL
+from covid_model.data import *
 from definitions import AgeGroups
 
 
@@ -46,6 +45,9 @@ class COVIDSettings(ModelSettings):
             self.cumHospRateByAgeMean = [[] for i in range(len(AgeGroups))]
             self.cumHospRateByAgeVar = [[] for i in range(len(AgeGroups))]
             self.cumHospRateByAgeN = [[] for i in range(len(AgeGroups))]
+
+            self.prevImmFromInfMean = []
+            self.prevImmFromInfVar = []
 
             self.cumVaccRateMean = []
             self.cumVaccRateVar = []
@@ -92,6 +94,16 @@ class COVIDSettings(ModelSettings):
                         self.cumHospRateByAgeMean[a].append(None)
                         self.cumHospRateByAgeVar[a].append(None)
                         self.cumHospRateByAgeN[a].append(None)
+
+                # prevalence of population with immunity after infection
+                if week == PREV_IMMUNE_FROM_INF[0][0]:
+                    self.prevImmFromInfMean.append(PREV_IMMUNE_FROM_INF[0][1] * 0.01)
+                    self.prevImmFromInfVar.append(
+                        0.25*(CUM_HOSP_RATE_OVERALL[0][3]-CUM_HOSP_RATE_OVERALL[0][2])*0.01
+                    )
+                else:
+                    self.prevImmFromInfMean.append(None)
+                    self.prevImmFromInfVar.append(None)
 
                 # vaccination rate
                 if week == VACCINE_COVERAGE_OVER_TIME[-1][0]:

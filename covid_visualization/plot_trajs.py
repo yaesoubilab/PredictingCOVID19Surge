@@ -92,13 +92,17 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         title='Cumulative hospitalization rate\n(per 100,000 population)',
         y_range=(0, 1000*3), y_multiplier=100000, x_multiplier=prev_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
-            rows_of_data=CUM_HOSP_RATE_OVERALL))
+            rows_of_data=CUM_HOSP_RATE_OVERALL
+        ))
     obs_prev_immune_from_inf = A.TrajPlotInfo(
         outcome_name='Obs: Prevalence with immunity from infection',
         title='Prevalence of population with\nimmunity from infection (%)',
         y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
-            rows_of_data=PREV_IMMUNE_FROM_INF))
+            rows_of_data=PREV_IMMUNE_FROM_INF,
+            feasible_range_info=A.FeasibleRangeInfo(
+                x_range=[0, FEASIBILITY_PERIOD * 52],
+                y_range=[0, MAX_PREV_IMMUNE_FROM_INF])))
     obs_cum_vacc_rate = A.TrajPlotInfo(
         outcome_name='Obs: Cumulative vaccination rate',
         title='Cumulative vaccination rate (%)',
