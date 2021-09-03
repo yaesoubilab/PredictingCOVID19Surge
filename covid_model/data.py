@@ -120,6 +120,9 @@ CUM_HOSP_RATE_BY_AGE = [
     [[76, 2462.9, 1179.8, 3660.8]]  # 75+
 ]
 
+# TODO: to update
+PREV_IMMUNE_FROM_INF = [[76, 20.6, 10, 30]]
+
 # age distribution of hospitalization (%)
 HOSP_AGE_DIST = [
     # week, value, minimum, maximum

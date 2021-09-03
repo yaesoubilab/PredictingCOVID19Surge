@@ -190,6 +190,9 @@ def build_covid_model(model):
     # number of individuals susceptible
     num_susp = SumPrevalence(
         name='Individuals susceptible', compartments=Ss)
+    # number of individuals with immunity from infection
+    num_immune_from_inf = SumPrevalence(
+        name='Individuals wth immunity from infection', compartments=Rs)
     # incidence 
     incd_by_age.append(SumIncidence(
         name='Incidence', compartments=Is, first_nonzero_obs_marks_start_of_epidemic=True, if_surveyed=True))
@@ -214,6 +217,11 @@ def build_covid_model(model):
                                 numerator_sum_time_series=num_susp,
                                 denominator_sum_time_series=pop_size_by_age[0],
                                 if_surveyed=True)
+    # prevalence with immunity due to infection
+    prev_immune_from_inf = RatioTimeSeries(name='Prevalence with immunity from infection',
+                                           numerator_sum_time_series=num_immune_from_inf,
+                                           denominator_sum_time_series=pop_size_by_age[0],
+                                           if_surveyed=True)
     # incidence rate
     incd_rate_by_age.append(RatioTimeSeries(name='Incidence rate',
                                             numerator_sum_time_series=incd_by_age[0],
@@ -428,7 +436,7 @@ def build_covid_model(model):
     # summation-time series
     list_of_sum_time_series = []
     list_of_sum_time_series.extend(pop_size_by_age)
-    list_of_sum_time_series.append(num_susp)
+    list_of_sum_time_series.extend([num_susp, num_immune_from_inf])
     list_of_sum_time_series.extend(incd_by_age)
     list_of_sum_time_series.extend(new_hosp_by_age)
     list_of_sum_time_series.extend(cum_incd_by_age)
@@ -442,7 +450,7 @@ def build_covid_model(model):
     # ratio time-series
     list_of_ratio_time_series = []
     list_of_ratio_time_series.extend(incd_rate_by_age)
-    list_of_ratio_time_series.append(prev_susp)
+    list_of_ratio_time_series.extend([prev_susp, prev_immune_from_inf])
     list_of_ratio_time_series.extend(new_hosp_rate_by_age)
     list_of_ratio_time_series.extend(cum_hosp_rate_by_age)
     list_of_ratio_time_series.extend(cum_death_rate_by_age)
