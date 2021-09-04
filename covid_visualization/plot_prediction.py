@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from SimPy.InOutFunctions import read_csv_rows
-from definitions import ROOT_DIR
+from definitions import ROOT_DIR, get_dataset_labels
 
 X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'green', 'orange', 'red', 'brown']
 
@@ -29,13 +29,11 @@ def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance(noise=None, fig_size=(7.5, 4)):
+def plot_performance(noise_coeff=None, bias_delay=None, fig_size=(7.5, 4)):
 
     # find the file name
-    if noise is None:
-        label = ''
-    else:
-        label = '-with noise {}'.format(noise)
+    label = get_dataset_labels(
+        week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
     # read data
     data = read_csv_rows(file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label),
@@ -87,4 +85,6 @@ def plot_performance(noise=None, fig_size=(7.5, 4)):
 if __name__ == '__main__':
 
     # noise could be None, 1, or 2
-    plot_performance(noise=None, fig_size=(10, 3))
+    plot_performance(noise_coeff=None, fig_size=(10, 3))
+    plot_performance(noise_coeff=0.5, fig_size=(10, 3))
+    plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=(10, 3))

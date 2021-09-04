@@ -2,7 +2,7 @@ import pandas as pd
 
 from sklearn.feature_selection import RFE, SelectFromModel
 from sklearn.inspection import permutation_importance
-from sklearn.linear_model import LogisticRegression, LassoCV
+from sklearn.linear_model import LassoCV
 
 
 def get_selected_features_based_on_TF_result(features, mask):

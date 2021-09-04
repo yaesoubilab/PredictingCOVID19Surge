@@ -1,12 +1,12 @@
 from SimPy.InOutFunctions import read_csv_rows, write_csv
 from covid_prediction.model_specs import *
-from definitions import ROOT_DIR
+from definitions import ROOT_DIR, get_dataset_labels
 
 WEEKS = (-12, -8, -4)
 MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 
 
-def print_selected_features(weeks, models, noise):
+def print_selected_features(weeks, models, noise_coeff, bias_delay):
 
     # read feature names
     feature_names = read_csv_rows(
@@ -35,11 +35,7 @@ def print_selected_features(weeks, models, noise):
     for model in models:
         for week in weeks:
 
-            if noise is None:
-                label = 'wk {}-model {}'.format(week, model.name)
-            else:
-                label = 'wk {}-model {} with noise {}'.format(week, model.name, noise)
-
+            label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
             filename = '/outputs/prediction_summary/features/NN features-{}.csv'.format(label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
             col_names.append(col_name)
@@ -73,16 +69,12 @@ def print_selected_features(weeks, models, noise):
         row.extend(v)
         result.append(row)
 
-    if noise is None:
-        label = 'selected_features_by_model'
-    else:
-        label = 'selected_features_by_model_with_noise'
-        
+    label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
     write_csv(rows=result,
-              file_name=ROOT_DIR+'/outputs/prediction_summary/{}.csv'.format(label))
+              file_name=ROOT_DIR+'/outputs/prediction_summary/selected features by model{}.csv'.format(label))
 
 
 if __name__ == '__main__':
     
-    print_selected_features(noise=None, weeks=WEEKS, models=MODELS)
-    print_selected_features(noise=1, weeks=WEEKS, models=MODELS)
+    print_selected_features(noise_coeff=None, weeks=WEEKS, models=MODELS)
+    print_selected_features(noise_coeff=1, weeks=WEEKS, models=MODELS)

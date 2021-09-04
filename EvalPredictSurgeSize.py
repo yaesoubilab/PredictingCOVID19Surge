@@ -48,15 +48,15 @@ def evaluate(noise_coeff, bias_delay=None):
     write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label))
 
     # plot
-    plot_performance(noise=noise_coeff)
+    plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
 
     # print features by model
-    print_selected_features(noise=noise_coeff, weeks=WEEKS, models=MODELS)
+    print_selected_features(noise_coeff=noise_coeff, weeks=WEEKS, models=MODELS)
 
 
 if __name__ == '__main__':
 
     evaluate(noise_coeff=None)
-    evaluate(noise_coeff=1)
+    evaluate(noise_coeff=0.5)
     evaluate(noise_coeff=0.5, bias_delay=4)
 
