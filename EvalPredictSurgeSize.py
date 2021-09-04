@@ -51,7 +51,7 @@ def evaluate(noise_coeff, bias_delay=None):
     plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
 
     # print features by model
-    print_selected_features(noise_coeff=noise_coeff, weeks=WEEKS, models=MODELS)
+    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
 
 if __name__ == '__main__':
