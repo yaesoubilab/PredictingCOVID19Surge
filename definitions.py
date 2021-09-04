@@ -52,3 +52,18 @@ class AgeGroupsProfiles:
 
     def get_str_profile(self, profile):
         return PROFILES[profile]
+
+
+def get_dataset_labels(week, noise_coeff, bias_delay):
+
+    if bias_delay is not None and noise_coeff is not None:
+        label = ' with noise {} and bias {}'.format(noise_coeff, bias_delay)
+    elif noise_coeff is not None:
+        label = ' with noise {}'.format(noise_coeff)
+    else:
+        label = ''
+
+    if week is not None:
+        label = 'wk {}'.format(week) + label
+
+    return label

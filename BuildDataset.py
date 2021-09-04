@@ -1,4 +1,5 @@
 from covid_prediction.feature_engineering import *
+from definitions import get_dataset_labels
 
 
 HOSPITALIZATION_THRESHOLD = 0.0001  # per 100,000 population
@@ -47,14 +48,9 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
             err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC * noise_coeff)
 
     # find output file name
-    if bias_delay is not None and noise_coeff is not None:
-        output_file = 'data-wk {} with noise {} and bias {}.csv'.format(
-            week_of_prediction_in_fall, noise_coeff, bias_delay)
-    elif noise_coeff is not None:
-        output_file = 'data-wk {} with noise {}.csv'.format(
-            week_of_prediction_in_fall, noise_coeff)
-    else:
-        output_file = 'data-wk {}.csv'.format(week_of_prediction_in_fall)
+    label = get_dataset_labels(
+        week=week_of_prediction_in_fall, noise_coeff=noise_coeff, bias_delay=bias_delay)
+    output_file = 'data-{}.csv'.format(label)
 
     # create new dataset based on raw data
     feature_engineer.pre_process(
@@ -120,7 +116,7 @@ if __name__ == "__main__":
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                      noise_coeff=1)
+                      noise_coeff=0.5)
 
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),

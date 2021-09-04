@@ -133,7 +133,7 @@ class FeatureEngineering:
 
         # report correlations
         report_corrs(df=df, outcomes=OUTCOME_LABELS,
-                     csv_file_name='outputs/prediction_datasets/corrs-{}.csv'.format(output_file))
+                     csv_file_name='outputs/prediction_datasets/corrs-{}'.format(output_file))
 
     def _get_if_threshold_passed_and_max_and_week_of_peak(self, df):
         """
