@@ -14,22 +14,33 @@ OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold 
 
 class ErrorModel:
 
-    def __init__(self, survey_size, bias=None):
+    def __init__(self, survey_size, bias_delay=None, bias_st_dev=None):
         self.surveySize = survey_size
-        self.bias = bias
+        self.biasDelay = bias_delay
+        self.biasStDev = bias_st_dev
         self.rnd = RandomState(1)
 
-    def get_obs(self, true_value):
+    def get_obs(self, true_values):
+        """
+        :param true_values: (list) time-series of true values
+        :return: observed value
+        """
+
         # bias
         bias = 0
-        if self.bias is not None:
-            bias = self.bias.f(true_value)
+        if self.biasDelay is not None:
+            # if enough observations are accumulated
+            if len(true_values) >= self.biasDelay:
+                bias = true_values[-self.biasDelay] - true_values[-1]
+                # bias += self.rnd.normal(loc=0, scale=self.biasStDev * true_values[-self.biasDelay])
+            else:
+                bias = 0
 
         # noise
-        st_dev = sqrt(true_value * (1 - true_value) / self.surveySize)
+        st_dev = sqrt(true_values[-1] * (1 - true_values[-1]) / self.surveySize)
         noise = self.rnd.normal(loc=0, scale=st_dev)
 
-        return min(max(true_value + bias + noise, 0), 1)
+        return min(max(true_values[-1] + bias + noise, 0), 1)
 
 
 class FeatureEngineering:
@@ -178,25 +189,28 @@ class FeatureEngineering:
                 raise ValueError('Invalid feature information.')
 
             # read trajectory data until the time of prediction
-            data = []
+            true_values = []
+            observed_values = []
             if incd_or_prev == 'incd':
                 for pair in zip(df['Observation Period'], col):
                     if not np.isnan(pair[1]):
                         if pair[0] <= week:
+                            true_values.append(pair[1])
                             if err_model is None:
-                                data.append(pair[1])
+                                observed_values.append(true_values[-1])
                             else:
-                                data.append(err_model.get_obs(true_value=pair[1]))
+                                observed_values.append(err_model.get_obs(true_values=true_values))
                         else:
                             break
             elif incd_or_prev == 'prev':
                 for pair in zip(df['Observation Time'], col):
                     if not np.isnan(pair[1]):
                         if 52 * pair[0] - week < 0.5:
+                            true_values.append(pair[1])
                             if err_model is None:
-                                data.append(pair[1])
+                                observed_values.append(true_values[-1])
                             else:
-                                data.append(err_model.get_obs(true_value=pair[1]))
+                                observed_values.append(err_model.get_obs(true_values=true_values))
                         else:
                             break
             else:
@@ -204,20 +218,20 @@ class FeatureEngineering:
 
             # calculate feature value
             if isinstance(info, str):
-                f_values.append(data[-1])
+                f_values.append(observed_values[-1])
             elif isinstance(info, tuple):
                 for v in info:
                     if isinstance(v, str):
                         # get the last observation
-                        f_values.append(data[-1])
+                        f_values.append(observed_values[-1])
                     elif isinstance(v, tuple):
                         if v[0] == 'ave':
                             # get the average
-                            f_values.append(np.average(data[-v[1]:]))
+                            f_values.append(np.average(observed_values[-v[1]:]))
                         elif v[0] == 'slope':
                             # get the slope
                             x = np.arange(0, v[1])
-                            y = data[-v[1]:]
+                            y = observed_values[-v[1]:]
                             slope = np.polyfit(x, y, deg=1)[0]
                             f_values.append(slope)
                         else:

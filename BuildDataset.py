@@ -6,19 +6,21 @@ TIME_OF_FALL = 1.5   # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years
 SIM_DURATION = 2.25
 
 # survey sizes
-N_NOVEL_INCD = 690
-N_PREV_SUSC = 500
+N_NOVEL_INCD = 1521
+N_PREV_SUSC = 481
+BIAS_DELAY = 4
 
 
-def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_noise=None, add_bias=False):
+def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
+                  noise_coeff=None, bias_delay=None):
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                              a negative int for number of weeks before the peak
     :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
     :param hosp_threshold: threshold of hospitalization capacity
-    :param add_noise: (None or int) if None, the noise model is not added, otherwise, the noise model is
+    :param noise_coeff: (None or int) if None, the noise model is not added, otherwise, the noise model is
         added with survey size multiplied by add_noise.
-    :param add_bias: (bool) if noise and bias models should be added
+    :param bias_delay: (None or int): delay (in weeks) of observing the true value
     """
     # read dataset
     feature_engineer = FeatureEngineering(
@@ -30,15 +32,27 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_n
     # error models
     err_novel_incd = None   # error model for % of incidence with novel variant
     err_prev_susc = None    # error model for prevalence susceptible
-    if add_noise is not None:
-        err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD*add_noise)
-        err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC*add_noise)
+    # if bias needs to be added
+    if bias_delay:
+        # and if noise needs to be added
+        if noise_coeff is not None:
+            err_novel_incd = ErrorModel(
+                survey_size=N_NOVEL_INCD * noise_coeff, bias_delay=BIAS_DELAY)
+            err_prev_susc = ErrorModel(
+                survey_size=N_PREV_SUSC * noise_coeff, bias_delay=BIAS_DELAY)
+    else: # no bias
+        # if noise needs to be added
+        if noise_coeff is not None:
+            err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD * noise_coeff)
+            err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC * noise_coeff)
 
     # find output file name
-    if add_bias and add_noise is not None:
-        output_file = 'data-wk {} with noise {} and bias.csv'.format(week_of_prediction_in_fall, add_noise)
-    elif add_noise is not None:
-        output_file = 'data-wk {} with noise {}.csv'.format(week_of_prediction_in_fall, add_noise)
+    if bias_delay is not None and noise_coeff is not None:
+        output_file = 'data-wk {} with noise {} and bias {}.csv'.format(
+            week_of_prediction_in_fall, noise_coeff, bias_delay)
+    elif noise_coeff is not None:
+        output_file = 'data-wk {} with noise {}.csv'.format(
+            week_of_prediction_in_fall, noise_coeff)
     else:
         output_file = 'data-wk {}.csv'.format(week_of_prediction_in_fall)
 
@@ -98,6 +112,7 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold, add_n
 
 if __name__ == "__main__":
     for week_in_fall in (-4, -8, -12):
+
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD)
@@ -105,4 +120,9 @@ if __name__ == "__main__":
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                      add_noise=1)
+                      noise_coeff=1)
+
+        build_dataset(week_of_prediction_in_fall=week_in_fall,
+                      pred_period=(TIME_OF_FALL, SIM_DURATION),
+                      hosp_threshold=HOSPITALIZATION_THRESHOLD,
+                      noise_coeff=0.5, bias_delay=BIAS_DELAY)

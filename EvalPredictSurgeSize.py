@@ -15,9 +15,11 @@ IF_STANDARDIZED = True
 FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
 
 
-def evaluate(noise):
+def evaluate(noise_coeff, bias_delay=None):
     """
-    :param noise: None, 1, or 2 (1 or 2 to multiply the survey size by)
+    :param noise_coeff: (None or int) if None, the noise model is not added, otherwise, the noise model is
+        added with survey size multiplied by add_noise.
+    :param bias_delay: (None or int): delay (in weeks) of observing the true value
     """
 
     # make prediction at different weeks
@@ -27,15 +29,17 @@ def evaluate(noise):
         for model in MODELS:
 
             # find the label
-            if noise is None:
-                label = 'wk {}'.format(week)
+            if bias_delay is not None and noise_coeff is not None:
+                label = 'wk {} with noise {} and bias {}'.format(week, noise_coeff, bias_delay)
+            elif noise_coeff is not None:
+                label = 'wk {} with noise {}'.format(week, noise_coeff)
             else:
-                label = 'wk {} with noise {}'.format(week, noise)
+                label = 'wk {}'.format(week)
             print('Evaluating model {} at {}.'.format(
                 model.name, label))
 
             best_spec = get_neural_net_best_spec(
-                week=week, model_spec=model, noise=noise,
+                week=week, model_spec=model, noise=noise_coeff,
                 list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
                 if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
@@ -43,20 +47,22 @@ def evaluate(noise):
             rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.PI])
 
     # print summary of results
-    if noise is None:
+    if noise_coeff is None:
         label = ''
     else:
-        label = '-with noise {}'.format(noise)
+        label = '-with noise {}'.format(noise_coeff)
     write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label))
 
     # plot
-    plot_performance(noise=noise)
+    plot_performance(noise=noise_coeff)
 
     # print features by model
-    print_selected_features(noise=noise, weeks=WEEKS, models=MODELS)
+    print_selected_features(noise=noise_coeff, weeks=WEEKS, models=MODELS)
 
 
 if __name__ == '__main__':
 
-    evaluate(noise=None)
-    evaluate(noise=1)
+    evaluate(noise_coeff=None)
+    evaluate(noise_coeff=1)
+    evaluate(noise_coeff=0.5, bias_delay=4)
+
