@@ -39,7 +39,7 @@ class COVIDParameters(EpiParameters):
         # dominant strain
         self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
-        self.probHosp18To29 = Uniform(0.001, 0.01)  # age group 18-29 as the reference
+        self.probHosp18To29 = Uniform(0.001, 0.005)  # age group 18-29 as the reference
 
         # parameters related to duration of E, hospitalizations, and R
         self.durEByProfile = [Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
