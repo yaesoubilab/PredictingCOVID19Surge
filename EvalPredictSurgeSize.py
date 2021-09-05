@@ -35,6 +35,11 @@ def evaluate(noise_coeff, bias_delay=None):
             print('Evaluating model {} at {}.'.format(
                 model.name, label))
 
+            # model zero assumes no noise or bias
+            if isinstance(model, Zero):
+                noise_coeff = None
+                bias_delay = None
+
             best_spec = get_neural_net_best_spec(
                 week=week, model_spec=model, noise_coeff=noise_coeff, bias_delay=bias_delay,
                 list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
