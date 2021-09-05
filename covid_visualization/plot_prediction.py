@@ -4,7 +4,8 @@ import numpy as np
 from SimPy.InOutFunctions import read_csv_rows
 from definitions import ROOT_DIR, get_dataset_labels
 
-X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'green', 'orange', 'red', 'brown']
+X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange', 'red', 'brown']
+FIG_SIZE = (11, 3.6)
 
 
 def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values):
@@ -29,7 +30,9 @@ def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance(noise_coeff=None, bias_delay=None, fig_size=(7.5, 4)):
+def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
+
+    fig_size = FIG_SIZE if fig_size is None else fig_size
 
     # find the file name
     label = get_dataset_labels(
@@ -85,6 +88,6 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=(7.5, 4)):
 if __name__ == '__main__':
 
     # noise could be None, 1, or 2
-    plot_performance(noise_coeff=None, fig_size=(11, 3.6))
-    plot_performance(noise_coeff=1, fig_size=(11, 3.6))
-    plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=(11, 3.6))
+    plot_performance(noise_coeff=None, fig_size=FIG_SIZE)
+    plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
+    plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
