@@ -28,7 +28,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
     SIM_DURATION = Def.SIM_DURATION*52
     A.X_RANGE = (0, SIM_DURATION)     # x-axis range
     A.X_TICKS = (0, 52/2)      # x-axis ticks (min at 0 with interval of 5)
-    A.X_LABEL = 'Weeks'     # x-axis label
+    A.X_LABEL = 'Weeks since March 1, 2010'     # x-axis label
 
     indexer = Def.AgeGroupsProfiles(n_age_groups=len(AgeGroups), n_profiles=len(Profiles))
 
