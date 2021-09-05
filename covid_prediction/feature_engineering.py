@@ -180,7 +180,6 @@ class FeatureEngineering:
         :return: list of values for features
         """
 
-
         err_model = None # error model
         f_values = []   # feature values
         for info in info_of_features:

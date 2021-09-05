@@ -15,8 +15,8 @@ class ModelSpec:
 Zero = ModelSpec(name='Zero',
                  features=[
                      # 'Obs: Incidence rate',
-                     'Obs: Incidence rate-ave-2wk',
-                     'Obs: Incidence rate-slope-4wk',
+                     # 'Obs: Incidence rate-ave-2wk',
+                     # 'Obs: Incidence rate-slope-4wk',
                      # 'Obs: New hospitalization rate',
                      'Obs: New hospitalization rate-ave-2wk',
                      'Obs: New hospitalization rate-slope-4wk',
