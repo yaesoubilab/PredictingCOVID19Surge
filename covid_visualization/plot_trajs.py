@@ -115,7 +115,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         title='Incidence associated with\n'
               'novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
-        x_multiplier=obs_incd_multiplier)
+        x_multiplier=obs_incd_multiplier,
+        calibration_info=A.CalibrationTargetPlotInfo(
+            rows_of_data=D.PERC_INF_WITH_NOVEL,
+            if_connect_obss=False))
 
     # summary
     sim_outcomes.plot_multi_panel(n_rows=1, n_cols=3,
@@ -289,4 +292,5 @@ if __name__ == "__main__":
     plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
          incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
          obs_incd_multiplier=sets.observationPeriod * 52,
+         n_random_trajs_to_display=200,
          )

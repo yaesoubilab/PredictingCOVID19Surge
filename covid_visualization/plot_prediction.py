@@ -86,5 +86,5 @@ if __name__ == '__main__':
 
     # noise could be None, 1, or 2
     plot_performance(noise_coeff=None, fig_size=(10, 3))
-    plot_performance(noise_coeff=0.5, fig_size=(10, 3))
+    plot_performance(noise_coeff=1, fig_size=(10, 3))
     plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=(10, 3))

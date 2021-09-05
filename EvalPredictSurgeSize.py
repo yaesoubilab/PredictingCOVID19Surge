@@ -36,14 +36,17 @@ def evaluate(noise_coeff, bias_delay=None):
                 model.name, label))
 
             # model zero assumes no noise or bias
-            if isinstance(model, Zero):
-                noise_coeff = None
-                bias_delay = None
+            if model == Zero:
+                best_spec = get_neural_net_best_spec(
+                    week=week, model_spec=model, noise_coeff=None, bias_delay=None,
+                    list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
+                    if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
-            best_spec = get_neural_net_best_spec(
-                week=week, model_spec=model, noise_coeff=noise_coeff, bias_delay=bias_delay,
-                list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
-                if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
+            else:
+                best_spec = get_neural_net_best_spec(
+                    week=week, model_spec=model, noise_coeff=noise_coeff, bias_delay=bias_delay,
+                    list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
+                    if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
             # store outcomes
             rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.PI])
@@ -62,6 +65,6 @@ def evaluate(noise_coeff, bias_delay=None):
 if __name__ == '__main__':
 
     evaluate(noise_coeff=None)
-    evaluate(noise_coeff=0.5)
+    evaluate(noise_coeff=1)
     evaluate(noise_coeff=0.5, bias_delay=4)
 

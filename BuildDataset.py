@@ -44,7 +44,7 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
                 survey_size=N_PREV_SUSC * noise_coeff, bias_delay=bias_delay)
             err_hosp_vacc = ErrorModel(
                 survey_size=N_HOSP_UNVAC, bias_delay=bias_delay)
-    else: # no bias (only noise)
+    else:  # no bias (only noise)
         # if noise needs to be added
         if noise_coeff is not None:
             err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD * noise_coeff)
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                      noise_coeff=0.5)
+                      noise_coeff=1)
 
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),

@@ -14,16 +14,16 @@ OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold 
 
 class ErrorModel:
 
-    def __init__(self, survey_size=None, bias_delay=None, bias_st_dev=None):
+    def __init__(self, survey_size=None, bias_delay=None):
+
         self.surveySize = survey_size
         self.biasDelay = bias_delay
-        self.biasStDev = bias_st_dev
         self.rnd = RandomState(1)
 
     def get_obs(self, true_values):
         """
         :param true_values: (list) time-series of true values
-        :return: observed value
+        :return: observed value (with noise and bias added)
         """
 
         bias = 0
