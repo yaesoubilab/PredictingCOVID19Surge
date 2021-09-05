@@ -14,7 +14,7 @@ OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold 
 
 class ErrorModel:
 
-    def __init__(self, survey_size, bias_delay=None, bias_st_dev=None):
+    def __init__(self, survey_size=None, bias_delay=None, bias_st_dev=None):
         self.surveySize = survey_size
         self.biasDelay = bias_delay
         self.biasStDev = bias_st_dev
@@ -26,21 +26,30 @@ class ErrorModel:
         :return: observed value
         """
 
-        # bias
         bias = 0
+        noise = 0
+
+        # bias
         if self.biasDelay is not None:
             # if enough observations are accumulated
             if len(true_values) >= self.biasDelay:
                 bias = true_values[-self.biasDelay] - true_values[-1]
-                # bias += self.rnd.normal(loc=0, scale=self.biasStDev * true_values[-self.biasDelay])
+                noise = self.get_noise(true_value=true_values[-self.biasDelay], n=self.surveySize)
             else:
                 bias = 0
 
-        # noise
-        st_dev = sqrt(true_values[-1] * (1 - true_values[-1]) / self.surveySize)
-        noise = self.rnd.normal(loc=0, scale=st_dev)
+        else:
+            noise = self.get_noise(true_value=true_values[-1], n=self.surveySize)
 
         return min(max(true_values[-1] + bias + noise, 0), 1)
+
+    def get_noise(self, true_value, n):
+
+        if n is None:
+            return 0
+        else:
+            st_dev = sqrt(true_value * (1 - true_value) / n)
+            return self.rnd.normal(loc=0, scale=st_dev)
 
 
 class FeatureEngineering:

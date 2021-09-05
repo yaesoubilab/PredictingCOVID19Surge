@@ -9,7 +9,7 @@ SIM_DURATION = 2.25
 # survey sizes
 N_NOVEL_INCD = 1521
 N_PREV_SUSC = 481
-BIAS_DELAY = 4
+N_HOSP_UNVAC = 864
 
 
 def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
@@ -33,19 +33,23 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
     # error models
     err_novel_incd = None   # error model for % of incidence with novel variant
     err_prev_susc = None    # error model for prevalence susceptible
+    err_hosp_vacc = None  # error model for the % of hospitalized patients who are vaccinated
     # if bias needs to be added
-    if bias_delay:
+    if bias_delay is not None:
         # and if noise needs to be added
         if noise_coeff is not None:
             err_novel_incd = ErrorModel(
-                survey_size=N_NOVEL_INCD * noise_coeff, bias_delay=BIAS_DELAY)
+                survey_size=N_NOVEL_INCD * noise_coeff, bias_delay=bias_delay)
             err_prev_susc = ErrorModel(
-                survey_size=N_PREV_SUSC * noise_coeff, bias_delay=BIAS_DELAY)
-    else: # no bias
+                survey_size=N_PREV_SUSC * noise_coeff, bias_delay=bias_delay)
+            err_hosp_vacc = ErrorModel(
+                survey_size=N_HOSP_UNVAC, bias_delay=bias_delay)
+    else: # no bias (only noise)
         # if noise needs to be added
         if noise_coeff is not None:
             err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD * noise_coeff)
             err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC * noise_coeff)
+            err_hosp_vacc = None  # no error
 
     # find output file name
     label = get_dataset_labels(
@@ -66,9 +70,9 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
             ('Obs: % of incidence due to Novel-Unvaccinated', err_novel_incd, ('ave', 2), ('slope', 4)),
             ('Obs: % of incidence due to Novel-Vaccinated', err_novel_incd, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to Novel-Unvaccinated', ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to Novel-Vaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to Novel-Vaccinated', err_hosp_vacc, ('ave', 2), ('slope', 4)),
             ('Obs: % of incidence with novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations with novel variant', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations with novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
         ],
         info_of_prev_fs=[
             'Obs: Cumulative hospitalization rate',
@@ -121,4 +125,4 @@ if __name__ == "__main__":
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(TIME_OF_FALL, SIM_DURATION),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                      noise_coeff=0.5, bias_delay=BIAS_DELAY)
+                      noise_coeff=0.5, bias_delay=4)
