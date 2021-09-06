@@ -17,8 +17,8 @@ ORDER_OF_FEATURES = [
     '% novel variant among new infections (4-wk change)',
     '% novel variant among new hospitalizations (2-wk average)',
     '% novel variant among new hospitalizations (4-wk change)',
-    '% novel variant among vaccinated hospitalizations (2-wk average)',
-    '% novel variant among vaccinated hospitalizations (4-wk change)',
+    '% of new hospitalizations that are vaccinated and due to novel variant (2-wk average)',
+    '% of new hospitalizations that are vaccinated and due to novel variant (4-wk change)',
 ]
 
 
@@ -78,11 +78,16 @@ def print_selected_features(weeks, models, noise_coeff, bias_delay):
 
             i += 1
 
-    # print results
-    result = [col_names]
+    # put results into rows (dictionary with feature names as keys)
+    dict_result = {'features': col_names[1:]}
     for f, v in dic_cleaned_features_and_selection_results.items():
+        dict_result[f] = v
+
+    # order rows to be consistent with the table in the manuscript
+    result = [col_names]
+    for f in ORDER_OF_FEATURES:
         row = [f]
-        row.extend(v)
+        row.extend(dict_result[f])
         result.append(row)
 
     label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
@@ -94,3 +99,4 @@ if __name__ == '__main__':
     
     print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=None, bias_delay=None)
     print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=1, bias_delay=None)
+    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=0.5, bias_delay=4)
