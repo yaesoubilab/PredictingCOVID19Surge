@@ -136,8 +136,7 @@ def build_covid_model(model):
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=Vs[a])
         losing_vaccine_immunity[a] = EpiIndepEvent(
-            name='Losing vaccine immunity-'+str_a,
-            rate_param=params.rateOfLosingVacImmunity[pathogen], destination=Ss[a])
+            name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
 
         # --------- connections of events and compartments ---------
         # attached epidemic events to compartments

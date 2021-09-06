@@ -70,7 +70,7 @@ class COVIDParameters(EpiParameters):
         self.ratioProbHospByProfile = [Constant(1), Uniform(0.5, 1.5), Uniform(0, 0.1), Uniform(0, 0.5)]
 
         # vaccine information [dominant, novel]
-        self.durVacImmunity = [Uniform(0.5, 1.5), Uniform(0.5, 1.5)]
+        self.durVacImmunity = Uniform(0.5, 1.5)
         self.vacEffAgainstInf = [Uniform(0.9, 1), Uniform(0, 1)]
 
         # vaccination rate is age-dependent
@@ -120,7 +120,7 @@ class COVIDParameters(EpiParameters):
         self.vaccRateByAge = [None] * self.nAgeGroups
         self.logitProbDeathInHospByAge = [None] * self.nAgeGroups
         self.ratesOfDeathInHospByAge = [None] * self.nAgeGroups
-        self.rateOfLosingVacImmunity = [None, None]
+        self.rateOfLosingVacImmunity = None
 
         self.matrixOfPercChangeInContactsY1 = None
         self.matrixOfPercChangeInContactsY1Plus = None
@@ -217,8 +217,7 @@ class COVIDParameters(EpiParameters):
             matrix_of_params_or_values=matrix_of_params_y1_plus)
 
         # rates of leaving compartments
-        for v in range(2):
-            self.rateOfLosingVacImmunity[v] = Inverse(par=self.durVacImmunity[v])
+        self.rateOfLosingVacImmunity = Inverse(par=self.durVacImmunity)
 
         for p in range(self.nProfiles):
             self.ratesOfLeavingE[p] = Inverse(par=self.durEByProfile[p])

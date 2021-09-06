@@ -170,14 +170,14 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_novel_unvacc = A.TrajPlotInfo(
         outcome_name='Obs: % of new hospitalizations due to Novel-UV',
-        title='Unvaccinated new hospitalizations\nassociated with'
-              'novel strain (%)',
+        title='Percentage of new hospitalizations that are\n'
+              'unvaccinated and due to novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_novel_vacc = A.TrajPlotInfo(
         outcome_name='Obs: % of new hospitalizations due to Novel-V',
-        title='Vaccinated new hospitalizations\nassociated with'
-              'novel strain (%)',
+        title='Percentage of new hospitalizations that are\n'
+              'vaccinated and due to novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
 
