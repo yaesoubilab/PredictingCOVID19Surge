@@ -111,7 +111,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
             rows_of_data=D.VACCINE_COVERAGE_OVER_TIME,
             if_connect_obss=True))
     obs_incd_novel = A.TrajPlotInfo(
-        outcome_name='Obs: % of incidence with novel variant',
+        outcome_name='Obs: % of incidence due to novel variant',
         title='Incidence associated with\n'
               'novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
@@ -142,7 +142,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
     # ------ plot information for the novel variant plot --------
     # -----------------------------------------------------
     obs_incd_novel = A.TrajPlotInfo(
-        outcome_name='Obs: % of incidence with novel variant',
+        outcome_name='Obs: % of incidence due to novel variant',
         title='Incidence associated with\n'
               'novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
@@ -151,33 +151,33 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
             rows_of_data=D.PERC_INF_WITH_NOVEL,
             if_connect_obss=False))
     obs_incd_novel_unvacc = A.TrajPlotInfo(
-        outcome_name='Obs: % of incidence due to Novel-Unvaccinated',
-        title='Incidence associated with\n'
-              'novel variant among the unvaccinated\n(%)',
+        outcome_name='Obs: % of incidence due to Novel-UV',
+        title='Unvaccinated cases associated with\n'
+              'novel variant (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
     obs_incd_novl_vacc = A.TrajPlotInfo(
-        outcome_name='Obs: % of incidence due to Novel-Vaccinated',
-        title='Incidence associated with\n'
-              'novel variant among the vaccinated\n(%)',
+        outcome_name='Obs: % of incidence due to Novel-V',
+        title='Vaccinated cases associated with\n'
+              'novel variant (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_novel = A.TrajPlotInfo(
-        outcome_name='Obs: % of new hospitalizations with novel variant',
-        title='New hospitalizations associated with\n'
+        outcome_name='Obs: % of new hospitalizations due to novel variant',
+        title='New hospitalizations\nassociated with'
               'novel variant (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_novel_unvacc = A.TrajPlotInfo(
-        outcome_name='Obs: % of new hospitalizations due to Novel-Unvaccinated',
-        title='New hospitalizations associated with\n'
-              'novel strain among the unvaccinated\n(%)',
+        outcome_name='Obs: % of new hospitalizations due to Novel-UV',
+        title='Unvaccinated new hospitalizations\nassociated with'
+              'novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_novel_vacc = A.TrajPlotInfo(
-        outcome_name='Obs: % of new hospitalizations due to Novel-Vaccinated',
-        title='New hospitalizations associated with\n'
-              'novel strain among the vaccinated\n(%)',
+        outcome_name='Obs: % of new hospitalizations due to Novel-V',
+        title='Vaccinated new hospitalizations\nassociated with'
+              'novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
 

@@ -277,14 +277,14 @@ def build_covid_model(model):
     Is_novel = []
     Hs_novel = []
     for p in range(age_groups_profiles.nProfiles):
-        # find Is and Hs due to novel variant
-        if p in (Profiles.N_VAC.value, Profiles.N_UNVAC.value):
+        # find Is and Hs that are vaccinated
+        if p in (Profiles.D_VAC.value, Profiles.N_VAC.value):
             for a in range(age_groups_profiles.nAgeGroups):
                 i = age_groups_profiles.get_row_index(age_group=a, profile=p)
                 Is_vacc.append(Is[i])
                 Hs_vacc.append(Hs[i])
-        # find Is and Hs that are vaccinated
-        if p in (Profiles.D_VAC.value, Profiles.N_VAC.value):
+        # find Is and Hs that are due to novel variant
+        if p in (Profiles.N_UNVAC.value, Profiles.N_VAC.value):
             for a in range(age_groups_profiles.nAgeGroups):
                 i = age_groups_profiles.get_row_index(age_group=a, profile=p)
                 Is_novel.append(Is[i])
