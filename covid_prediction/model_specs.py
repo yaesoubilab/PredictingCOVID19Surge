@@ -12,7 +12,7 @@ class ModelSpec:
         self.listNumOfNeurons = list_num_of_neurons
 
 
-Zero = ModelSpec(name='Zero',
+Zero = ModelSpec(name='O',
                  features=[
                      # 'Obs: Incidence rate',
                      # 'Obs: Incidence rate-ave-2wk',

@@ -1,3 +1,5 @@
+import string
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -8,12 +10,16 @@ X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange
 FIG_SIZE = (11, 3.6)
 
 
-def add_to_ax(ax, title, x_labels, ys, errs, colors, show_y_label, show_y_values):
+def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, show_y_label, show_y_values):
 
     x_pos = np.arange(len(x_labels))
     ax.scatter(x_pos, ys, c=colors)
     for pos, y, err, color in zip(x_pos, ys, errs, colors):
         ax.errorbar(pos, y, yerr=err, fmt="o", c=color)
+
+    # labels
+    ax.text(-0.05, 1.05, panel_label, transform=ax.transAxes,
+            size=10, weight='bold')
 
     if show_y_label:
         ax.set_ylabel('$R^{2}$ Score')
@@ -70,6 +76,7 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
 
         add_to_ax(ax=axes[i],
                   title=key,
+                  panel_label=string.ascii_uppercase[i] + ')',
                   x_labels=x_labels,
                   ys=[v[1] for v in value],
                   errs=[v[2] for v in value],
