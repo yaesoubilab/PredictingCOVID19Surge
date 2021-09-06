@@ -271,33 +271,51 @@ def build_covid_model(model):
                                                      denominator_sum_time_series=new_hosp_by_age[0],
                                                      if_surveyed=True))
 
-    # incidence and new hospitalization for novel + vaccinated
-    Is_novel_vacc = []
-    Hs_novel_vacc = []
+    # incidence and new hospitalization among the vaccinated
+    Is_vacc = []
+    Hs_vacc = []
+    Is_novel = []
+    Hs_novel = []
     for p in range(age_groups_profiles.nProfiles):
-        # find Is and Hs in this profile
-        if p in (Profiles.N_UNVAC.value, Profiles.N_VAC.value):
+        # find Is and Hs due to novel variant
+        if p in (Profiles.N_VAC.value, Profiles.N_UNVAC.value):
             for a in range(age_groups_profiles.nAgeGroups):
                 i = age_groups_profiles.get_row_index(age_group=a, profile=p)
-                Is_novel_vacc.append(Is[i])
-                Hs_novel_vacc.append(Hs[i])
+                Is_vacc.append(Is[i])
+                Hs_vacc.append(Hs[i])
+        # find Is and Hs that are vaccinated
+        if p in (Profiles.D_VAC.value, Profiles.N_VAC.value):
+            for a in range(age_groups_profiles.nAgeGroups):
+                i = age_groups_profiles.get_row_index(age_group=a, profile=p)
+                Is_novel.append(Is[i])
+                Hs_novel.append(Hs[i])
 
-    incd_novel_vacc = SumIncidence(
-        name='Incidence-novel and vaccinated', compartments=Is_novel_vacc)
-    new_hosp_novel_vacc = SumIncidence(
-        name='New hosp-novel and vaccinated', compartments=Hs_novel_vacc)
-    # profile-distribution of incidence
-    perc_incd_novel_vacc = RatioTimeSeries(name='% of incidence with novel variant',
-                                           numerator_sum_time_series=incd_novel_vacc,
-                                           denominator_sum_time_series=incd_by_age[0],
-                                           if_surveyed=True)
-    # profile-distribution of new hospitalization
-    perc_new_hosp_incd_novel_vacc = RatioTimeSeries(name='% of new hospitalizations with novel variant',
-                                                    numerator_sum_time_series=new_hosp_novel_vacc,
-                                                    denominator_sum_time_series=new_hosp_by_age[0],
-                                                    if_surveyed=True)
+    incd_vacc = SumIncidence(
+        name='Incidence-vaccinated', compartments=Is_vacc)
+    new_hosp_vacc = SumIncidence(
+        name='New hospitalizations and vaccinated', compartments=Hs_vacc)
+    incd_novel = SumIncidence(
+        name='Incidence-novel', compartments=Is_novel)
+    new_hosp_novel = SumIncidence(
+        name='New hospitalizations-novel', compartments=Hs_novel)
+    perc_incd_vacc = RatioTimeSeries(name='% of incidence that are vaccinated',
+                                     numerator_sum_time_series=incd_vacc,
+                                     denominator_sum_time_series=incd_by_age[0],
+                                     if_surveyed=True)
+    perc_new_hosp_vacc = RatioTimeSeries(name='% of new hospitalizations that are vaccinated',
+                                         numerator_sum_time_series=new_hosp_vacc,
+                                         denominator_sum_time_series=new_hosp_by_age[0],
+                                         if_surveyed=True)
+    perc_incd_novel = RatioTimeSeries(name='% of incidence due to novel variant',
+                                      numerator_sum_time_series=incd_novel,
+                                      denominator_sum_time_series=incd_by_age[0],
+                                      if_surveyed=True)
+    perc_new_hosp_novel = RatioTimeSeries(name='% of new hospitalizations due to novel variant',
+                                          numerator_sum_time_series=new_hosp_novel,
+                                          denominator_sum_time_series=new_hosp_by_age[0],
+                                          if_surveyed=True)
 
-    # list to contain summation statistics
+    # list to contain summation statistics for age groups
     for a in range(age_groups_profiles.nAgeGroups):
         str_a = age_groups_profiles.get_str_age(age_group=a)
 
@@ -420,7 +438,7 @@ def build_covid_model(model):
             ratios=sets.cumVaccRateMean, survey_sizes=sets.cumVaccRateN)
 
         # calibration information for the percentage of infection associated with the novel variant
-        profile_dist_incd[1].add_calibration_targets(
+        perc_incd_novel.add_calibration_targets(
             ratios=sets.percInfWithNovelMean, survey_sizes=sets.percInfWithNovelN)
 
     # --------- interventions, features, conditions ---------
@@ -445,7 +463,7 @@ def build_covid_model(model):
     list_of_sum_time_series.extend(cum_vaccine_by_age)
     list_of_sum_time_series.extend(incd_by_profile)
     list_of_sum_time_series.extend(new_hosp_by_profile)
-    list_of_sum_time_series.extend([incd_novel_vacc, new_hosp_novel_vacc])
+    list_of_sum_time_series.extend([incd_vacc, new_hosp_vacc, incd_novel, new_hosp_novel])
 
     # ratio time-series
     list_of_ratio_time_series = []
@@ -460,7 +478,8 @@ def build_covid_model(model):
     list_of_ratio_time_series.extend(age_dist_cum_incd)
     list_of_ratio_time_series.extend(age_dist_new_hosp)
     list_of_ratio_time_series.extend(age_dist_cum_death)
-    list_of_ratio_time_series.extend([perc_incd_novel_vacc, perc_new_hosp_incd_novel_vacc])
+    list_of_ratio_time_series.extend([perc_incd_vacc, perc_new_hosp_vacc,
+                                      perc_incd_novel, perc_new_hosp_novel])
 
     model.populate(compartments=compartments,
                    parameters=params,
