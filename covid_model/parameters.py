@@ -44,8 +44,10 @@ class COVIDParameters(EpiParameters):
         # parameters related to duration of E, hospitalizations, and R
         self.durEByProfile = [Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
+                              Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)]
         self.durHospByProfile = [Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
+                                 Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
                                  Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
                                  Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d)]
         # self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
@@ -53,21 +55,23 @@ class COVIDParameters(EpiParameters):
         #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
         self.durRByProfile = [Uniform(0.25, 1.5),
                               Uniform(0.25, 1.5),
+                              Uniform(0.25, 1.5),
                               Uniform(0.25, 1.5)]
 
-        # [dominant, novel, vaccinated]
-        self.ratioTransmByProfile = [Constant(1), Uniform(1, 2), Uniform(0, 0.5)]
-        self.ratioDurInfByProfile = [Constant(1), Uniform(0.75, 1.25), Uniform(0, 0.5)]
-        self.ratioProbHospByProfile = [Constant(1), Uniform(0.5, 1.5), Uniform(0, 0.5)]
-
-        # parameters related to novel strain and vaccinated individuals
+        # probability that an importated case is infected with the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
                                       Beta(mean=1.75, st_dev=0.1, minimum=1.5, maximum=2),  # t_middle
                                       Uniform(minimum=0.4, maximum=0.6)]  # max
 
-        # vaccine information
-        self.durVacImmunity = Uniform(0.5, 1.5)  # Beta(mean=1.5, st_dev=0.25, minimum=0.5, maximum=2.5)
-        self.vacEffAgainstInfWithNovel = Uniform(0, 1)
+        # parameters related to novel strain and vaccine effectiveness
+        # [dominant-unvaccinated, novel-unvaccinated, dominant-vaccinated, novel-vaccinated]
+        self.ratioTransmByProfile = [Constant(1), Uniform(1, 2), Uniform(0, 0.5), Uniform(0, 0.5)]
+        self.ratioDurInfByProfile = [Constant(1), Uniform(0.75, 1.25), Uniform(0, 0.5), Uniform(0, 0.5)]
+        self.ratioProbHospByProfile = [Constant(1), Uniform(0.5, 1.5), Uniform(0, 0.1), Uniform(0, 0.5)]
+
+        # vaccine information [dominant, novel]
+        self.durVacImmunity = [Uniform(0.5, 1.5), Uniform(0.5, 1.5)]
+        self.vacEffAgainstInf = [Uniform(0.9, 1), Uniform(0, 1)]
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
@@ -100,7 +104,7 @@ class COVIDParameters(EpiParameters):
 
         self.infectivityDominant = None
         self.infectivityByProfile = [None] * self.nProfiles
-        self.suspVaccinatedAgainstNovel = None
+        self.suspVaccinated = [None, None]
 
         self.probNovelStrain = None
         self.relativeProbHospByAge = [None] * self.nAgeGroups
@@ -116,7 +120,7 @@ class COVIDParameters(EpiParameters):
         self.vaccRateByAge = [None] * self.nAgeGroups
         self.logitProbDeathInHospByAge = [None] * self.nAgeGroups
         self.ratesOfDeathInHospByAge = [None] * self.nAgeGroups
-        self.rateOfLosingVacImmunity = None
+        self.rateOfLosingVacImmunity = [None, None]
 
         self.matrixOfPercChangeInContactsY1 = None
         self.matrixOfPercChangeInContactsY1Plus = None
@@ -141,8 +145,8 @@ class COVIDParameters(EpiParameters):
             self.sizeIProfile0ByAge.append(AMultinomialOutcome(par_multinomial=self.distI0ToIs, outcome_index=a))
             self.importRateByAge.append(Constant(value=importation_rate * us_age_dist[a]))
 
-        # susceptibility of the vaccinated
-        self.suspVaccinatedAgainstNovel = OneMinus(par=self.vacEffAgainstInfWithNovel)
+        # susceptibility of the vaccinated against dominant and novel variants
+        self.suspVaccinated = [OneMinus(par=self.vacEffAgainstInf[0]), OneMinus(par=self.vacEffAgainstInf[1])]
 
         # infectivity of the dominant strain
         self.infectivityDominant = InfectivityFromR0(
@@ -166,8 +170,8 @@ class COVIDParameters(EpiParameters):
 
         # probability of hospitalization by age
         for a in range(self.nAgeGroups):
-            self.probHospByAgeAndProfile[a] = [Product(
-                parameters=[self.probHosp18To29, self.relativeProbHospByAge[a]]), None, None]
+            self.probHospByAgeAndProfile[a] = [
+                Product(parameters=[self.probHosp18To29, self.relativeProbHospByAge[a]]), None, None, None]
 
         # probability of hospitalization for new variant and vaccinated individuals
         for a in range(self.nAgeGroups):
@@ -178,6 +182,7 @@ class COVIDParameters(EpiParameters):
         # probability of death by age
         for a in range(self.nAgeGroups):
             self.probDeathIfHospByAgeAndProfile[a] = [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25),
+                                                      Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25),
                                                       Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25),
                                                       Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25)]
 
@@ -212,7 +217,9 @@ class COVIDParameters(EpiParameters):
             matrix_of_params_or_values=matrix_of_params_y1_plus)
 
         # rates of leaving compartments
-        self.rateOfLosingVacImmunity = Inverse(par=self.durVacImmunity)
+        for v in range(2):
+            self.rateOfLosingVacImmunity[v] = Inverse(par=self.durVacImmunity[v])
+
         for p in range(self.nProfiles):
             self.ratesOfLeavingE[p] = Inverse(par=self.durEByProfile[p])
             self.ratesOfLeavingI[p] = Inverse(par=self.durIByProfile[p])
@@ -270,8 +277,8 @@ class COVIDParameters(EpiParameters):
              'Prob novel strain params': self.probNovelStrainParams,
              'Prob novel strain': self.probNovelStrain,
 
-             'Vaccine effectiveness against infection with novel': self.vacEffAgainstInfWithNovel,
-             'Susceptibility of vaccinated against novel': self.suspVaccinatedAgainstNovel,
+             'Vaccine effectiveness against infection': self.vacEffAgainstInf,
+             'Susceptibility of vaccinated': self.suspVaccinated,
              'Vaccination rate params': self.vaccRateParams,
              'Vaccination rate t_min by age': self.vaccRateTMinByAge,
              'Vaccination rate': self.vaccRateByAge,

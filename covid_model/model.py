@@ -35,7 +35,7 @@ def build_covid_model(model):
     # events
     importation = [None] * age_groups_profiles.nAgeGroups
     infection_in_S = [None] * age_groups_profiles.length
-    infection_in_V = [None] * age_groups_profiles.nAgeGroups
+    infection_in_V = [None] * age_groups_profiles.length
     leaving_Es = [None] * age_groups_profiles.length
     leaving_Is = [None] * age_groups_profiles.length
     leaving_Hs = [None] * age_groups_profiles.length
@@ -43,7 +43,7 @@ def build_covid_model(model):
     deaths_in_hosp = [None] * age_groups_profiles.length
     vaccination_in_S = [None] * age_groups_profiles.nAgeGroups
     vaccination_in_R = [None] * age_groups_profiles.length
-    losing_vaccine_immunity = [None] * age_groups_profiles.nAgeGroups
+    losing_vaccine_immunity = [None] * age_groups_profiles.length
 
     # --------- model compartments ---------
     for a in range(age_groups_profiles.nAgeGroups):
@@ -52,7 +52,7 @@ def build_covid_model(model):
                             susceptibility_params=[Constant(value=1), Constant(value=1)],
                             row_index_contact_matrix=a)
         Vs[a] = Compartment(name='Vaccinated-'+str_a,
-                            susceptibility_params=[Constant(value=0), params.suspVaccinatedAgainstNovel],
+                            susceptibility_params=params.suspVaccinated,
                             row_index_contact_matrix=a)
 
         for p in range(age_groups_profiles.nProfiles):
@@ -61,7 +61,7 @@ def build_covid_model(model):
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
 
             # infectivity
-            infectivity_params = [Constant(value=0), Constant(value=0), Constant(value=0)]
+            infectivity_params = [Constant(value=0) for i in range(age_groups_profiles.nProfiles)]
             infectivity_params[p] = params.infectivityByProfile[p]
 
             # -------- compartments ----------
@@ -84,8 +84,8 @@ def build_covid_model(model):
                                      probability_params=params.probHospByAgeAndProfile[a][p])
 
         # if an imported cases is infected with the novel strain
-        dest_if_novel = age_groups_profiles.get_row_index(age_group=a, profile=1)
-        dest_if_current = age_groups_profiles.get_row_index(age_group=a, profile=0)
+        dest_if_novel = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.N_UNVAC.value)
+        dest_if_current = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.D_UNVAC.value)
         if_novel_strain[a] = ChanceNode(name='If infected with the novel strain-'+str_a,
                                         destination_compartments=[Es[dest_if_novel], Es[dest_if_current]],
                                         probability_params=params.probNovelStrain)
@@ -111,12 +111,13 @@ def build_covid_model(model):
             str_a_p = age_groups_profiles.get_str_age_profile(age_group=a, profile=p)
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
 
-            if p in (0, 1):
+            pathogen = p % 2
+            if p in (Profiles.D_UNVAC.value, Profiles.N_UNVAC.value):
                 infection_in_S[i] = EpiDepEvent(
-                    name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=p)
+                    name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=pathogen)
             else:
-                infection_in_V[a] = EpiDepEvent(
-                    name='Infection in V-'+str_a_p, destination=Es[i], generating_pathogen=1)
+                infection_in_V[i] = EpiDepEvent(
+                    name='Infection in V-'+str_a_p, destination=Es[i], generating_pathogen=pathogen)
             leaving_Es[i] = EpiIndepEvent(
                 name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[p], destination=Is[i])
             leaving_Is[i] = EpiIndepEvent(
@@ -135,17 +136,23 @@ def build_covid_model(model):
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=Vs[a])
         losing_vaccine_immunity[a] = EpiIndepEvent(
-            name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
+            name='Losing vaccine immunity-'+str_a,
+            rate_param=params.rateOfLosingVacImmunity[pathogen], destination=Ss[a])
 
         # --------- connections of events and compartments ---------
         # attached epidemic events to compartments
-        i_inf_event = age_groups_profiles.get_row_index(age_group=a, profile=0)
-        Ss[a].add_events(events=[infection_in_S[i_inf_event],  # infection with dominant
-                                 infection_in_S[i_inf_event+1],  # infection with novel
+        i_inf_with_dominant_event = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.D_UNVAC.value)
+        i_inf_with_novel_event = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.N_UNVAC.value)
+        Ss[a].add_events(events=[infection_in_S[i_inf_with_dominant_event],  # infection with dominant
+                                 infection_in_S[i_inf_with_novel_event],  # infection with novel
                                  vaccination_in_S[a],
                                  importation[a]])
-        Vs[a].add_events(events=[losing_vaccine_immunity[a],
-                                 infection_in_V[a]])
+        i_inf_with_dominant_event = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.D_VAC.value)
+        i_inf_with_novel_event = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.N_VAC.value)
+        Vs[a].add_events(events=[infection_in_V[i_inf_with_dominant_event],  # infection with dominant
+                                 infection_in_V[i_inf_with_novel_event],  # infection with novel
+                                 losing_vaccine_immunity[a],
+                                 ])
 
         for p in range(age_groups_profiles.nProfiles):
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
@@ -184,50 +191,37 @@ def build_covid_model(model):
     age_dist_new_hosp = []
     age_dist_cum_death = []
 
-    # population size 
     pop_size_by_age.append(SumPrevalence(
         name='Population size', compartments=compartments))
-    # number of individuals susceptible
     num_susp = SumPrevalence(
         name='Individuals susceptible', compartments=Ss)
-    # number of individuals with immunity from infection
     num_immune_from_inf = SumPrevalence(
         name='Individuals wth immunity from infection', compartments=Rs)
-    # incidence 
     incd_by_age.append(SumIncidence(
         name='Incidence', compartments=Is, first_nonzero_obs_marks_start_of_epidemic=True, if_surveyed=True))
-    # cumulative incidence
     cum_incd_by_age.append(SumCumulativeIncidence(
         name='Cumulative incidence', compartments=Is))
-    # new hospitalization
     new_hosp_by_age.append(SumIncidence(
         name='New hospitalizations', compartments=Hs, if_surveyed=True))
-    # cumulative hospitalization
     cum_hosp_by_age.append(SumCumulativeIncidence(
         name='Cumulative hospitalizations', compartments=Hs, if_surveyed=True))
-    # cumulative death 
     cum_death_by_age.append(SumCumulativeIncidence(
         name='Cumulative death', compartments=Ds, if_surveyed=True))
-    # cumulative vaccination 
     cum_vaccine_by_age.append(SumCumulativeIncidence(
         name='Cumulative vaccination', compartments=Vs, if_surveyed=True))
 
-    # prevalence susceptible
     prev_susp = RatioTimeSeries(name='Prevalence susceptible',
                                 numerator_sum_time_series=num_susp,
                                 denominator_sum_time_series=pop_size_by_age[0],
                                 if_surveyed=True)
-    # prevalence with immunity due to infection
     prev_immune_from_inf = RatioTimeSeries(name='Prevalence with immunity from infection',
                                            numerator_sum_time_series=num_immune_from_inf,
                                            denominator_sum_time_series=pop_size_by_age[0],
                                            if_surveyed=True)
-    # incidence rate
     incd_rate_by_age.append(RatioTimeSeries(name='Incidence rate',
                                             numerator_sum_time_series=incd_by_age[0],
                                             denominator_sum_time_series=pop_size_by_age[0],
                                             if_surveyed=True))
-    # new hospitalization rate
     new_hosp_rate_by_age.append(RatioTimeSeries(name='New hospitalization rate',
                                                 numerator_sum_time_series=new_hosp_by_age[0],
                                                 denominator_sum_time_series=pop_size_by_age[0],
@@ -236,12 +230,10 @@ def build_covid_model(model):
                                                 numerator_sum_time_series=cum_hosp_by_age[0],
                                                 denominator_sum_time_series=pop_size_by_age[0],
                                                 if_surveyed=True))
-    # cumulative death rate 
     cum_death_rate_by_age.append(RatioTimeSeries(name='Cumulative death rate',
                                                  numerator_sum_time_series=cum_death_by_age[0],
                                                  denominator_sum_time_series=pop_size_by_age[0],
                                                  if_surveyed=True))
-    # cumulative vaccination rate
     cum_vaccine_rate_by_age.append(RatioTimeSeries(name='Cumulative vaccination rate',
                                                    numerator_sum_time_series=cum_vaccine_by_age[0],
                                                    denominator_sum_time_series=pop_size_by_age[0],
@@ -284,7 +276,7 @@ def build_covid_model(model):
     Hs_novel_vacc = []
     for p in range(age_groups_profiles.nProfiles):
         # find Is and Hs in this profile
-        if p in (Profiles.N.value, Profiles.V.value):
+        if p in (Profiles.N_UNVAC.value, Profiles.N_VAC.value):
             for a in range(age_groups_profiles.nAgeGroups):
                 i = age_groups_profiles.get_row_index(age_group=a, profile=p)
                 Is_novel_vacc.append(Is[i])

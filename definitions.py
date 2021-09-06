@@ -9,13 +9,15 @@ PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
-PROFILES = ['Dominant', 'Novel-Unvaccinated', 'Novel-Vaccinated']
+PROFILES = ['Dominant-UV', 'Novel-UV',
+            'Dominant-V', 'Novel-V']
 
 
 class Profiles(Enum):
-    D = 0   # infected with dominant strain
-    N = 1   # infected with novel strain
-    V = 2   # vaccinated and infected with novel strain
+    D_UNVAC = 0   # infected with dominant strain
+    N_UNVAC = 1   # infected with novel strain
+    D_VAC = 2  # vaccinated and infected with dominant strain
+    N_VAC = 3   # vaccinated and infected with novel strain
 
 
 class AgeGroups(Enum):
