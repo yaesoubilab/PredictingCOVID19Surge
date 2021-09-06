@@ -5,6 +5,22 @@ from definitions import ROOT_DIR, get_dataset_labels
 WEEKS = (-12, -8, -4)
 MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 
+ORDER_OF_FEATURES = [
+    'New hospitalization rate (2-wk average)',
+    'New hospitalization rate (4-wk change)',
+    'Cumulative hospitalization rate',
+    'Cumulative vaccination rate',
+    '% of population susceptible',
+    '% vaccinated among hospitalized patients (2-wk average)',
+    '% vaccinated among hospitalized patients (4-wk change)',
+    '% novel variant among new infections (2-wk average)',
+    '% novel variant among new infections (4-wk change)',
+    '% novel variant among new hospitalizations (2-wk average)',
+    '% novel variant among new hospitalizations (4-wk change)',
+    '% novel variant among vaccinated hospitalizations (2-wk average)',
+    '% novel variant among vaccinated hospitalizations (4-wk change)',
+]
+
 
 def print_selected_features(weeks, models, noise_coeff, bias_delay):
 
@@ -76,5 +92,5 @@ def print_selected_features(weeks, models, noise_coeff, bias_delay):
 
 if __name__ == '__main__':
     
-    print_selected_features(noise_coeff=None, weeks=WEEKS, models=MODELS)
-    print_selected_features(noise_coeff=1, weeks=WEEKS, models=MODELS)
+    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=None, bias_delay=None)
+    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=1, bias_delay=None)
