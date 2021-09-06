@@ -4,9 +4,9 @@ Obs: Incidence rate-slope-4wk,Incidence rate (4-wk change)
 Obs: New hospitalization rate,New hospitalization rate (last wk)
 Obs: New hospitalization rate-ave-2wk,New hospitalization rate (2-wk average)
 Obs: New hospitalization rate-slope-4wk,New hospitalization rate (4-wk change)
-Obs: % of new hospitalizations that are vaccinated,% of new hospitalizations that are vaccinated (last wk)
-Obs: % of new hospitalizations that are vaccinated-ave-2wk,% of new hospitalizations that are vaccinated (2-wk average)
-Obs: % of new hospitalizations that are vaccinated-slope-4wk,% of new hospitalizations that are vaccinated (4-wk change)
+Obs: % of new hospitalizations that are vaccinated,% vaccinated among new hospitalizations (last wk)
+Obs: % of new hospitalizations that are vaccinated-ave-2wk,% vaccinated among new hospitalizations (2-wk average)
+Obs: % of new hospitalizations that are vaccinated-slope-4wk,% vaccinated among new hospitalizations (4-wk change)
 Obs: % of incidence due to novel variant,% novel variant among new infections (last wk)
 Obs: % of incidence due to novel variant-ave-2wk,% novel variant among new infections (2-wk average)
 Obs: % of incidence due to novel variant-slope-4wk,% novel variant among new infections (4-wk change)
@@ -14,8 +14,8 @@ Obs: % of new hospitalizations due to novel variant,% novel variant among new ho
 Obs: % of new hospitalizations due to novel variant-ave-2wk,% novel variant among new hospitalizations (2-wk average)
 Obs: % of new hospitalizations due to novel variant-slope-4wk,% novel variant among new hospitalizations (4-wk change)
 Obs: % of new hospitalizations due to Novel-V,% of new hospitalizations that are vaccinated and due to novel variant (last wk)
-Obs: % of new hospitalizations due to Novel-V-ave-2wk,% of new hospitalizations that are vaccinated and due to novel variant  (2-wk average)
-Obs: % of new hospitalizations due to Novel-V-slope-4wk,% of new hospitalizations that are vaccinated and due to novel variant  (4-wk change)
+Obs: % of new hospitalizations due to Novel-V-ave-2wk,% of new hospitalizations that are vaccinated and due to novel variant (2-wk average)
+Obs: % of new hospitalizations due to Novel-V-slope-4wk,% of new hospitalizations that are vaccinated and due to novel variant (4-wk change)
 Obs: Cumulative hospitalization rate,Cumulative hospitalization rate
 Obs: Cumulative vaccination rate,Cumulative vaccination rate
 Obs: Prevalence susceptible,% of population susceptible
