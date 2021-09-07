@@ -63,15 +63,17 @@ class COVIDParameters(EpiParameters):
                                       Beta(mean=1.75, st_dev=0.1, minimum=1.5, maximum=2),  # t_middle
                                       Uniform(minimum=0.4, maximum=0.6)]  # max
 
-        # parameters related to novel strain and vaccine effectiveness
+        # parameters related to novel strain
         # [dominant-unvaccinated, novel-unvaccinated, dominant-vaccinated, novel-vaccinated]
-        self.ratioTransmByProfile = [Constant(1), Uniform(1, 2), Uniform(0, 0.5), Uniform(0, 0.5)]
-        self.ratioDurInfByProfile = [Constant(1), Uniform(0.75, 1.25), Uniform(0, 0.5), Uniform(0, 0.5)]
-        self.ratioProbHospByProfile = [Constant(1), Uniform(0.5, 1.5), Uniform(0, 0.1), Uniform(0, 0.5)]
+        self.ratioTransmByProfile = [Constant(1), Uniform(1, 2), None, None]
+        self.ratioDurInfByProfile = [Constant(1), Uniform(0.75, 1.25), None, None]
+        self.ratioProbHospByProfile = [Constant(1), Uniform(0.5, 1.5), None, None]
 
         # vaccine information [dominant, novel]
         self.durVacImmunity = Uniform(0.5, 1.5)
-        self.vacEffAgainstInf = [Uniform(0.9, 1), Uniform(0, 1)]
+        self.vacEffAgainstInf = [Uniform(0, 1), Uniform(0, 1)]
+        self.vacEffAgainstHosp = [Uniform(0.9, 1), Uniform(0, 1)]
+        self.vacEffReducingInfectiousness = [Uniform(0.9, 1), Uniform(0, 1)]
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
