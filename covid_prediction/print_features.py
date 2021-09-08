@@ -51,8 +51,11 @@ def print_selected_features(weeks, models, noise_coeff, bias_delay):
     for model in models:
         for week in weeks:
 
-            label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
-            filename = '/outputs/prediction_summary/features/NN features-{}.csv'.format(label)
+            if model == Zero:
+                label = get_dataset_labels(week=week, noise_coeff=None, bias_delay=None)
+            else:
+                label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
+            filename = '/outputs/prediction_summary/features/NN features-{}-{}.csv'.format(model.name, label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
             col_names.append(col_name)
             # read file

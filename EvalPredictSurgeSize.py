@@ -5,7 +5,7 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR, get_dataset_labels
 
-MODELS = (Zero, A, B1, B1, B2, B3, B4, C1, C2)
+MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 WEEKS = (-12, -8, -4)
 
 CV_FOLD = 20         # num of splits for cross validation
@@ -49,7 +49,7 @@ def evaluate(noise_coeff, bias_delay=None):
                     if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
             # store outcomes
-            rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.PI])
+            rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.formattedMeanPI])
 
     # print summary of results
     label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)

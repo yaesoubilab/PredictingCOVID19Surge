@@ -156,8 +156,8 @@ C1 = ModelSpec(name='C1',
                    'Obs: Cumulative vaccination rate',
                    'Obs: % of incidence due to novel variant-ave-2wk',
                    'Obs: % of incidence due to novel variant-slope-4wk',
-                   'Obs: % of new hospitalizations due to Novel-V-ave-2wk',
-                   'Obs: % of new hospitalizations due to Novel-V-slope-4wk',
+                   'Obs: % of new hospitalizations that are vaccinated-ave-2wk',
+                   'Obs: % of new hospitalizations that are vaccinated-slope-4wk',
                ],
                list_num_of_features_wanted=[6, 7, 8],
                list_num_of_neurons=[8, 9, 10])
@@ -176,3 +176,16 @@ C2 = ModelSpec(name='C2',
                list_num_of_features_wanted=[6, 7, 8],
                list_num_of_neurons=[8, 9, 10])
 
+C3 = ModelSpec(name='C2',
+               features=[
+                   'Obs: New hospitalization rate-ave-2wk',
+                   'Obs: New hospitalization rate-slope-4wk',
+                   'Obs: Cumulative hospitalization rate',
+                   'Obs: Cumulative vaccination rate',
+                   'Obs: % of new hospitalizations due to novel variant-ave-2wk',
+                   'Obs: % of new hospitalizations due to novel variant-slope-4wk',
+                   'Obs: % of new hospitalizations due to Novel-V-ave-2wk',
+                   'Obs: % of new hospitalizations due to Novel-V-slope-4wk',
+                ],
+               list_num_of_features_wanted=[6, 7, 8],
+               list_num_of_neurons=[8, 9, 10])

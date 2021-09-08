@@ -48,9 +48,10 @@ def get_neural_net_best_spec(week, model_spec, noise_coeff, bias_delay,
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,
-        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-{}.csv'.format(label),
-        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-{}.csv'
-            .format(label)
+        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-{}-{}.csv'
+            .format(model_spec.name, label),
+        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-{}-{}.csv'
+            .format(model_spec.name, label)
     )
 
     return best_spec

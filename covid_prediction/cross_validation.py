@@ -110,7 +110,7 @@ class NeuralNetCrossValidator:
 
         # store the performance of this specification
         self.performanceSummary.add_cv_performance(scores=cv_score_list,
-                                                   deci=4,
+                                                   deci=2,
                                                    selected_features=self.preProcessedData.selectedFeatureNames)
 
 
