@@ -1,5 +1,6 @@
-from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Logit, Product, OneMinus, MatrixOfParams, TimeDependentSigmoid, \
-    Beta, Uniform, UniformDiscrete, Gamma
+from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Logit, Product, \
+    OneMinus, MatrixOfParams, TimeDependentSigmoid, \
+    Beta, Uniform, UniformDiscrete, Gamma, Equal, OneMinusTimes
 from apace.Inputs import EpiParameters
 from apace.Inputs import InfectivityFromR0
 from definitions import AgeGroups, Profiles
@@ -64,16 +65,15 @@ class COVIDParameters(EpiParameters):
                                       Uniform(minimum=0.4, maximum=0.6)]  # max
 
         # parameters related to novel strain
-        # [dominant-unvaccinated, novel-unvaccinated, dominant-vaccinated, novel-vaccinated]
-        self.ratioTransmByProfile = [Constant(1), Uniform(1, 2), None, None]
-        self.ratioDurInfByProfile = [Constant(1), Uniform(0.75, 1.25), None, None]
-        self.ratioProbHospByProfile = [Constant(1), Uniform(0.5, 1.5), None, None]
+        self.ratioTransmNovel = Uniform(1, 2)
+        self.ratioDurInfNovel = Uniform(0.75, 1.25)
+        self.ratioProbHospNovel = Uniform(0.5, 1.5)
 
-        # vaccine information [dominant, novel]
+        # parameters related to vaccine effectiveness [dominant, novel]
         self.durVacImmunity = Uniform(0.5, 1.5)
         self.vacEffAgainstInf = [Uniform(0, 1), Uniform(0, 1)]
-        self.vacEffAgainstHosp = [Uniform(0.9, 1), Uniform(0, 1)]
         self.vacEffReducingInfectiousness = [Uniform(0.9, 1), Uniform(0, 1)]
+        self.vacEffAgainstHosp = [Uniform(0.9, 1), Uniform(0, 1)]
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
@@ -106,7 +106,10 @@ class COVIDParameters(EpiParameters):
 
         self.infectivityDominant = None
         self.infectivityByProfile = [None] * self.nProfiles
-        self.suspVaccinated = [None, None]
+        self.suspVaccinated = None
+        self.ratioTransmByProfile = None
+        self.ratioProbHospByProfile = None
+        self.ratioDurInfByProfile = None
 
         self.probNovelStrain = None
         self.relativeProbHospByAge = [None] * self.nAgeGroups
@@ -147,8 +150,26 @@ class COVIDParameters(EpiParameters):
             self.sizeIProfile0ByAge.append(AMultinomialOutcome(par_multinomial=self.distI0ToIs, outcome_index=a))
             self.importRateByAge.append(Constant(value=importation_rate * us_age_dist[a]))
 
+        # duration of infectiousness
+        self.ratioDurInfByProfile = [Constant(1), Equal(self.ratioDurInfNovel), None, None]
+        self.ratioDurInfByProfile[2] = Equal(self.ratioDurInfByProfile[0])
+        self.ratioDurInfByProfile[3] = Equal(self.ratioDurInfByProfile[1])
+
         # susceptibility of the vaccinated against dominant and novel variants
-        self.suspVaccinated = [OneMinus(par=self.vacEffAgainstInf[0]), OneMinus(par=self.vacEffAgainstInf[1])]
+        self.suspVaccinated = [OneMinus(par=self.vacEffAgainstInf[0]),
+                               OneMinus(par=self.vacEffAgainstInf[1])]
+
+        # vaccine effectiveness in reducing infectiousness
+        # [dominant-unvaccinated, novel-unvaccinated, dominant-vaccinated, novel-vaccinated]
+        self.ratioTransmByProfile = [Constant(1), Equal(self.ratioTransmNovel), None, None]
+        self.ratioTransmByProfile[2] = OneMinus(self.vacEffReducingInfectiousness[0])
+        self.ratioTransmByProfile[3] = OneMinusTimes(self.vacEffReducingInfectiousness[1],
+                                                     self.ratioTransmByProfile[2])
+        # vaccine effectiveness against hospitalization
+        self.ratioProbHospByProfile = [Constant(1), Equal(self.ratioProbHospNovel), None, None]
+        self.ratioProbHospByProfile[2] = OneMinus(self.vacEffAgainstHosp[0])
+        self.ratioProbHospByProfile[3] = OneMinusTimes(self.vacEffAgainstHosp[1],
+                                                       self.ratioProbHospByProfile[2])
 
         # infectivity of the dominant strain
         self.infectivityDominant = InfectivityFromR0(
@@ -249,37 +270,45 @@ class COVIDParameters(EpiParameters):
 
              'R0': self.R0,
              'Duration of infectiousness-dominant': self.durI,
+             'Importation rate': self.importRateByAge,
+             'Prob novel strain params': self.probNovelStrainParams,
+             'Prob novel strain': self.probNovelStrain,
+
+             'Ratio infectiousness duration of novel to dominant': self.ratioDurInfNovel,
+             'Ratio of infectiousness duration by profile': self.ratioDurInfByProfile,
+
+             'Duration of vaccine immunity': self.durVacImmunity,
+             'Vaccine effectiveness against infection': self.vacEffAgainstInf,
+             'Susceptibility of vaccinated': self.suspVaccinated,
+
+             'Ratio transmissibility of novel to dominant': self.ratioTransmNovel,
+             'Vaccine effectiveness in reducing infectiousness': self.vacEffReducingInfectiousness,
+             'Ratio of transmissibility by profile': self.ratioTransmByProfile,
+
+             # transmission parameter
+             'Infectivity-dominant': self.infectivityDominant,
+             'Infectivity by profile': self.infectivityByProfile,
+
+             'Ratio prob of hospitalization of novel to dominant': self.ratioProbHospNovel,
+             'Vaccine effectiveness against hospitalization': self.vacEffAgainstHosp,
+             'Ratio of hospitalization prob by profile': self.ratioProbHospByProfile,
 
              # prob hospitalization
              'Prob Hosp for 18-29': self.probHosp18To29,
              'Relative prob hosp by age': self.relativeProbHospByAge,
              'Ratio of hospitalization probability by profile': self.ratioProbHospByProfile,
 
-             # transmission parameter
-             'Infectivity-dominant': self.infectivityDominant,
-             'Ratio transmissibility by profile': self.ratioTransmByProfile,
-             'Infectivity by profile': self.infectivityByProfile,
-
              # time in compartments
-             'Ratio of infectiousness duration by profile': self.ratioDurInfByProfile,
-
              'Duration of E': self.durEByProfile,
              'Duration of I': self.durIByProfile,
              'Duration of Hosp': self.durHospByProfile,
              'Duration of R': self.durRByProfile,
-             'Duration of vaccine immunity': self.durVacImmunity,
 
              'Rates of leaving E': self.ratesOfLeavingE,
              'Rates of leaving I': self.ratesOfLeavingI,
              'Rates of leaving Hosp': self.ratesOfLeavingHosp,
              'Rates of leaving R': self.ratesOfLeavingR,
 
-             'Importation rate': self.importRateByAge,
-             'Prob novel strain params': self.probNovelStrainParams,
-             'Prob novel strain': self.probNovelStrain,
-
-             'Vaccine effectiveness against infection': self.vacEffAgainstInf,
-             'Susceptibility of vaccinated': self.suspVaccinated,
              'Vaccination rate params': self.vaccRateParams,
              'Vaccination rate t_min by age': self.vaccRateTMinByAge,
              'Vaccination rate': self.vaccRateByAge,

@@ -61,8 +61,8 @@ def build_covid_model(model):
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
 
             # infectivity
-            infectivity_params = [Constant(value=0) for i in range(age_groups_profiles.nProfiles)]
-            infectivity_params[p] = params.infectivityByProfile[p]
+            infectivity_params = [Constant(0), Constant(0)]
+            infectivity_params[p % 2] = params.infectivityByProfile[p]
 
             # -------- compartments ----------
             Es[i] = Compartment(name='Exposed-'+str_a_p,
