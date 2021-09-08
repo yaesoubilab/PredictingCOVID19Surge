@@ -291,12 +291,11 @@ class COVIDParameters(EpiParameters):
 
              'Ratio prob of hospitalization of novel to dominant': self.ratioProbHospNovel,
              'Vaccine effectiveness against hospitalization': self.vacEffAgainstHosp,
-             'Ratio of hospitalization prob by profile': self.ratioProbHospByProfile,
+             'Ratio of hospitalization probability by profile': self.ratioProbHospByProfile,
 
              # prob hospitalization
              'Prob Hosp for 18-29': self.probHosp18To29,
              'Relative prob hosp by age': self.relativeProbHospByAge,
-             'Ratio of hospitalization probability by profile': self.ratioProbHospByProfile,
 
              # time in compartments
              'Duration of E': self.durEByProfile,
