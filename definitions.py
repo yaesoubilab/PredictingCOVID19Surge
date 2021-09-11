@@ -14,10 +14,10 @@ PROFILES = ['Dominant-UV', 'Novel-UV',
 
 
 class Profiles(Enum):
-    D_UNVAC = 0   # infected with dominant strain
-    N_UNVAC = 1   # infected with novel strain
-    D_VAC = 2  # vaccinated and infected with dominant strain
-    N_VAC = 3   # vaccinated and infected with novel strain
+    DOM_UNVAC = 0   # infected with dominant strain
+    NOV_UNVAC = 1   # infected with novel strain
+    DOM_VAC = 2  # vaccinated and infected with dominant strain
+    NOV_VAC = 3   # vaccinated and infected with novel strain
 
 
 class AgeGroups(Enum):
