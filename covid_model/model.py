@@ -34,7 +34,8 @@ def build_covid_model(model):
     ifs_hosp = [None] * age_groups_profiles.length
     ifs_novel_strain = [None] * age_groups_profiles.nAgeGroups
     counting_vacc_in_S = [None] * age_groups_profiles.nAgeGroups
-    counting_vacc_in_R = [None] * age_groups_profiles.length
+    counting_vacc_in_R_dom = [None] * age_groups_profiles.nAgeGroups
+    counting_vacc_in_R_nov = [None] * age_groups_profiles.nAgeGroups
 
     # events
     importation = [None] * age_groups_profiles.nAgeGroups
@@ -46,7 +47,8 @@ def build_covid_model(model):
     leaving_Rs = [None] * age_groups_profiles.length
     deaths_in_hosp = [None] * age_groups_profiles.length
     vaccination_in_S = [None] * age_groups_profiles.nAgeGroups
-    vaccination_in_R = [None] * age_groups_profiles.length
+    vaccination_in_R_dom = [None] * age_groups_profiles.nAgeGroups
+    vaccination_in_R_nov = [None] * age_groups_profiles.nAgeGroups
     losing_vaccine_immunity = [None] * age_groups_profiles.length
 
     # --------- model compartments ---------
@@ -90,18 +92,17 @@ def build_covid_model(model):
         # count vaccinations among recovered after infection with dominant or novel variants
         for p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
             str_a_p = age_groups_profiles.get_str_age_profile(age_group=a, profile=p)
-            i = age_groups_profiles.get_row_index(age_group=a, profile=p)
 
             if p == Profiles.DOM_UNVAC.value:
                 dest_after_vacc_in_recovered = age_groups_profiles.get_row_index(age_group=a,
                                                                                  profile=Profiles.DOM_VAC.value)
-                counting_vacc_in_R[i] = Counter(name='Vaccination in R-' + str_a_p,
-                                                destination_compartment=Rs[dest_after_vacc_in_recovered])
+                counting_vacc_in_R_dom[a] = Counter(name='Vaccination in R-' + str_a_p,
+                                                    destination_compartment=Rs[dest_after_vacc_in_recovered])
             elif p == Profiles.NOV_UNVAC.value:
                 dest_after_vacc_in_recovered = age_groups_profiles.get_row_index(age_group=a,
                                                                                  profile=Profiles.NOV_VAC.value)
-                counting_vacc_in_R[i] = Counter(name='Vaccination in R-' + str_a_p,
-                                                destination_compartment=Rs[dest_after_vacc_in_recovered])
+                counting_vacc_in_R_nov[a] = Counter(name='Vaccination in R-' + str_a_p,
+                                                    destination_compartment=Rs[dest_after_vacc_in_recovered])
 
         # if an imported cases is infected with the novel strain
         dest_if_novel = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.NOV_UNVAC.value)
@@ -152,14 +153,17 @@ def build_covid_model(model):
                 name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[p], destination=Ss[a])
             deaths_in_hosp[i] = EpiIndepEvent(
                 name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][p], destination=Ds[i])
-            vaccination_in_R[i] = EpiIndepEvent(
-                name='Vaccinating R-'+str_a_p, rate_param=params.vaccRateByAge[a],
-                destination=counting_vacc_in_R[a])
 
         importation[a] = PoissonEvent(
             name='Importation-'+str_a, destination=ifs_novel_strain[a], rate_param=params.importRateByAge[a])
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=counting_vacc_in_S[a])
+        vaccination_in_R_dom[a] = EpiIndepEvent(
+            name='Vaccinating R-' + str_a_p, rate_param=params.vaccRateByAge[a],
+            destination=counting_vacc_in_R_dom[a])
+        vaccination_in_R_nov[i] = EpiIndepEvent(
+            name='Vaccinating R-' + str_a_p, rate_param=params.vaccRateByAge[a],
+            destination=counting_vacc_in_R_nov[a])
         losing_vaccine_immunity[a] = EpiIndepEvent(
             name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
 
@@ -183,7 +187,7 @@ def build_covid_model(model):
             Es[i].add_event(event=leaving_Es[i])
             Is[i].add_event(event=leaving_Is[i])
             Hs[i].add_events(events=[leaving_Hs[i], deaths_in_hosp[i]])
-            Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R[i]])
+            Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R_dom[i]])
 
     # --------- sum time-series ------
     # population size
@@ -197,7 +201,7 @@ def build_covid_model(model):
     compartments.extend(Ds)
 
     # lists to contain summation statistics
-    all_vaccinations = counting_vacc_in_S + counting_vacc_in_R
+    all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_dom + counting_vacc_in_R_nov
     pop_size_by_age = []
     incd_by_age = []
     new_hosp_by_age = []
@@ -350,9 +354,7 @@ def build_covid_model(model):
         Ds_this_age = []
 
         # number vaccinated
-        i_dom = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.DOM_UNVAC.value)
-        i_nov = age_groups_profiles.get_row_index(age_group=a, profile=Profiles.NOV_UNVAC.value)
-        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R[i_dom], counting_vacc_in_R[i_nov]]
+        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R_dom[a], counting_vacc_in_R_nov[a]]
 
         for p in range(age_groups_profiles.nProfiles):
             i = age_groups_profiles.get_row_index(age_group=a, profile=p)
@@ -482,7 +484,8 @@ def build_covid_model(model):
     chance_nodes.extend(ifs_hosp)
     chance_nodes.extend(ifs_novel_strain)
     chance_nodes.extend(counting_vacc_in_S)
-    chance_nodes.extend(counting_vacc_in_R)
+    chance_nodes.extend(counting_vacc_in_R_dom)
+    chance_nodes.extend(counting_vacc_in_R_nov)
 
     # summation-time series
     list_of_sum_time_series = []
