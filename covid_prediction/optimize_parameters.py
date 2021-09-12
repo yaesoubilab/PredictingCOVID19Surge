@@ -37,14 +37,14 @@ def get_neural_net_best_spec(week, model_spec, noise_coeff, bias_delay,
     df = df.sample(frac=1, random_state=1)
 
     # find the best specification
-    cv = CV.NeuralNetSepecOptimizer(data=df, feature_names=model_spec.features,
-                                    outcome_name='Maximum hospitalization rate',
-                                    list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
-                                    list_of_alphas=list_of_alphas,
-                                    list_of_n_neurons=model_spec.listNumOfNeurons,
-                                    feature_selection_method=feature_selection,
-                                    cv_fold=cv_fold,
-                                    if_standardize=if_standardize)
+    cv = CV.NeuralNetSpecOptimizer(data=df, feature_names=model_spec.features,
+                                   outcome_name='Maximum hospitalization rate',
+                                   list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
+                                   list_of_alphas=list_of_alphas,
+                                   list_of_n_neurons=model_spec.listNumOfNeurons,
+                                   feature_selection_method=feature_selection,
+                                   cv_fold=cv_fold,
+                                   if_standardize=if_standardize)
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,

@@ -117,14 +117,14 @@ class NeuralNetCrossValidator:
 
 
 def run_this_cross_validator(cross_validator, i):
-    """ helper function for parallelization  """
+    """ helper function for parallelization (the extract argument i is to prevent errors) """
 
     # simulate and return the cohort
     cross_validator.go()
     return cross_validator
 
 
-class NeuralNetSepecOptimizer:
+class NeuralNetSpecOptimizer:
     """ class to find the optimal specification for a neural network using cross validation """
 
     def __init__(self, data, feature_names, outcome_name,
