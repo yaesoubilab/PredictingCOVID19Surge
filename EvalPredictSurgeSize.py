@@ -9,7 +9,7 @@ MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 WEEKS = (-12, -8, -4)
 
 CV_FOLD = 20         # num of splits for cross validation
-IF_PARALLEL = True
+IF_PARALLEL = False
 ALPHAS = [0.001]
 IF_STANDARDIZED = True
 FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
