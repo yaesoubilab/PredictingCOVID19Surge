@@ -26,6 +26,7 @@ Prob novel strain params-1,Prob that an imported case is infected with novel var
 Prob novel strain params-2,Prob that an imported case is infected with novel variant (max)
 Ratio infectiousness duration of novel to dominant,Ratio of duration of infection with novel to dominant
 Duration of vaccine immunity,Duration of vaccine immunity
+Ratio of duration of immunity from infection+vaccination to infection,Relative increase in the duration of infection-induced immunity after vaccination
 Vaccine effectiveness against infection-0,Vaccine effectiveness against infection with dominant variant
 Vaccine effectiveness against infection-1,Vaccine effectiveness against infection with novel variant
 Ratio transmissibility of novel to dominant,Ratio of transmisibility of novel to dominant
