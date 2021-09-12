@@ -159,10 +159,10 @@ def build_covid_model(model):
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=counting_vacc_in_S[a])
         vaccination_in_R_dom[a] = EpiIndepEvent(
-            name='Vaccinating R-' + str_a_p, rate_param=params.vaccRateByAge[a],
+            name='Vaccinating R-dominant-' + str_a, rate_param=params.vaccRateByAge[a],
             destination=counting_vacc_in_R_dom[a])
-        vaccination_in_R_nov[i] = EpiIndepEvent(
-            name='Vaccinating R-' + str_a_p, rate_param=params.vaccRateByAge[a],
+        vaccination_in_R_nov[a] = EpiIndepEvent(
+            name='Vaccinating R-novel-' + str_a, rate_param=params.vaccRateByAge[a],
             destination=counting_vacc_in_R_nov[a])
         losing_vaccine_immunity[a] = EpiIndepEvent(
             name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
@@ -187,18 +187,14 @@ def build_covid_model(model):
             Es[i].add_event(event=leaving_Es[i])
             Is[i].add_event(event=leaving_Is[i])
             Hs[i].add_events(events=[leaving_Hs[i], deaths_in_hosp[i]])
-            Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R_dom[i]])
+            if p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
+                Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R_dom[a], vaccination_in_R_nov[a]])
+            else:
+                Rs[i].add_event(event=leaving_Rs[i])
 
     # --------- sum time-series ------
     # population size
-    compartments = []
-    compartments.extend(Ss)
-    compartments.extend(Vs)
-    compartments.extend(Es)
-    compartments.extend(Is)
-    compartments.extend(Hs)
-    compartments.extend(Rs)
-    compartments.extend(Ds)
+    compartments = Ss + Vs + Es + Is + Hs + Rs + Ds
 
     # lists to contain summation statistics
     all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_dom + counting_vacc_in_R_nov
