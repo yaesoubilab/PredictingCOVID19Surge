@@ -54,10 +54,9 @@ class COVIDParameters(EpiParameters):
         # self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
         #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
         #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
-        self.durRByProfile = [Uniform(0.25, 1.5),
-                              Uniform(0.25, 1.5),
-                              Uniform(0.25, 1.5),
-                              Uniform(0.25, 1.5)]
+
+        self.ratioDurImmunityFromInfAndVaccToInf = Uniform(1.0, 1.5)
+        self.durRByProfile = [Uniform(0.25, 1.5), Uniform(0.25, 1.5), None, None]
 
         # probability that an importated case is infected with the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
@@ -240,6 +239,14 @@ class COVIDParameters(EpiParameters):
             matrix_of_params_or_values=matrix_of_params_y1_plus)
 
         # rates of leaving compartments
+        # duration of immunity for vaccinated and recovered
+        self.durRByProfile[Profiles.DOM_VAC.value] = Product(
+            parameters=[self.durRByProfile[Profiles.DOM_UNVAC.value],
+                        self.ratioDurImmunityFromInfAndVaccToInf])
+        self.durRByProfile[Profiles.NOV_VAC.value] = Product(
+            parameters=[self.durRByProfile[Profiles.NOV_UNVAC.value],
+                        self.ratioDurImmunityFromInfAndVaccToInf])
+
         self.rateOfLosingVacImmunity = Inverse(par=self.durVacImmunity)
 
         for p in range(self.nProfiles):
@@ -278,6 +285,8 @@ class COVIDParameters(EpiParameters):
              'Ratio of infectiousness duration by profile': self.ratioDurInfByProfile,
 
              'Duration of vaccine immunity': self.durVacImmunity,
+             'Ratio of duration of immunity from infection+vaccination to infection':
+                 self.ratioDurImmunityFromInfAndVaccToInf,
              'Vaccine effectiveness against infection': self.vacEffAgainstInf,
              'Susceptibility of vaccinated': self.suspVaccinated,
 
