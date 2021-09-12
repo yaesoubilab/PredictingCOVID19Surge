@@ -68,14 +68,16 @@ class NeuralNetCrossValidator:
 
     def __init__(self, preprocessed_data,
                  n_features_wanted, alpha, n_neurons,
-                 feature_selection_method, cv_fold):
+                 feature_selection_method, cv_fold, scoring=None):
         """
         :param preprocessed_data: (PreProcessor)
         :param n_features_wanted:
         :param alpha:
         :param n_neurons:
         :param feature_selection_method:
-        :param cv_fold:
+        :param cv_fold: (int) number of cross validation folds
+        :param scoring: (string) if not specified, will use 'R2 score' for prediction problem.
+                Set to 'roc_auc' for classification problem
         """
         assert isinstance(preprocessed_data, PreProcessor)
 
@@ -85,6 +87,7 @@ class NeuralNetCrossValidator:
         self.nNeurons = n_neurons
         self.featureSelection = feature_selection_method
         self.cvFold = cv_fold
+        self.scoring = scoring
 
         self.performanceSummary = None
 
@@ -108,7 +111,8 @@ class NeuralNetCrossValidator:
         cv_score_list = cross_val_score(estimator=model,
                                         X=self.preProcessedData.selectedX,
                                         y=self.preProcessedData.y,
-                                        cv=self.cvFold)
+                                        cv=self.cvFold,
+                                        scoring=self.scoring)
 
         # store the performance of this specification
         self.performanceSummary.add_cv_performance(scores=cv_score_list,
