@@ -5,9 +5,9 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
-MODELS = (A, B1) #, Zero, A, B1, B2, B3, B4, C1, C2)
-OUTCOMES = ('If hospitalization threshold passed', ) # ('Maximum hospitalization rate', 'If hospitalization threshold passed')
-WEEKS = (-12, -8)#, -8, -4)
+MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
+OUTCOMES = ('Maximum hospitalization rate', 'If hospitalization threshold passed')
+WEEKS = (-12, -8, -4)
 
 CV_FOLD = 10         # num of splits for cross validation
 IF_PARALLEL = False
