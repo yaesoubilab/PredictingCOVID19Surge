@@ -22,7 +22,7 @@ ORDER_OF_FEATURES = [
 ]
 
 
-def print_selected_features(weeks, models, noise_coeff, bias_delay):
+def print_selected_features(outcome, weeks, models, noise_coeff, bias_delay):
 
     # read feature names
     feature_names = read_csv_rows(
@@ -55,7 +55,8 @@ def print_selected_features(weeks, models, noise_coeff, bias_delay):
                 label = get_dataset_labels(week=week, noise_coeff=None, bias_delay=None)
             else:
                 label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
-            filename = '/outputs/prediction_summary/features/NN features-{}-{}.csv'.format(model.name, label)
+            filename = '/outputs/prediction_summary/features/features-predicting {}-{}-{}.csv'.format(
+                outcome, model.name, label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
             col_names.append(col_name)
             # read file
@@ -95,11 +96,13 @@ def print_selected_features(weeks, models, noise_coeff, bias_delay):
 
     label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
     write_csv(rows=result,
-              file_name=ROOT_DIR+'/outputs/prediction_summary/selected features by model{}.csv'.format(label))
+              file_name=ROOT_DIR+'/outputs/prediction_summary/selected features for predicting {}-{}.csv'.format(
+                  outcome, label))
 
 
 if __name__ == '__main__':
-    
-    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=None, bias_delay=None)
-    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=1, bias_delay=None)
-    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=0.5, bias_delay=4)
+
+    for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
+        print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS, noise_coeff=None, bias_delay=None)
+        print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS, noise_coeff=1, bias_delay=None)
+        print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS, noise_coeff=0.5, bias_delay=4)

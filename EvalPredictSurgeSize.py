@@ -5,12 +5,12 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR, get_dataset_labels
 
-MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
+MODELS = (Zero,) #, A, B1, B2, B3, B4, C1, C2)
 OUTCOMES = ('Maximum hospitalization rate', 'If hospitalization threshold passed')
-WEEKS = (-12, -8, -4)
+WEEKS = (-12,)#, -8, -4)
 
-CV_FOLD = 20         # num of splits for cross validation
-IF_PARALLEL = False
+CV_FOLD = 10         # num of splits for cross validation
+IF_PARALLEL = True
 ALPHAS = [0.001]
 IF_STANDARDIZED = True
 FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
@@ -34,8 +34,8 @@ def evaluate(noise_coeff, bias_delay=None):
                 label = get_dataset_labels(
                     week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
-                print('Evaluating model {} at {}.'.format(
-                    model.name, label))
+                print("Evaluating model {} with outcome '{}' at {}.".format(
+                    model.name, outcome, label))
 
                 # model zero assumes no noise or bias
                 if model == Zero:
@@ -55,15 +55,18 @@ def evaluate(noise_coeff, bias_delay=None):
                 # store outcomes
                 rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.formattedMeanPI])
 
-        # print summary of results
-        label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
-        write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label))
+            # print summary of results
+            label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
+            write_csv(rows=rows,
+                      file_name=ROOT_DIR+'/outputs/prediction_summary/predicting {}-summary{}.csv'
+                      .format(outcome, label))
 
-        # plot
-        plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
+            # plot
+            plot_performance(outcome=outcome, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
-        # print features by model
-        print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=noise_coeff, bias_delay=bias_delay)
+            # print features by model
+            print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS,
+                                    noise_coeff=noise_coeff, bias_delay=bias_delay)
 
 
 if __name__ == '__main__':

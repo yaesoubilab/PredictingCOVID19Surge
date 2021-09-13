@@ -36,7 +36,7 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, show_y_label, 
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
+def plot_performance(outcome=None, noise_coeff=None, bias_delay=None, fig_size=None):
 
     fig_size = FIG_SIZE if fig_size is None else fig_size
 
@@ -45,8 +45,9 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
         week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
     # read data
-    data = read_csv_rows(file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label),
-                         if_ignore_first_row=True, if_convert_float=True)
+    data = read_csv_rows(
+        file_name=ROOT_DIR+'/outputs/prediction_summary/predicting {}-summary{}.csv'.format(outcome, label),
+        if_ignore_first_row=True, if_convert_float=True)
 
     dict_of_figs = {}
     for row in data:
@@ -88,13 +89,14 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
 
     # Save the figure and show
     plt.tight_layout()
-    plt.savefig(ROOT_DIR+'/outputs/figures/performance{}.png'.format(label))
+    plt.savefig(ROOT_DIR+'/outputs/figures/predicting {}-performance{}.png'.format(outcome, label))
     plt.show()
 
 
 if __name__ == '__main__':
 
-    # noise could be None, 1, or 2
-    plot_performance(noise_coeff=None, fig_size=FIG_SIZE)
-    plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
-    plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
+    for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
+        # noise could be None, 1, or 2
+        plot_performance(outcome=outcome, noise_coeff=None, fig_size=FIG_SIZE)
+        plot_performance(outcome=outcome, noise_coeff=1, fig_size=FIG_SIZE)
+        plot_performance(outcome=outcome,noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
