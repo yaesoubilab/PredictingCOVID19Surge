@@ -6,6 +6,7 @@ from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR, get_dataset_labels
 
 MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
+OUTCOMES = ('Maximum hospitalization rate', 'If hospitalization threshold passed')
 WEEKS = (-12, -8, -4)
 
 CV_FOLD = 20         # num of splits for cross validation
@@ -25,41 +26,44 @@ def evaluate(noise_coeff, bias_delay=None):
     # make prediction at different weeks
     rows = [['Week', 'Model', 'R2', 'error', 'PI']]
 
-    for week in WEEKS:
-        for model in MODELS:
+    for outcome in OUTCOMES:
+        for week in WEEKS:
+            for model in MODELS:
 
-            # find the label
-            label = get_dataset_labels(
-                week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
+                # find the label
+                label = get_dataset_labels(
+                    week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
-            print('Evaluating model {} at {}.'.format(
-                model.name, label))
+                print('Evaluating model {} at {}.'.format(
+                    model.name, label))
 
-            # model zero assumes no noise or bias
-            if model == Zero:
-                best_spec = get_neural_net_best_spec(
-                    week=week, model_spec=model, noise_coeff=None, bias_delay=None,
-                    list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
-                    if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
+                # model zero assumes no noise or bias
+                if model == Zero:
+                    best_spec = get_neural_net_best_spec(
+                        outcome_name=outcome,
+                        week=week, model_spec=model, noise_coeff=None, bias_delay=None,
+                        list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
+                        if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
-            else:
-                best_spec = get_neural_net_best_spec(
-                    week=week, model_spec=model, noise_coeff=noise_coeff, bias_delay=bias_delay,
-                    list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
-                    if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
+                else:
+                    best_spec = get_neural_net_best_spec(
+                        outcome_name=outcome,
+                        week=week, model_spec=model, noise_coeff=noise_coeff, bias_delay=bias_delay,
+                        list_of_alphas=ALPHAS, feature_selection=FEATURE_SELECTION,
+                        if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
-            # store outcomes
-            rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.formattedMeanPI])
+                # store outcomes
+                rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.formattedMeanPI])
 
-    # print summary of results
-    label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
-    write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label))
+        # print summary of results
+        label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
+        write_csv(rows=rows, file_name=ROOT_DIR+'/outputs/prediction_summary/summary{}.csv'.format(label))
 
-    # plot
-    plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
+        # plot
+        plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
 
-    # print features by model
-    print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=noise_coeff, bias_delay=bias_delay)
+        # print features by model
+        print_selected_features(weeks=WEEKS, models=MODELS, noise_coeff=noise_coeff, bias_delay=bias_delay)
 
 
 if __name__ == '__main__':

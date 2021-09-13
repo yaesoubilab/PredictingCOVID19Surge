@@ -4,10 +4,11 @@ import covid_prediction.cross_validation as CV
 from definitions import ROOT_DIR, get_dataset_labels
 
 
-def get_neural_net_best_spec(week, model_spec, noise_coeff, bias_delay,
+def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_delay,
                              list_of_alphas, feature_selection, if_standardize,
                              cv_fold, if_parallel=False):
     """
+    :param outcome_name: (string) 'Maximum hospitalization rate' or 'If hospitalization threshold passed'
     :param week: (int) week when the predictions should be made
     :param model_spec: (ModelSpec) model specifications
     :param noise_coeff: (None or integer)
@@ -36,22 +37,33 @@ def get_neural_net_best_spec(week, model_spec, noise_coeff, bias_delay,
     # randomize rows (since the dataset is ordered based on the likelihood weights)
     df = df.sample(frac=1, random_state=1)
 
+    # scoring and outcome for filenames
+    if outcome_name == 'Maximum hospitalization rate':
+        scoring = None  # use default which is R2 score
+        outcome = 'size'
+    elif outcome_name == 'If hospitalization threshold passed':
+        scoring = 'roc_auc'
+        outcome = 'prob'
+    else:
+        raise ValueError('Invalid outcome to predict.')
+
     # find the best specification
     cv = CV.NeuralNetSpecOptimizer(data=df, feature_names=model_spec.features,
-                                   outcome_name='Maximum hospitalization rate',
+                                   outcome_name=outcome_name,
                                    list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
                                    list_of_alphas=list_of_alphas,
                                    list_of_n_neurons=model_spec.listNumOfNeurons,
                                    feature_selection_method=feature_selection,
                                    cv_fold=cv_fold,
+                                   scoring=scoring,
                                    if_standardize=if_standardize)
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,
-        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-{}-{}.csv'
-            .format(model_spec.name, label),
-        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-{}-{}.csv'
-            .format(model_spec.name, label)
+        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/NN eval-{}-{}-{}.csv'
+            .format(outcome, model_spec.name, label),
+        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/NN features-{}-{}-{}.csv'
+            .format(outcome, model_spec.name, label)
     )
 
     return best_spec

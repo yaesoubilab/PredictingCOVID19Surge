@@ -133,7 +133,7 @@ class NeuralNetSpecOptimizer:
 
     def __init__(self, data, feature_names, outcome_name,
                  list_of_n_features_wanted, list_of_alphas, list_of_n_neurons,
-                 feature_selection_method, cv_fold, if_standardize=True):
+                 feature_selection_method, cv_fold, scoring=None, if_standardize=True):
 
         self.crossValidators = []
         self.crossValidationSummaries = []
@@ -154,7 +154,8 @@ class NeuralNetSpecOptimizer:
                         NeuralNetCrossValidator(
                             preprocessed_data=preprocessed_data,
                             n_features_wanted=n_fs, alpha=alpha, n_neurons=n_neurons,
-                            feature_selection_method=feature_selection_method, cv_fold=cv_fold))
+                            feature_selection_method=feature_selection_method,
+                            cv_fold=cv_fold, scoring=scoring))
 
     def find_best_spec(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
         """ find the best specification for the neural network model
@@ -184,7 +185,7 @@ class NeuralNetSpecOptimizer:
         # find the best specification
         best_spec = None
         max_r2 = float('-inf')
-        summary = [['# features', 'alpha', '# neurons', 'R2', 'R2 and PI']]
+        summary = [['# features', 'alpha', '# neurons', 'Score', 'Score and PI']]
         for s in self.crossValidationSummaries:
             summary.append([s.nFeatures, s.alpha, s.nNeurons, s.meanScore, s.formattedMeanPI])
             if s.meanScore > max_r2:
