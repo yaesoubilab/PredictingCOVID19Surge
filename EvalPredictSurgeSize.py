@@ -10,7 +10,7 @@ OUTCOMES = ('Maximum hospitalization rate', 'If hospitalization threshold passed
 WEEKS = (-12, -8, -4)
 
 CV_FOLD = 10         # num of splits for cross validation
-IF_PARALLEL = False
+IF_PARALLEL = True
 ALPHAS = [0.001]
 IF_STANDARDIZED = True
 FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
