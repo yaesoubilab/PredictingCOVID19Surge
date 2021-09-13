@@ -1,6 +1,6 @@
 from SimPy.InOutFunctions import read_csv_rows, write_csv
 from covid_prediction.model_specs import *
-from definitions import ROOT_DIR, get_dataset_labels
+from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 WEEKS = (-12, -8, -4)
 MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
@@ -22,7 +22,7 @@ ORDER_OF_FEATURES = [
 ]
 
 
-def print_selected_features(outcome, weeks, models, noise_coeff, bias_delay):
+def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_delay):
 
     # read feature names
     feature_names = read_csv_rows(
@@ -56,7 +56,7 @@ def print_selected_features(outcome, weeks, models, noise_coeff, bias_delay):
             else:
                 label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
             filename = '/outputs/prediction_summary/features/features-predicting {}-{}-{}.csv'.format(
-                outcome, model.name, label)
+                short_outcome, model.name, label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
             col_names.append(col_name)
             # read file
@@ -97,12 +97,16 @@ def print_selected_features(outcome, weeks, models, noise_coeff, bias_delay):
     label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
     write_csv(rows=result,
               file_name=ROOT_DIR+'/outputs/prediction_summary/selected features for predicting {}-{}.csv'.format(
-                  outcome, label))
+                  short_outcome, label))
 
 
 if __name__ == '__main__':
 
     for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
-        print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS, noise_coeff=None, bias_delay=None)
-        print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS, noise_coeff=1, bias_delay=None)
-        print_selected_features(outcome=outcome, weeks=WEEKS, models=MODELS, noise_coeff=0.5, bias_delay=4)
+        short_outcome = get_short_outcome(outcome=outcome)
+        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+                                models=MODELS, noise_coeff=None, bias_delay=None)
+        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+                                models=MODELS, noise_coeff=1, bias_delay=None)
+        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+                                models=MODELS, noise_coeff=0.5, bias_delay=4)

@@ -1,7 +1,7 @@
 import pandas as pd
 
 import covid_prediction.cross_validation as CV
-from definitions import ROOT_DIR, get_dataset_labels
+from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 
 def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_delay,
@@ -40,16 +40,17 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     # scoring and outcome for filenames
     if outcome_name == 'Maximum hospitalization rate':
         scoring = None  # use default which is R2 score
-        outcome = 'size'
+        if_outcome_binary = False
     elif outcome_name == 'If hospitalization threshold passed':
         scoring = 'roc_auc'
-        outcome = 'prob'
+        if_outcome_binary = True
     else:
         raise ValueError('Invalid outcome to predict.')
+    short_outcome = get_short_outcome(outcome_name)
 
     # find the best specification
     cv = CV.NeuralNetSpecOptimizer(data=df, feature_names=model_spec.features,
-                                   outcome_name=outcome_name,
+                                   outcome_name=outcome_name, if_outcome_binary=if_outcome_binary,
                                    list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
                                    list_of_alphas=list_of_alphas,
                                    list_of_n_neurons=model_spec.listNumOfNeurons,
@@ -61,9 +62,9 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,
         save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/eval-predicting {}-{}-{}.csv'
-            .format(outcome, model_spec.name, label),
+            .format(short_outcome, model_spec.name, label),
         save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/features-predicting {}-{}-{}.csv'
-            .format(outcome, model_spec.name, label)
+            .format(short_outcome, model_spec.name, label)
     )
 
     return best_spec

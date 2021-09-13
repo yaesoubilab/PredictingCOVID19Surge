@@ -28,15 +28,17 @@ class PreProcessor:
         self.selectedFeatureNames = None
         self.selectedX = None
 
-    def preprocess(self, if_standardize=False, degree_of_polynomial=None):
+    def preprocess(self, y_is_binary=False, if_standardize=False, degree_of_polynomial=None):
         """
+        :param y_is_binary: (bool) set True if y is a binary variable
         :param if_standardize: (bool) set True to standardize features and outcome
         :param degree_of_polynomial: (int >=1 ) to add polynomial terms
         """
 
         if if_standardize:
             self.X = standardize(self._X)
-            self.y = standardize(self._y.reshape(-1, 1)).ravel()
+            if not y_is_binary:
+                self.y = standardize(self._y.reshape(-1, 1)).ravel()
 
         if degree_of_polynomial is not None:
             poly = PolynomialFeatures(degree_of_polynomial)

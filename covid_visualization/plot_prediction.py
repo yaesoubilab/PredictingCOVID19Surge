@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from SimPy.InOutFunctions import read_csv_rows
-from definitions import ROOT_DIR, get_dataset_labels
+from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange', 'red', 'brown']
 FIG_SIZE = (11, 3.6)
@@ -36,7 +36,7 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, show_y_label, 
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance(outcome=None, noise_coeff=None, bias_delay=None, fig_size=None):
+def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_size=None):
 
     fig_size = FIG_SIZE if fig_size is None else fig_size
 
@@ -46,7 +46,7 @@ def plot_performance(outcome=None, noise_coeff=None, bias_delay=None, fig_size=N
 
     # read data
     data = read_csv_rows(
-        file_name=ROOT_DIR+'/outputs/prediction_summary/predicting {}-summary{}.csv'.format(outcome, label),
+        file_name=ROOT_DIR+'/outputs/prediction_summary/predicting {}-summary{}.csv'.format(short_outcome, label),
         if_ignore_first_row=True, if_convert_float=True)
 
     dict_of_figs = {}
@@ -89,7 +89,7 @@ def plot_performance(outcome=None, noise_coeff=None, bias_delay=None, fig_size=N
 
     # Save the figure and show
     plt.tight_layout()
-    plt.savefig(ROOT_DIR+'/outputs/figures/predicting {}-performance{}.png'.format(outcome, label))
+    plt.savefig(ROOT_DIR +'/outputs/figures/predicting {}-performance{}.png'.format(short_outcome, label))
     plt.show()
 
 
@@ -97,6 +97,7 @@ if __name__ == '__main__':
 
     for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
         # noise could be None, 1, or 2
-        plot_performance(outcome=outcome, noise_coeff=None, fig_size=FIG_SIZE)
-        plot_performance(outcome=outcome, noise_coeff=1, fig_size=FIG_SIZE)
-        plot_performance(outcome=outcome,noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
+        short_outcome = get_short_outcome(outcome=outcome)
+        plot_performance(short_outcome=short_outcome, noise_coeff=None, fig_size=FIG_SIZE)
+        plot_performance(short_outcome=short_outcome, noise_coeff=1, fig_size=FIG_SIZE)
+        plot_performance(short_outcome=short_outcome, noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)

@@ -131,7 +131,7 @@ def run_this_cross_validator(cross_validator, i):
 class NeuralNetSpecOptimizer:
     """ class to find the optimal specification for a neural network using cross validation """
 
-    def __init__(self, data, feature_names, outcome_name,
+    def __init__(self, data, feature_names, outcome_name, if_outcome_binary,
                  list_of_n_features_wanted, list_of_alphas, list_of_n_neurons,
                  feature_selection_method, cv_fold, scoring=None, if_standardize=True):
 
@@ -140,7 +140,7 @@ class NeuralNetSpecOptimizer:
 
         # preprocess
         preprocessed_data = PreProcessor(df=data, feature_names=feature_names, y_name=outcome_name)
-        preprocessed_data.preprocess(if_standardize=if_standardize)
+        preprocessed_data.preprocess(y_is_binary=if_outcome_binary, if_standardize=if_standardize)
 
         # send the number of neurons to (number of features + 2)
         # if the number of neurons is not provided

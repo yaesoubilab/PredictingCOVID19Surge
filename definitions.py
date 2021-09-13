@@ -69,3 +69,13 @@ def get_dataset_labels(week, noise_coeff, bias_delay):
         label = 'wk {}'.format(week) + label
 
     return label
+
+
+def get_short_outcome(outcome):
+
+    if outcome == 'Maximum hospitalization rate':
+        return 'size'
+    elif outcome == 'If hospitalization threshold passed':
+        return 'prob'
+    else:
+        raise ValueError('Invalid outcome to predict.')
