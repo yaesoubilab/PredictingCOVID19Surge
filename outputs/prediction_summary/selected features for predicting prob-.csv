@@ -1,9 +1,9 @@
 features,12 weeks until peak | model A,8 weeks until peak | model A,4 weeks until peak | model A,12 weeks until peak | model B1,8 weeks until peak | model B1,4 weeks until peak | model B1
 New hospitalization rate (2-wk average),+,+,+,+,+,+
 New hospitalization rate (4-wk change),+,+,+,+,+,+
-Cumulative hospitalization rate,+,+,+,+,+,+
+Cumulative hospitalization rate,+,+,+,+,-,+
 Cumulative vaccination rate,+,+,+,+,+,+
-% of population susceptible,,,,+,+,+
+% of population susceptible,,,,+,+,-
 % vaccinated among new hospitalizations (2-wk average),,,,,,
 % vaccinated among new hospitalizations (4-wk change),,,,,,
 % novel variant among new infections (2-wk average),,,,,,
