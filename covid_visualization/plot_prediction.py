@@ -10,7 +10,7 @@ X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange
 FIG_SIZE = (11, 3.6)
 
 
-def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, show_y_label, show_y_values):
+def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_y_values):
 
     x_pos = np.arange(len(x_labels))
     ax.scatter(x_pos, ys, c=colors)
@@ -21,10 +21,7 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, show_y_label, 
     ax.text(-0.05, 1.05, panel_label, transform=ax.transAxes,
             size=10, weight='bold')
 
-    if show_y_label:
-        ax.set_ylabel('$R^{2}$ Score')
-    else:
-        ax.set_ylabel(' ')
+    ax.set_ylabel(y_label)
     if not show_y_values:
         ax.set_yticklabels([])
     ax.set_xlabel('Predictive Models')
@@ -75,6 +72,17 @@ def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_
             else:
                 x_labels.append(v[0])
 
+        # y-labels
+        if i == 0:
+            if short_outcome == 'size':
+                y_label = '$R^{2}$ Score'
+            elif short_outcome == 'prob':
+                y_label = 'ROC AUC'
+            else:
+                raise ValueError('Invalid short outcome.')
+        else:
+            y_label = ' '
+
         add_to_ax(ax=axes[i],
                   title=key,
                   panel_label=string.ascii_uppercase[i] + ')',
@@ -82,14 +90,14 @@ def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_
                   ys=[v[1] for v in value],
                   errs=[v[2] for v in value],
                   colors=X_LABEL_COLORS[:len(value)],
-                  show_y_label=True if i == 0 else False,
+                  y_label=y_label,
                   show_y_values=True if i == 0 else False)
 
         i += 1
 
     # Save the figure and show
     plt.tight_layout()
-    plt.savefig(ROOT_DIR +'/outputs/figures/predicting {}-performance{}.png'.format(short_outcome, label))
+    plt.savefig(ROOT_DIR +'/outputs/figures/prediction/{}-performance{}.png'.format(short_outcome, label))
     plt.show()
 
 
