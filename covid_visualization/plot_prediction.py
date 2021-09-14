@@ -8,7 +8,7 @@ from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange', 'red', 'brown']
 Y_LABELS = ['Predicting the size of\nhospitalization peak\n($R^{2}$ Score)',
-            'Predicting if hospital capacity\nwill be exceeded\n(ROC AUC)']
+            'Predicting if hospitalization\ncapacity will be exceeded\n(ROC AUC)']
 FIG_SIZE = (9, 6)
 N_OF_PRED_TIMES = 3 # 12, 8, 4 weeks to peak
 
@@ -131,5 +131,5 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
 if __name__ == '__main__':
 
     plot_performance(noise_coeff=None, fig_size=FIG_SIZE)
-    # plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
-    # plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
+    plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
+    plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)

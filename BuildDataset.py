@@ -2,7 +2,7 @@ from covid_prediction.feature_engineering import *
 from definitions import get_dataset_labels
 
 
-HOSPITALIZATION_THRESHOLD = 0.0001  # per 100,000 population
+HOSPITALIZATION_THRESHOLD = 10.3/100000  # per 100,000 population
 TIME_OF_FALL = 1.5   # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
 SIM_DURATION = 2.25
 
