@@ -9,7 +9,7 @@ MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 OUTCOMES = ('Maximum hospitalization rate', 'If hospitalization threshold passed')
 WEEKS = (-12, -8, -4)
 
-CV_FOLD = 10         # num of splits for cross validation
+CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = True
 ALPHAS = [0.001]
 IF_STANDARDIZED = True

@@ -4,11 +4,11 @@ New hospitalization rate (4-wk change),+,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+,+
 Cumulative hospitalization rate,+,+,+,+,+,+,+,+,+,+,+,+,+,+,-,+,+,+,+,+,+,+,+,+
 Cumulative vaccination rate,-,+,+,+,+,+,+,+,+,-,+,+,+,+,+,-,+,+,+,+,+,+,+,+
 % of population susceptible,+,+,+,,,,+,+,+,,,,,,,,,,,,,,,
-% vaccinated among new hospitalizations (2-wk average),-,+,-,,,,,,,+,+,+,,,,,,,+,-,-,,,
-% vaccinated among new hospitalizations (4-wk change),+,+,-,,,,,,,+,+,-,,,,,,,-,-,-,,,
-% novel variant among new infections (2-wk average),+,-,+,,,,,,,,,,-,+,+,,,,+,+,+,,,
+% vaccinated among new hospitalizations (2-wk average),-,+,-,,,,,,,+,+,+,,,,,,,+,-,+,,,
+% vaccinated among new hospitalizations (4-wk change),+,+,-,,,,,,,+,+,-,,,,,,,-,-,+,,,
+% novel variant among new infections (2-wk average),+,+,+,,,,,,,,,,-,+,+,,,,+,+,+,,,
 % novel variant among new infections (4-wk change),+,+,+,,,,,,,,,,+,+,+,,,,+,+,+,,,
-% novel variant among new hospitalizations (2-wk average),+,+,+,,,,,,,,,,,,,+,+,-,,,,+,+,+
-% novel variant among new hospitalizations (4-wk change),-,+,+,,,,,,,,,,,,,+,+,+,,,,+,+,+
-% of new hospitalizations that are vaccinated and due to novel variant (2-wk average),-,+,+,,,,,,,,,,,,,,,,,,,+,-,+
-% of new hospitalizations that are vaccinated and due to novel variant (4-wk change),-,-,+,,,,,,,,,,,,,,,,,,,+,-,-
+% novel variant among new hospitalizations (2-wk average),+,+,+,,,,,,,,,,,,,+,+,+,,,,+,+,+
+% novel variant among new hospitalizations (4-wk change),-,+,+,,,,,,,,,,,,,+,+,-,,,,+,+,+
+% of new hospitalizations that are vaccinated and due to novel variant (2-wk average),-,-,+,,,,,,,,,,,,,,,,,,,+,-,+
+% of new hospitalizations that are vaccinated and due to novel variant (4-wk change),-,-,-,,,,,,,,,,,,,,,,,,,+,-,-
