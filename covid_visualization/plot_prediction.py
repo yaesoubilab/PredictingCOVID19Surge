@@ -13,7 +13,8 @@ FIG_SIZE = (9, 6)
 N_OF_PRED_TIMES = 3 # 12, 8, 4 weeks to peak
 
 
-def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_y_values, show_x_label):
+def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors,
+              y_range, y_label, show_y_values, show_x_label):
 
     x_pos = np.arange(len(x_labels))
     ax.scatter(x_pos, ys, c=colors)
@@ -31,7 +32,7 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_
         ax.set_xlabel('Predictive Models')
     ax.set_xticks(x_pos)
     ax.set_xticklabels(x_labels)
-    ax.set_ylim((0, 1))
+    ax.set_ylim(y_range)
     ax.set_xlim((-0.5, len(x_labels) - 0.5))
     ax.set_title(title, fontsize=10, fontweight='bold')
     ax.yaxis.grid(True, alpha=0.5)
@@ -75,8 +76,10 @@ def add_performance_for_outcome(axes, short_outcome, panel_labels, show_x_label,
         if i == 0:
             if short_outcome == 'size':
                 y_label = Y_LABELS[0]
+                y_range = (0, 1)
             elif short_outcome == 'prob':
                 y_label = Y_LABELS[1]
+                y_range = (0.5, 1)
             else:
                 raise ValueError('Invalid short outcome.')
         else:
@@ -89,6 +92,7 @@ def add_performance_for_outcome(axes, short_outcome, panel_labels, show_x_label,
                   ys=[v[1] for v in value],
                   errs=[v[2] for v in value],
                   colors=X_LABEL_COLORS[:len(value)],
+                  y_range=y_range,
                   y_label=y_label,
                   show_y_values=True if i == 0 else False,
                   show_x_label=show_x_label)
