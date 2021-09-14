@@ -5,7 +5,7 @@ from covid_prediction.print_features import print_selected_features
 from covid_visualization.plot_prediction import plot_performance
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
-MODELS = (A, B1) # (Zero, A, B1, B2, B3, B4, C1, C2)
+MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
 OUTCOMES = ('Maximum hospitalization rate', 'If hospitalization threshold passed')
 WEEKS = (-12, -8, -4)
 
@@ -63,8 +63,7 @@ def evaluate(noise_coeff, bias_delay=None):
                       .format(short_outcome, label))
 
         # plot
-        plot_performance(short_outcome=short_outcome,
-                         noise_coeff=noise_coeff, bias_delay=bias_delay)
+        plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
 
         # print features by model
         print_selected_features(short_outcome=short_outcome,
