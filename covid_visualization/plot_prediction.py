@@ -7,10 +7,13 @@ from SimPy.InOutFunctions import read_csv_rows
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange', 'red', 'brown']
-FIG_SIZE = (11, 3.6)
+Y_LABELS = ['Predicting the size of\nhospitalization peak\n($R^{2}$ Score)',
+            'Predicting if hospital capacity\nwill be exceeded\n(ROC AUC)']
+FIG_SIZE = (9, 6)
+N_OF_PRED_TIMES = 3 # 12, 8, 4 weeks to peak
 
 
-def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_y_values):
+def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_y_values, show_x_label):
 
     x_pos = np.arange(len(x_labels))
     ax.scatter(x_pos, ys, c=colors)
@@ -24,7 +27,8 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_
     ax.set_ylabel(y_label)
     if not show_y_values:
         ax.set_yticklabels([])
-    ax.set_xlabel('Predictive Models')
+    if show_x_label:
+        ax.set_xlabel('Predictive Models')
     ax.set_xticks(x_pos)
     ax.set_xticklabels(x_labels)
     ax.set_ylim((0, 1))
@@ -33,9 +37,7 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors, y_label, show_
     ax.yaxis.grid(True, alpha=0.5)
 
 
-def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_size=None):
-
-    fig_size = FIG_SIZE if fig_size is None else fig_size
+def add_performance_for_outcome(axes, short_outcome, panel_labels, show_x_label, noise_coeff=None, bias_delay=None):
 
     # find the file name
     label = get_dataset_labels(
@@ -59,9 +61,6 @@ def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_
             # (model, mean, error)
             dict_of_figs[title] = [[row[1], row[2], row[3]]]
 
-    # make the figure
-    fig, axes = plt.subplots(1, len(dict_of_figs), figsize=fig_size)
-
     i = 0
     for key, value in dict_of_figs.items():
 
@@ -75,9 +74,9 @@ def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_
         # y-labels
         if i == 0:
             if short_outcome == 'size':
-                y_label = '$R^{2}$ Score'
+                y_label = Y_LABELS[0]
             elif short_outcome == 'prob':
-                y_label = 'ROC AUC'
+                y_label = Y_LABELS[1]
             else:
                 raise ValueError('Invalid short outcome.')
         else:
@@ -85,27 +84,52 @@ def plot_performance(short_outcome=None, noise_coeff=None, bias_delay=None, fig_
 
         add_to_ax(ax=axes[i],
                   title=key,
-                  panel_label=string.ascii_uppercase[i] + ')',
+                  panel_label=panel_labels[i],
                   x_labels=x_labels,
                   ys=[v[1] for v in value],
                   errs=[v[2] for v in value],
                   colors=X_LABEL_COLORS[:len(value)],
                   y_label=y_label,
-                  show_y_values=True if i == 0 else False)
+                  show_y_values=True if i == 0 else False,
+                  show_x_label=show_x_label)
+
+        i += 1
+
+
+def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
+
+    fig_size = FIG_SIZE if fig_size is None else fig_size
+
+    # make the figure
+    fig, axes = plt.subplots(2, N_OF_PRED_TIMES, figsize=fig_size)
+
+    i = 0
+    for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
+
+        # short outcome
+        short_outcome = get_short_outcome(outcome=outcome)
+
+        # panel labels
+        panel_labels = [string.ascii_uppercase[N_OF_PRED_TIMES*i+j] + ')' for j in range(N_OF_PRED_TIMES)]
+
+        add_performance_for_outcome(
+            axes=axes[i], short_outcome=short_outcome, panel_labels=panel_labels,
+            noise_coeff=noise_coeff, bias_delay=bias_delay,
+            show_x_label=True if i == 1 else 0
+        )
 
         i += 1
 
     # Save the figure and show
-    plt.tight_layout()
-    plt.savefig(ROOT_DIR +'/outputs/figures/prediction/{}-performance{}.png'.format(short_outcome, label))
-    plt.show()
+    label = get_dataset_labels(
+        week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
+    fig.tight_layout()
+    fig.savefig(ROOT_DIR +'/outputs/figures/prediction/{}-performance{}.png'.format(short_outcome, label))
+    fig.show()
 
 
 if __name__ == '__main__':
 
-    for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
-        # noise could be None, 1, or 2
-        short_outcome = get_short_outcome(outcome=outcome)
-        plot_performance(short_outcome=short_outcome, noise_coeff=None, fig_size=FIG_SIZE)
-        plot_performance(short_outcome=short_outcome, noise_coeff=1, fig_size=FIG_SIZE)
-        plot_performance(short_outcome=short_outcome, noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
+    plot_performance(noise_coeff=None, fig_size=FIG_SIZE)
+    # plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
+    # plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
