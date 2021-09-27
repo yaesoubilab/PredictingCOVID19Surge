@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split  # Import train_test_split 
 from sklearn.tree import DecisionTreeClassifier  # Import Decision Tree Classifier
 from sklearn.tree import export_graphviz
 
+from covid_prediction.prediction_models import DecisionTree
+
 # load dataset
 pima = pd.read_csv("pima-indians-diabetes.csv")
 
@@ -19,7 +21,7 @@ y = pima.Outcome  # Target variable
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)  # 70% training and 30% test
 
 # Create Decision Tree classifier object
-clf = DecisionTreeClassifier()
+clf = DecisionTreeClassifier(random_state=1)
 
 # Train Decision Tree Classifier
 clf = clf.fit(X_train, y_train)
@@ -51,4 +53,9 @@ dot_data = export_graphviz(clf,
 graph = pydotplus.graph_from_dot_data(dot_data)
 graph.write_png('diabetes.png')
 
+
+# ----------- testing DecisionTree class -----------
+dt = DecisionTree(df=pima, features=feature_cols, y_name='Outcome')
+dt.run(test_size=0.3, criterion="entropy", max_depth=3, display_decision_path=False)
+dt.performanceTest.print()
 
