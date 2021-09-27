@@ -1,7 +1,9 @@
 import pandas as pd
+import pydotplus
 from sklearn import metrics  # Import scikit-learn metrics module for accuracy calculation
 from sklearn.model_selection import train_test_split  # Import train_test_split function
 from sklearn.tree import DecisionTreeClassifier  # Import Decision Tree Classifier
+from sklearn.tree import export_graphviz
 
 # load dataset
 pima = pd.read_csv("pima-indians-diabetes.csv")
@@ -40,3 +42,13 @@ y_pred = clf.predict(X_test)
 
 # Model Accuracy, how often is the classifier correct?
 print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+
+# ----------- figure ------------
+dot_data = export_graphviz(clf,
+                           out_file=None, filled=True, rounded=True, proportion=True, impurity=False,
+                           special_characters=True, feature_names=feature_cols, class_names=['0','1'])
+
+graph = pydotplus.graph_from_dot_data(dot_data)
+graph.write_png('diabetes.png')
+
+
