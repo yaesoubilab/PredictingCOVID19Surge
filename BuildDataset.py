@@ -1,10 +1,9 @@
 from covid_prediction.feature_engineering import *
-from definitions import get_dataset_labels
+from definitions import get_dataset_labels, FEASIBILITY_PERIOD, SIM_DURATION
 
 
 HOSPITALIZATION_THRESHOLD = 10.3/100000  # per 100,000 population
-TIME_OF_FALL = 1.5   # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
-SIM_DURATION = 2.25
+TIME_OF_FALL = FEASIBILITY_PERIOD
 
 # survey sizes
 N_NOVEL_INCD = 1521
@@ -17,7 +16,8 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                              a negative int for number of weeks before the peak
-    :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
+    :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends;
+        it is assumed that prediction is made at time y0 for an outcome observed during (y0, y1).
     :param hosp_threshold: threshold of hospitalization capacity
     :param noise_coeff: (None or int) if None, the noise model is not added, otherwise, the noise model is
         added with survey size multiplied by add_noise.
@@ -135,18 +135,29 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
 
 
 if __name__ == "__main__":
-    for week_in_fall in (-4, -8, -12):
 
+    # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
+    for week_in_fall in (8, 16, 24, 32):
+        time_of_prediction = TIME_OF_FALL + week_in_fall/52
         build_dataset(week_of_prediction_in_fall=week_in_fall,
-                      pred_period=(TIME_OF_FALL, SIM_DURATION),
+                      pred_period=(time_of_prediction, time_of_prediction+4/52),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD)
 
-        build_dataset(week_of_prediction_in_fall=week_in_fall,
-                      pred_period=(TIME_OF_FALL, SIM_DURATION),
-                      hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                      noise_coeff=1)
+    datasets_for_pred_negative_weeks = False
+    if datasets_for_pred_negative_weeks:
+        # datasets for prediction made at weeks with certain duration until peak
+        for week_until_peak in (-4, -8, -12):
 
-        build_dataset(week_of_prediction_in_fall=week_in_fall,
-                      pred_period=(TIME_OF_FALL, SIM_DURATION),
-                      hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                      noise_coeff=0.5, bias_delay=4)
+            build_dataset(week_of_prediction_in_fall=week_until_peak,
+                          pred_period=(TIME_OF_FALL, SIM_DURATION),
+                          hosp_threshold=HOSPITALIZATION_THRESHOLD)
+
+            build_dataset(week_of_prediction_in_fall=week_until_peak,
+                          pred_period=(TIME_OF_FALL, SIM_DURATION),
+                          hosp_threshold=HOSPITALIZATION_THRESHOLD,
+                          noise_coeff=1)
+
+            build_dataset(week_of_prediction_in_fall=week_until_peak,
+                          pred_period=(TIME_OF_FALL, SIM_DURATION),
+                          hosp_threshold=HOSPITALIZATION_THRESHOLD,
+                          noise_coeff=0.5, bias_delay=4)

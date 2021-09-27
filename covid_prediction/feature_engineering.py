@@ -63,7 +63,7 @@ class FeatureEngineering:
         """
         self.directoryName = dir_of_trajs
         self.weekOfPredInFall = week_of_prediction_in_fall
-        self.predictionPeriodWeek = (int(pred_period[0]*52), int(pred_period[1]*52))
+        self.predictionPeriodWeek = (round(pred_period[0]*52, 0), round(pred_period[1]*52, 0))
         self.hospThreshold = hosp_threshold
         self.namesOfTrajFiles = os.listdir(dir_of_trajs)
 
@@ -111,7 +111,7 @@ class FeatureEngineering:
             if self.weekOfPredInFall < 0:
                 pred_week = peak_week + self.weekOfPredInFall
             else:
-                pred_week = self.predictionPeriodWeek[0] + self.weekOfPredInFall
+                pred_week = self.predictionPeriodWeek[0]
 
             # read values of incidence and prevalence features for this trajectory
             incd_fs = self._get_feature_values(df=df, week=pred_week,
@@ -135,14 +135,20 @@ class FeatureEngineering:
         df = pd.DataFrame(data=all_feature_values,
                           columns=col_labels)
 
-        # save new dataset to file
-        output_dir = Path('outputs/prediction_datasets/')
+        # find directoy
+        if self.weekOfPredInFall < 0:
+            output_dir = Path('outputs/prediction_datasets/time_to_peak/')
+        else:
+            output_dir = Path('outputs/prediction_datasets/week_into_fall/')
+
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # save new dataset to file
         df.to_csv(output_dir / output_file, index=False)
 
         # report correlations
         report_corrs(df=df, outcomes=OUTCOME_LABELS,
-                     csv_file_name='outputs/prediction_datasets/corrs-{}'.format(output_file))
+                     csv_file_name=output_dir / 'corrs-{}'.format(output_file))
 
     def _get_if_threshold_passed_and_max_and_week_of_peak(self, df):
         """
@@ -161,6 +167,9 @@ class FeatureEngineering:
                 if pair[2] > maximum:
                     week = pair[1]
                     maximum = pair[2]
+            # exit loop if prediction period has passed
+            if pair[1] > self.predictionPeriodWeek[1]:
+                break
 
         # decide if surpass the hospitalization threshold
         if_surpass_threshold = 0
