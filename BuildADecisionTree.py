@@ -21,7 +21,7 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth, fig_filename):
 
     # plot the decision path
     dt.plot_decision_path(file_name=fig_filename, simple=True, class_names=['Yes', 'No'],
-                          impurity=True, proportion=False, label='all', precision=6,
+                          impurity=True, proportion=False, label='all', precision=2,
                           shorten_feature_names=SHORT_FEATURE_NAMES)
 
 

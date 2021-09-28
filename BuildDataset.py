@@ -62,20 +62,21 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
         # information for incidence and prevalence features can be provided as
         #   'name of the feature' to calculate the recording at prediction time
         # or
-        #   (feature's name, ('ave', 2), ('slope', 4))
-        # to report the recording at prediction time and
+        #   (feature's name, 100, ('ave', 2), ('slope', 4))
+        # to multiply the column values as needed,
+        # to report the recording at prediction time, and
         # to calculate the average and slope of observations during past weeks
         info_of_incd_fs=[
-            ('Obs: Incidence rate', ('ave', 2), ('slope', 4)),
-            ('Obs: New hospitalization rate', ('ave', 2), ('slope', 4)),
+            ('Obs: Incidence rate', 100000, ('ave', 2), ('slope', 4)),
+            ('Obs: New hospitalization rate', 100000, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations that are vaccinated', err_hosp_vacc, ('ave', 2), ('slope', 4)),
             ('Obs: % of incidence due to novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to Novel-V', err_hosp_vacc, ('ave', 2), ('slope', 4)),
         ],
         info_of_prev_fs=[
-            'Obs: Cumulative hospitalization rate',
-            'Obs: Cumulative vaccination rate',
+            ('Obs: Cumulative hospitalization rate', 100000),
+            ('Obs: Cumulative vaccination rate', 100000),
             ('Obs: Prevalence susceptible', err_prev_susc)],
         info_of_parameter_fs=[
             'R0',
@@ -165,7 +166,6 @@ if __name__ == "__main__":
 
     # build datasets for prediction at certain weeks:
     build_and_combine_datasets(weeks_in_fall=(8, 16, 24, 32))
-
 
     # datasets for prediction at cetain weeks until peak
     datasets_for_pred_negative_weeks = False

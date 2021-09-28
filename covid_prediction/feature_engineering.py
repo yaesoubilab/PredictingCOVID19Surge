@@ -194,10 +194,17 @@ class FeatureEngineering:
         err_model = None # error model
         f_values = []   # feature values
         for info in info_of_features:
+            # multiplier to multiply the value of this column by
+            multiplier = 1
+
             # get the column in trajectory files where the data is located to define features
             if isinstance(info, str):
                 col = df[info]
             elif isinstance(info, tuple):
+                # find multiplier
+                if type(info[1]) == int or type(info[1]) == float:
+                    multiplier = info[1]
+
                 # feature name
                 col = df[info[0]]
                 # find the error model
@@ -214,7 +221,7 @@ class FeatureEngineering:
                 for pair in zip(df['Observation Period'], col):
                     if not np.isnan(pair[1]):
                         if pair[0] <= week:
-                            true_values.append(pair[1])
+                            true_values.append(pair[1]*multiplier)
                             if err_model is None:
                                 observed_values.append(true_values[-1])
                             else:
@@ -225,7 +232,7 @@ class FeatureEngineering:
                 for pair in zip(df['Observation Time'], col):
                     if not np.isnan(pair[1]):
                         if 52 * pair[0] - week < 0.5:
-                            true_values.append(pair[1])
+                            true_values.append(pair[1]*multiplier)
                             if err_model is None:
                                 observed_values.append(true_values[-1])
                             else:
