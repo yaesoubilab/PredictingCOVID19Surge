@@ -1,4 +1,12 @@
 
+SHORT_FEATURE_NAMES = {
+    'Obs: New hospitalization rate-slope-4wk': 'dHosp',
+    'Obs: New hospitalization rate-ave-2wk': 'Hosp',
+    'Obs: Cumulative hospitalization rate': 'sumHosp',
+    'Obs: Cumulative vaccination rate': 'sumVacc'
+}
+
+
 class ModelSpec:
     """
     specifications of predictive models based on the features included,
@@ -94,10 +102,10 @@ Zero = ModelSpec(name='O',
 
 A = ModelSpec(name='A',
               features=[
-                  'Obs: Cumulative vaccination rate',
-                  'Obs: Cumulative hospitalization rate',
                   'Obs: New hospitalization rate-ave-2wk',
-                  'Obs: New hospitalization rate-slope-4wk'
+                  'Obs: New hospitalization rate-slope-4wk',
+                  'Obs: Cumulative hospitalization rate',
+                  'Obs: Cumulative vaccination rate',
               ],
               list_num_of_features_wanted=[4],
               list_num_of_neurons=[5, 7])
