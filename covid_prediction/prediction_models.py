@@ -77,14 +77,19 @@ class DecisionTree(Classifier):
         # update model performance attributes
         self.performanceTest = TreePerformanceSummary(y_test=y_test, y_test_hat=y_test_hat)
 
-    def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True, impurity=False, label=None):
+    def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True,
+                           impurity=False, label=None, precision=3):
         # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
         # print graph of decision tree path
         # a visited node is colored in green, all other nodes are white.
+        if simple:
+            impurity = False
+            label = None
+
         dot_data = export_graphviz(self.model,
                                    out_file=None, feature_names=self.features, class_names=class_names,
                                    proportion=proportion, impurity=impurity, label=label,
-                                   filled=True, rounded=True, special_characters=True)
+                                   filled=True, rounded=True, special_characters=True, precision=precision)
         graph = pydotplus.graph_from_dot_data(dot_data)
 
         if simple:

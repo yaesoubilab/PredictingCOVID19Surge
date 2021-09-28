@@ -174,9 +174,9 @@ class FeatureEngineering:
                 break
 
         # decide if surpass the hospitalization threshold
-        if_surpass_threshold = 0
+        if_surpass_threshold = 1
         if maximum > self.hospThreshold:
-            if_surpass_threshold = 1
+            if_surpass_threshold = 0
 
         return if_surpass_threshold, maximum, week
 
