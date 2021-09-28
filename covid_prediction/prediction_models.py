@@ -54,7 +54,9 @@ class TreePerformanceSummary:
 class DecisionTree(Classifier):
 
     def __init__(self, df, features, y_name):
+
         super().__init__(df, features, y_name)
+        self.model = None
 
     def run(self, test_size=0.2, criterion="mse", max_depth=None, save_decision_path_filename=None):
 
@@ -65,18 +67,18 @@ class DecisionTree(Classifier):
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
 
         # fit model
-        clf = DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, random_state=1)
-        clf.fit(X=x_train, y=y_train)
+        self.model = DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, random_state=1)
+        self.model.fit(X=x_train, y=y_train)
 
         # prediction
-        y_test_hat = clf.predict(x_test)
+        y_test_hat = self.model.predict(x_test)
 
         # update model performance attributes
         self.performanceTest = TreePerformanceSummary(y_test=y_test, y_test_hat=y_test_hat)
 
         if save_decision_path_filename is not None:
-            self._plot_decision_path(model=clf, features=self.features, x_test=x_test,
-                                     file_name=save_decision_path_filename)
+            self.plot_decision_path(features=self.features, x_test=x_test,
+                                    file_name=save_decision_path_filename)
             # # separate tree paths
             # i = 0
             # for datapoint in x_test:
@@ -84,15 +86,36 @@ class DecisionTree(Classifier):
             #                             file_name='{}tree{}.png'.format(output_path, i))
             #     i += 1
 
-    @staticmethod
-    def _plot_decision_path(model, features, x_test, file_name):
+    def plot_decision_path(self, file_name, class_names=None, proportion=True, impurity=False, label=None):
         # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
         # print graph of decision tree path
         # a visited node is colored in green, all other nodes are white.
-        dot_data = export_graphviz(model,
-                                   out_file=None, feature_names=features, class_names=['No', 'Yes'],
+        dot_data = export_graphviz(self.model,
+                                   out_file=None, feature_names=self.features, class_names=class_names,
+                                   proportion=proportion, impurity=impurity, label=label,
                                    filled=True, rounded=True, special_characters=True)
         graph = pydotplus.graph_from_dot_data(dot_data)
+
+        for node in graph.get_node_list():
+            if node.get_attributes().get('label') is None:
+                continue
+            else:
+                split_label = node.get_attributes().get('label').split('<br/>')
+                if len(split_label) == 4:
+                    del(split_label[1])
+                    del(split_label[1])
+                elif len(split_label) == 3:
+                    del(split_label[0])
+                    del(split_label[0])
+
+                # i = 0
+                # while i < len(split_label):
+                #     if split_label[i].startswith('samples') or split_label[i].startswith('value'):
+                #         del(split_label[i])
+                #     else:
+                #         i += 1
+
+                node.set('label', '<br/>'.join(split_label))
 
         # # empty all nodes, i.e.set color to white and number of samples to zero
         # for node in graph.get_node_list():
