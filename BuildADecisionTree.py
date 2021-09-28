@@ -1,6 +1,6 @@
 import pandas as pd
 
-from covid_prediction.model_specs import A, SHORT_FEATURE_NAMES
+from covid_prediction.model_specs import A, B3, SHORT_FEATURE_NAMES
 from covid_prediction.prediction_models import DecisionTree
 from definitions import ROOT_DIR
 
@@ -27,8 +27,9 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth, fig_filename):
 
 if __name__ == '__main__':
 
-    build_a_decision_tree(feature_names=A.features,
-                          outcome_name='If hospitalization threshold passed',
-                          max_depth=5,
-                          fig_filename=ROOT_DIR+'/outputs/figures/trees/model-{}.png'.format(A.name))
+    for model in (A, B3):
+        build_a_decision_tree(feature_names=model.features,
+                              outcome_name='If hospitalization threshold passed',
+                              max_depth=4,
+                              fig_filename=ROOT_DIR+'/outputs/figures/trees/model-{}.png'.format(model.name))
 

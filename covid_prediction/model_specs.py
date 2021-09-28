@@ -3,7 +3,9 @@ SHORT_FEATURE_NAMES = {
     'Obs: New hospitalization rate-slope-4wk': 'dHosp',
     'Obs: New hospitalization rate-ave-2wk': 'Hosp',
     'Obs: Cumulative hospitalization rate': 'sumHosp',
-    'Obs: Cumulative vaccination rate': 'Vacc'
+    'Obs: Cumulative vaccination rate': 'Vacc',
+    'Obs: % of incidence due to novel variant-ave-2wk': 'Novel',
+    'Obs: % of incidence due to novel variant-slope-4wk': 'dNovel'
 }
 
 

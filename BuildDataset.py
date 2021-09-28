@@ -137,13 +137,13 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
         report_corr=report_corr)
 
 
-def build_and_combine_datasets(weeks_in_fall):
+def build_and_combine_datasets(weeks_in_fall, weeks_to_predict=4):
 
     # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
     for week_in_fall in weeks_in_fall:
         time_of_prediction = TIME_OF_FALL + week_in_fall / 52
         build_dataset(week_of_prediction_in_fall=week_in_fall,
-                      pred_period=(time_of_prediction, time_of_prediction + 4 / 52),
+                      pred_period=(time_of_prediction, time_of_prediction + weeks_to_predict / 52),
                       hosp_threshold=HOSPITALIZATION_THRESHOLD,
                       report_corr=False)
 
@@ -165,7 +165,8 @@ def build_and_combine_datasets(weeks_in_fall):
 if __name__ == "__main__":
 
     # build datasets for prediction at certain weeks:
-    build_and_combine_datasets(weeks_in_fall=(8, 16, 24, 32))
+    build_and_combine_datasets(weeks_in_fall=(8, 16, 24, 32),
+                               weeks_to_predict=8)
 
     # datasets for prediction at cetain weeks until peak
     datasets_for_pred_negative_weeks = False
