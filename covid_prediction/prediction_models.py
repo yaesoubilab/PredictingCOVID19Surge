@@ -10,34 +10,25 @@ from sklearn.tree import DecisionTreeClassifier, export_graphviz
 import SimPy.Statistics as Stat
 
 
-def plot_cv_graph(reg, x, y):
-    predicted = cross_val_predict(reg, x, y, cv=10)
-    # visualization
-    fig, ax = plt.subplots()
-    ax.scatter(y, predicted, edgecolors=(0, 0, 0))
-    ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
-    ax.set_xlabel('Measured')
-    ax.set_ylabel('Predicted')
-    plt.show()
-
-
 class Classifier:
+
     def __init__(self, df, features, y_name):
+
         self.features = features
         self.y_name = y_name
         self.df = df
         self.X = np.asarray(self.df[self.features])
         self.y = np.asarray(self.df[self.y_name])
 
-        self.performanceTest = None
+        self.performanceTest = None  # performance summary on the test set
 
-    def _update_linear_performance(self, y_test, y_test_hat, cv_score):
-        """ update model performance for linear regression model & print coefficient/intercept, R-square"""
-        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
-
-    def _update_binary_performance_plot_roc_curve(self, y_test, y_test_hat, y_test_hat_prob=None,
-                                                  model_name=None, display_roc_curve=True):
+    def _update_binary_performance_plot_roc_curve(
+            self, y_test, y_test_hat, y_test_hat_prob=None,
+            model_name=None, display_roc_curve=True):
         """ update performance for classification models & plot roc curve """
+
+        print('Needs to be debugged...')
+
         self.performanceTest = BinaryPerformanceSummary(y_test=y_test,
                                                         y_test_hat=y_test_hat,
                                                         y_test_hat_prob=y_test_hat_prob)
@@ -45,15 +36,107 @@ class Classifier:
             self.performanceTest.plot_roc_curve(model_name=model_name)
 
 
-class MultiClassifiers:
+class TreePerformanceSummary:
+
+    def __init__(self, y_test, y_test_hat):
+
+        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
+        self.sen = tp / (tp + fn)
+        self.spe = tn / (tn + fp)
+        self.accuracy = accuracy_score(y_test, y_test_hat)
+
+    def print(self):
+        print('Accuracy:', self.accuracy)
+        print('Sensitivity:', self.sen)
+        print('Specificity:', self.spe)
+
+
+class DecisionTree(Classifier):
+
     def __init__(self, df, features, y_name):
+        super().__init__(df, features, y_name)
+
+    def run(self, test_size=0.2, criterion="mse", max_depth=None, save_decision_path_filename=None):
+
+        X = np.asarray(self.df[self.features])
+        y = np.asarray(self.df[self.y_name])
+
+        # split train vs. test set
+        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
+
+        # fit model
+        clf = DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, random_state=1)
+        clf.fit(X=x_train, y=y_train)
+
+        # prediction
+        y_test_hat = clf.predict(x_test)
+
+        # update model performance attributes
+        self.performanceTest = TreePerformanceSummary(y_test=y_test, y_test_hat=y_test_hat)
+
+        if save_decision_path_filename is not None:
+            self._plot_decision_path(model=clf, features=self.features, x_test=x_test,
+                                     file_name=save_decision_path_filename)
+            # # separate tree paths
+            # i = 0
+            # for datapoint in x_test:
+            #     self.plot_decision_path(features=self.features, x_test=[datapoint],
+            #                             file_name='{}tree{}.png'.format(output_path, i))
+            #     i += 1
+
+    @staticmethod
+    def _plot_decision_path(model, features, x_test, file_name):
+        # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
+        # print graph of decision tree path
+        # a visited node is colored in green, all other nodes are white.
+        dot_data = export_graphviz(model,
+                                   out_file=None, feature_names=features, class_names=['No', 'Yes'],
+                                   filled=True, rounded=True, special_characters=True)
+        graph = pydotplus.graph_from_dot_data(dot_data)
+
+        # # empty all nodes, i.e.set color to white and number of samples to zero
+        # for node in graph.get_node_list():
+        #     if node.get_attributes().get('label') is None:
+        #         continue
+        #     if 'samples = ' in node.get_attributes()['label']:
+        #         labels = node.get_attributes()['label'].split('<br/>')
+        #         for i, label in enumerate(labels):
+        #             if label.startswith('samples = '):
+        #                 labels[i] = 'samples = 0'
+        #         node.set('label', '<br/>'.join(labels))
+        #         node.set_fillcolor('white')
+        #
+        # samples = x_test
+        # decision_paths = self.model.decision_path(samples)
+        #
+        # for decision_path in decision_paths:
+        #     for n, node_value in enumerate(decision_path.toarray()[0]):
+        #         if node_value == 0:
+        #             continue
+        #         node = graph.get_node(str(n))[0]
+        #         node.set_fillcolor('green')
+        #         labels = node.get_attributes()['label'].split('<br/>')
+        #         for i, label in enumerate(labels):
+        #             if label.startswith('samples = '):
+        #                 labels[i] = 'samples = {}'.format(int(label.split('=')[1]) + 1)
+        #
+        #         node.set('label', '<br/>'.join(labels))
+
+        graph.write_png(file_name)
+
+
+
+# --------------------------------------------
+
+
+class MultiClassifiers:
+
+    def __init__(self, df, features, y_name):
+
         self.df = df
         self.features = features
         self.y_name = y_name
         self.performancesTest = None
-
-    def _update_linear_performances(self, performance_list):
-        self.performancesTest = BootstrapLinearPerformanceSummary(performance_list=performance_list)
 
     def _update_binary_performances_plot_roc_curve(self, performance_list, display_roc_curve):
         self.performancesTest = BootstrapBinaryPerformanceSummary(performance_list=performance_list)
@@ -63,6 +146,28 @@ class MultiClassifiers:
     def _update_decision_tree_performances(self, performance_list):
         self.performancesTest = BootstrapTreePerformanceSummary(performance_list=performance_list)
 
+
+class MultiDecisionTrees(MultiClassifiers):
+    def __init__(self, df, features, y_name):
+        super().__init__(df, features, y_name)
+
+    def run_many(self, num_bootstraps, test_size=0.2, penalty='l2', l1_solver='liblinear', display_roc_curve=True):
+
+        performance_test_list = []
+        i = 0
+        model = DecisionTree(df=self.df, features=self.features, y_name=self.y_name)
+
+        while len(performance_test_list) < num_bootstraps:
+            model.run(test_size=test_size, save_decision_path_filename=False)
+            # append performance
+            performance_test_list.append(model.performanceTest)
+
+            i += 1
+
+        self._update_decision_tree_performances(performance_list=performance_test_list)
+
+
+# ----------------------------------------
 
 class LinearReg(Classifier):
     def __init__(self, df, features, y_name):
@@ -103,7 +208,7 @@ class LinearReg(Classifier):
         cv_score = cross_val_score(estimator=reg, X=self.X, y=self.y)
 
         # update performance
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
+        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
         # if cv:
         #     plot_cv_graph(reg=reg, x=self.X, y=self.y)
@@ -126,7 +231,7 @@ class MultiLinearReg(MultiClassifiers):
 
             i += 1
 
-        self._update_linear_performances(performance_list=performance_test_list)
+        self.performancesTest = BootstrapLinearPerformanceSummary(performance_list=performance_test_list)
 
 
 class LogisticReg(Classifier):
@@ -237,7 +342,7 @@ class NNRegression(Classifier):
         cv_score = cross_val_score(estimator=clf, X=self.X, y=self.y)
 
         # update model performance attributes
-        self._update_linear_performance(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
+        self.performanceTest = LinearPerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, cv_score=cv_score)
 
 
 class MultiNNRegression(MultiClassifiers):
@@ -258,7 +363,7 @@ class MultiNNRegression(MultiClassifiers):
 
             i += 1
 
-        self._update_linear_performances(performance_list=performance_test_list)
+        self.performancesTest = BootstrapLinearPerformanceSummary(performance_list=performance_test_list)
 
 
 class NNClassification(Classifier):
@@ -292,101 +397,6 @@ class NNClassification(Classifier):
         self._update_binary_performance_plot_roc_curve(
             y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
             model_name='neural network', display_roc_curve=display_roc_curve)
-
-
-class DecisionTree(Classifier):
-
-    def __init__(self, df, features, y_name):
-        super().__init__(df, features, y_name)
-
-    def run(self, test_size=0.2, criterion="mse", max_depth=None, display_decision_path=False):
-
-        X = np.asarray(self.df[self.features])
-        y = np.asarray(self.df[self.y_name])
-
-        # split train vs. test set
-        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
-
-        # fit model
-        clf = DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, random_state=1)
-        clf.fit(X=x_train, y=y_train)
-
-        # prediction
-        y_test_hat = clf.predict(x_test)
-
-        # update model performance attributes
-        self.performanceTest = TreePerformanceSummary(y_test=y_test, y_test_hat=y_test_hat, tree_model=clf)
-
-        if display_decision_path:
-            output_path = 'outputs/decision_tree_path/'
-            # combined tree path
-            self.plot_decision_path(features=self.features, x_test=x_test,
-                                    file_name='{}combined_tree.png'.format(output_path))
-            # separate tree paths
-            i = 0
-            for datapoint in x_test:
-                self.plot_decision_path(features=self.features, x_test=[datapoint],
-                                        file_name='{}tree{}.png'.format(output_path, i))
-                i += 1
-
-    def plot_decision_path(self, features, x_test, file_name):
-        # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
-        # print graph of decision tree path
-        # a visited node is colored in green, all other nodes are white.
-        dot_data = export_graphviz(self.model,
-                                   out_file=None, feature_names=features, class_names=['not exceed', 'exceed'],
-                                   filled=True, rounded=True, special_characters=True)
-        graph = pydotplus.graph_from_dot_data(dot_data)
-        # empty all nodes, i.e.set color to white and number of samples to zero
-        for node in graph.get_node_list():
-            if node.get_attributes().get('label') is None:
-                continue
-            if 'samples = ' in node.get_attributes()['label']:
-                labels = node.get_attributes()['label'].split('<br/>')
-                for i, label in enumerate(labels):
-                    if label.startswith('samples = '):
-                        labels[i] = 'samples = 0'
-                node.set('label', '<br/>'.join(labels))
-                node.set_fillcolor('white')
-
-        samples = x_test
-        decision_paths = self.model.decision_path(samples)
-
-        for decision_path in decision_paths:
-            for n, node_value in enumerate(decision_path.toarray()[0]):
-                if node_value == 0:
-                    continue
-                node = graph.get_node(str(n))[0]
-                node.set_fillcolor('green')
-                labels = node.get_attributes()['label'].split('<br/>')
-                for i, label in enumerate(labels):
-                    if label.startswith('samples = '):
-                        labels[i] = 'samples = {}'.format(int(label.split('=')[1]) + 1)
-
-                node.set('label', '<br/>'.join(labels))
-
-        filename = file_name
-        graph.write_png(filename)
-
-
-class MultiDecisionTrees(MultiClassifiers):
-    def __init__(self, df, features, y_name):
-        super().__init__(df, features, y_name)
-
-    def run_many(self, num_bootstraps, test_size=0.2, penalty='l2', l1_solver='liblinear', display_roc_curve=True):
-
-        performance_test_list = []
-        i = 0
-        model = DecisionTree(df=self.df, features=self.features, y_name=self.y_name)
-
-        while len(performance_test_list) < num_bootstraps:
-            model.run(test_size=test_size, display_decision_path=False)
-            # append performance
-            performance_test_list.append(model.performanceTest)
-
-            i += 1
-
-        self._update_decision_tree_performances(performance_list=performance_test_list)
 
 
 class PerformanceSummary:
@@ -497,21 +507,7 @@ class BootstrapBinaryPerformanceSummary(BootstrapPerformanceSummary):
         plt.show()
 
 
-class TreePerformanceSummary(PerformanceSummary):
 
-    def __init__(self, y_test, y_test_hat, tree_model):
-
-        super().__init__(y_test, y_test_hat)
-        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
-        self.sen = tp / (tp + fn)
-        self.spe = tn / (tn + fp)
-        self.accuracy = accuracy_score(y_test, y_test_hat)
-        self.model = tree_model
-
-    def print(self):
-        print('Accuracy:', self.accuracy)
-        print('Sensitivity:', self.sen)
-        print('Specificity:', self.spe)
 
 
 class BootstrapTreePerformanceSummary(BootstrapPerformanceSummary):
@@ -523,3 +519,14 @@ class BootstrapTreePerformanceSummary(BootstrapPerformanceSummary):
     def print(self, decimal=3):
         print('Sensitivity:', self.statSen.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         print('Specificity:', self.statSpe.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
+
+
+def plot_cv_graph(reg, x, y):
+    predicted = cross_val_predict(reg, x, y, cv=10)
+    # visualization
+    fig, ax = plt.subplots()
+    ax.scatter(y, predicted, edgecolors=(0, 0, 0))
+    ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
+    ax.set_xlabel('Measured')
+    ax.set_ylabel('Predicted')
+    plt.show()

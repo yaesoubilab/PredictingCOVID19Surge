@@ -56,6 +56,6 @@ graph.write_png('diabetes.png')
 
 # ----------- testing DecisionTree class -----------
 dt = DecisionTree(df=pima, features=feature_cols, y_name='Outcome')
-dt.run(test_size=0.3, criterion="entropy", max_depth=3, display_decision_path=False)
+dt.run(test_size=0.3, criterion="entropy", max_depth=3, save_decision_path_filename='diabetes2.png')
 dt.performanceTest.print()
 
