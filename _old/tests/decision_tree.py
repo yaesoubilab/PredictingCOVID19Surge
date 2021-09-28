@@ -48,7 +48,8 @@ print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
 # ----------- figure ------------
 dot_data = export_graphviz(clf,
                            out_file=None, filled=True, rounded=True, proportion=True, impurity=False,
-                           special_characters=True, feature_names=feature_cols, class_names=['0','1'])
+                           special_characters=True, feature_names=feature_cols, class_names=['0','1']
+                           )
 
 graph = pydotplus.graph_from_dot_data(dot_data)
 graph.write_png('diabetes.png')

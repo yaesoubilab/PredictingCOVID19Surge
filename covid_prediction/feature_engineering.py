@@ -67,13 +67,14 @@ class FeatureEngineering:
         self.hospThreshold = hosp_threshold
         self.namesOfTrajFiles = os.listdir(dir_of_trajs)
 
-    def pre_process(self, info_of_incd_fs, info_of_prev_fs, info_of_parameter_fs, output_file):
+    def pre_process(self, info_of_incd_fs, info_of_prev_fs, info_of_parameter_fs, output_file, report_corr=True):
         """
         read a trajectory in the assigned the directory and pre-process
         :param info_of_incd_fs: information of incidence features
         :param info_of_prev_fs: information of prevalence features
         :param info_of_parameter_fs: names of parameter feature
         :param output_file: name of output csv
+        :param report_corr: (bool) whether to report correlations between features and outcomes
         """
 
         # find the labels of features
@@ -147,8 +148,9 @@ class FeatureEngineering:
         df.to_csv(output_dir / output_file, index=False)
 
         # report correlations
-        report_corrs(df=df, outcomes=OUTCOME_LABELS,
-                     csv_file_name=output_dir / 'corrs-{}'.format(output_file))
+        if report_corr:
+            report_corrs(df=df, outcomes=OUTCOME_LABELS,
+                         csv_file_name=output_dir / 'corrs-{}'.format(output_file))
 
     def _get_if_threshold_passed_and_max_and_week_of_peak(self, df):
         """
@@ -307,4 +309,4 @@ def report_corrs(df, outcomes, csv_file_name):
 
     df = pd.DataFrame(data=rows,
                       columns=col_labels)
-    df.to_csv(csv_file_name)
+    df.to_csv(csv_file_name, index=False)

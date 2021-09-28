@@ -94,10 +94,10 @@ Zero = ModelSpec(name='O',
 
 A = ModelSpec(name='A',
               features=[
-                  'Obs: New hospitalization rate-ave-2wk',
-                  'Obs: New hospitalization rate-slope-4wk',
+                  'Obs: Cumulative vaccination rate',
                   'Obs: Cumulative hospitalization rate',
-                  'Obs: Cumulative vaccination rate'
+                  'Obs: New hospitalization rate-ave-2wk',
+                  'Obs: New hospitalization rate-slope-4wk'
               ],
               list_num_of_features_wanted=[4],
               list_num_of_neurons=[5, 7])

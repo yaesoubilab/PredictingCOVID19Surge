@@ -8,6 +8,7 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 
 import SimPy.Statistics as Stat
+from SimPy.InOutFunctions import make_directory
 
 
 class Classifier:
@@ -76,16 +77,6 @@ class DecisionTree(Classifier):
         # update model performance attributes
         self.performanceTest = TreePerformanceSummary(y_test=y_test, y_test_hat=y_test_hat)
 
-        if save_decision_path_filename is not None:
-            self.plot_decision_path(features=self.features, x_test=x_test,
-                                    file_name=save_decision_path_filename)
-            # # separate tree paths
-            # i = 0
-            # for datapoint in x_test:
-            #     self.plot_decision_path(features=self.features, x_test=[datapoint],
-            #                             file_name='{}tree{}.png'.format(output_path, i))
-            #     i += 1
-
     def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True, impurity=False, label=None):
         # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
         # print graph of decision tree path
@@ -140,9 +131,11 @@ class DecisionTree(Classifier):
         #
         #         node.set('label', '<br/>'.join(labels))
 
+        # make the directory to save the figure
+        make_directory(filename=file_name)
+
+        # save the figure
         graph.write_png(file_name)
-
-
 
 # --------------------------------------------
 

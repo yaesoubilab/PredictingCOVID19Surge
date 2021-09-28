@@ -1,5 +1,5 @@
 from covid_prediction.feature_engineering import *
-from definitions import get_dataset_labels, FEASIBILITY_PERIOD, SIM_DURATION
+from definitions import ROOT_DIR, get_dataset_labels, FEASIBILITY_PERIOD, SIM_DURATION
 
 
 HOSPITALIZATION_THRESHOLD = 10.3/100000  # per 100,000 population
@@ -12,7 +12,7 @@ N_HOSP_UNVAC = 864
 
 
 def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
-                  noise_coeff=None, bias_delay=None):
+                  noise_coeff=None, bias_delay=None, report_corr=True):
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                              a negative int for number of weeks before the peak
@@ -21,7 +21,8 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
     :param hosp_threshold: threshold of hospitalization capacity
     :param noise_coeff: (None or int) if None, the noise model is not added, otherwise, the noise model is
         added with survey size multiplied by add_noise.
-    :param bias_delay: (None or int): delay (in weeks) of observing the true value
+    :param bias_delay: (None or int) delay (in weeks) of observing the true value
+    :param report_corr: (bool) whether to report correlations between features and outcomes
     """
     # read dataset
     feature_engineer = FeatureEngineering(
@@ -131,18 +132,42 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
             'PD Y1 thresholds-1',
             'Change in contacts - PD Y1'
         ],
-        output_file=output_file)
+        output_file=output_file,
+        report_corr=report_corr)
+
+
+def build_and_combine_datasets(weeks_in_fall):
+
+    # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
+    for week_in_fall in weeks_in_fall:
+        time_of_prediction = TIME_OF_FALL + week_in_fall / 52
+        build_dataset(week_of_prediction_in_fall=week_in_fall,
+                      pred_period=(time_of_prediction, time_of_prediction + 4 / 52),
+                      hosp_threshold=HOSPITALIZATION_THRESHOLD,
+                      report_corr=False)
+
+    # merge the data collected at different weeks to from a
+    # single dataset for training the model
+    dataframes = []
+    for w in weeks_in_fall:
+        dataframes.append(pd.read_csv(
+            ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/data-wk {}.csv'.format(w)))
+    dataset = pd.concat(dataframes)
+    dataset.to_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv',
+                   index=False)
+
+    # report correlation
+    report_corrs(df=dataset, outcomes=OUTCOME_LABELS,
+                 csv_file_name=ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/corr.csv')
 
 
 if __name__ == "__main__":
 
-    # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
-    for week_in_fall in (8, 16, 24, 32):
-        time_of_prediction = TIME_OF_FALL + week_in_fall/52
-        build_dataset(week_of_prediction_in_fall=week_in_fall,
-                      pred_period=(time_of_prediction, time_of_prediction+4/52),
-                      hosp_threshold=HOSPITALIZATION_THRESHOLD)
+    # build datasets for prediction at certain weeks:
+    build_and_combine_datasets(weeks_in_fall=(8, 16, 24, 32))
 
+
+    # datasets for prediction at cetain weeks until peak
     datasets_for_pred_negative_weeks = False
     if datasets_for_pred_negative_weeks:
         # datasets for prediction made at weeks with certain duration until peak
