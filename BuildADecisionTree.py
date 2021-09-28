@@ -11,7 +11,7 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth, fig_filename):
     dataset = pd.read_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv')
 
     # create a decision tree
-    dt = DecisionTree(df=dataset, features=feature_names, y_name=outcome_name)
+    dt = DecisionTree(df=dataset, feature_names=feature_names, y_name=outcome_name)
 
     # train the decision tree
     dt.run(test_size=0.2, criterion="entropy", max_depth=max_depth)
@@ -21,7 +21,7 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth, fig_filename):
 
     # plot the decision path
     dt.plot_decision_path(file_name=fig_filename, simple=True, class_names=['Yes', 'No'],
-                          impurity=True, proportion=False, label='all', precision=2,
+                          impurity=True, proportion=True, label='all', precision=2,
                           shorten_feature_names=SHORT_FEATURE_NAMES)
 
 

@@ -13,56 +13,76 @@ from SimPy.InOutFunctions import make_directory
 
 class Classifier:
 
-    def __init__(self, df, features, y_name):
+    def __init__(self, df, feature_names, y_name):
 
-        self.features = features
-        self.y_name = y_name
+        self.features = feature_names
+        self.yName = y_name
         self.df = df
         self.X = np.asarray(self.df[self.features])
-        self.y = np.asarray(self.df[self.y_name])
+        self.y = np.asarray(self.df[self.yName])
 
         self.performanceTest = None  # performance summary on the test set
 
-    def _update_binary_performance_plot_roc_curve(
-            self, y_test, y_test_hat, y_test_hat_prob=None,
-            model_name=None, display_roc_curve=True):
-        """ update performance for classification models & plot roc curve """
 
-        print('Needs to be debugged...')
-
-        self.performanceTest = BinaryPerformanceSummary(y_test=y_test,
-                                                        y_test_hat=y_test_hat,
-                                                        y_test_hat_prob=y_test_hat_prob)
-        if display_roc_curve:
-            self.performanceTest.plot_roc_curve(model_name=model_name)
-
-
-class TreePerformanceSummary:
-
-    def __init__(self, y_test, y_test_hat):
+class ClassifierPerformance:
+    def __init__(self, y_test, y_test_hat, y_test_hat_prob=None):
+        """
+        :param y_test: (list) of y values in the test set
+        :param y_test_hat: (list) of predicted y values using the test set
+        :param y_test_hat_prob: (list) of probabilities estimated using the test set
+            (for classifiers where such probability can be calcualted)
+        """
+        self.yTest = y_test
+        self.yTestHatProb = y_test_hat_prob
 
         tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
         self.sen = tp / (tp + fn)
         self.spe = tn / (tn + fp)
         self.accuracy = accuracy_score(y_test, y_test_hat)
 
+        self.roc_auc = None
+        if y_test_hat_prob is not None:
+            self.fpr, self.tpr, threshold = roc_curve(y_test, y_test_hat_prob[:, 1], drop_intermediate=False)
+            self.roc_auc = auc(self.fpr, self.tpr)
+
     def print(self):
         print('Accuracy:', self.accuracy)
         print('Sensitivity:', self.sen)
         print('Specificity:', self.spe)
+        if self.roc_auc is not None:
+            print("AUC:", self.roc_auc)
+
+    def plot_roc_curve(self, model_name):
+
+        fpr, tpr, threshold = roc_curve(self.yTest, self.yTestHatProb[:, 1])
+        plt.plot(fpr, tpr, color='green', lw=1, alpha=1)
+        plt.plot([0, 1], [0, 1], color='blue', lw=1, alpha=1, linestyle='--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('ROC curve for {} model'.format(model_name))
+        plt.text(0.7, 0.1, 'AUC: {}'.format(round(self.roc_auc, 2)))
+        plt.show()
 
 
 class DecisionTree(Classifier):
 
-    def __init__(self, df, features, y_name):
+    def __init__(self, df, feature_names, y_name):
+        """
+        :param df: (panda data frame)
+        :param feature_names: (list) of feature names
+        :param y_name: (string) name of outcome to predict
+        """
 
-        super().__init__(df, features, y_name)
+        super().__init__(df, feature_names, y_name)
         self.model = None
 
-    def run(self, test_size=0.2, criterion="mse", max_depth=None, save_decision_path_filename=None):
+    def run(self, test_size=0.2, criterion="mse", max_depth=None):
+        """ train the decision tree and store the summary of performance """
 
         X = np.asarray(self.df[self.features])
-        y = np.asarray(self.df[self.y_name])
+        y = np.asarray(self.df[self.yName])
 
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
@@ -75,23 +95,41 @@ class DecisionTree(Classifier):
         y_test_hat = self.model.predict(x_test)
 
         # update model performance attributes
-        self.performanceTest = TreePerformanceSummary(y_test=y_test, y_test_hat=y_test_hat)
+        self.performanceTest = ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat)
 
     def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True,
                            impurity=False, label=None, precision=3, shorten_feature_names=None):
-        # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
-        # print graph of decision tree path
-        # a visited node is colored in green, all other nodes are white.
+        """
+        plot the decision path
+        :param file_name: (string) filename to save the tree as
+        :param simple: (bool) if True only the decision rule and the prediction are shown in each node
+        :param class_names: (list) names to replace the values of outcome (i.e., [0, 1]) with
+            (for example: ['No', 'Yes']
+        :param proportion: (bool) if True, proportions instead of counts are shown.
+        :param impurity: (bool) if True, show the impurity at each node.
+        :param label: (string) {'all', 'root', 'none'}, to show informative labels for impurity, etc. at each node.
+            'all' to show at every node,
+            'root' to show only at the top root node, or
+            'none' to not show at any node.
+        :param precision: (int) Number of digits of precision for floating point
+            in the values of impurity, threshold and value attributes of each node.
+        :param shorten_feature_names: (dictionary) with keys as features names in the dataset and
+            values as alternative names to replace the original names with
+        """
+
+        # turn of labels and impurity if simple decision tree should be shown
         if simple:
             impurity = False
             label = None
 
+        # export model info into dot data
         dot_data = export_graphviz(self.model,
                                    out_file=None, feature_names=self.features, class_names=class_names,
                                    proportion=proportion, impurity=impurity, label=label,
                                    filled=True, rounded=True, special_characters=True, precision=precision)
         graph = pydotplus.graph_from_dot_data(dot_data)
 
+        # replace the feature names with the alternative names provided
         if shorten_feature_names is not None:
             for node in graph.get_node_list():
                 if node.get_attributes().get('label') is None:
@@ -100,9 +138,9 @@ class DecisionTree(Classifier):
                     split_label = node.get_attributes().get('label').split('<br/>')
                     for key, value in shorten_feature_names.items():
                         split_label[0] = split_label[0].replace(key, value)
-
                 node.set('label', '<br/>'.join(split_label))
 
+        # if a simple decision tree should be shown, remove the impurity and other values.
         if simple:
             for node in graph.get_node_list():
                 if node.get_attributes().get('label') is None:
@@ -110,13 +148,12 @@ class DecisionTree(Classifier):
                 else:
                     split_label = node.get_attributes().get('label').split('<br/>')
                     if len(split_label) == 4:
-                        del(split_label[1])
-                        del(split_label[1])
-                    elif len(split_label) == 3:
-                        del(split_label[0])
-                        del(split_label[0])
+                        del(split_label[1])  # number of samples
+                        del(split_label[1])  # split of sample
+                    elif len(split_label) == 3:  # for a terminating node, no rule is provided
+                        del(split_label[0])  # number of samples
+                        del(split_label[0])  # split of samples
                         split_label[0] = '<' + split_label[0]
-
                     node.set('label', '<br/>'.join(split_label))
 
         # # empty all nodes, i.e.set color to white and number of samples to zero
@@ -153,6 +190,7 @@ class DecisionTree(Classifier):
         # save the figure
         graph.write_png(file_name)
 
+
 # --------------------------------------------
 
 
@@ -182,7 +220,7 @@ class MultiDecisionTrees(MultiClassifiers):
 
         performance_test_list = []
         i = 0
-        model = DecisionTree(df=self.df, features=self.features, y_name=self.y_name)
+        model = DecisionTree(df=self.df, feature_names=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
             model.run(test_size=test_size, save_decision_path_filename=False)
@@ -194,11 +232,9 @@ class MultiDecisionTrees(MultiClassifiers):
         self._update_decision_tree_performances(performance_list=performance_test_list)
 
 
-# ----------------------------------------
-
 class LinearReg(Classifier):
-    def __init__(self, df, features, y_name):
-        super().__init__(df, features, y_name)
+    def __init__(self, df, feature_names, y_name):
+        super().__init__(df, feature_names, y_name)
 
         self.selected_features = None
 
@@ -249,7 +285,7 @@ class MultiLinearReg(MultiClassifiers):
 
         performance_test_list = []
         i = 0
-        model = LinearReg(df=self.df, features=self.features, y_name=self.y_name)
+        model = LinearReg(df=self.df, feature_names=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
             model.run(random_state=i, test_size=test_size, penalty=penalty, alpha=alpha)
@@ -262,14 +298,14 @@ class MultiLinearReg(MultiClassifiers):
 
 
 class LogisticReg(Classifier):
-    def __init__(self, df, features, y_name):
-        super().__init__(df, features, y_name)
+    def __init__(self, df, feature_names, y_name):
+        super().__init__(df, feature_names, y_name)
 
         self.coeffs = None
         self.intercept = None
 
     def run(self, random_state,
-            test_size=0.2, penalty='l2', l1_solver='liblinear', C=0.1, display_roc_curve=True):
+            test_size=0.2, penalty='l2', l1_solver='liblinear', C=0.1):
         """
         :param random_state: random state number
         :param l1_solver: solver that handle 'l1' penalty. 'liblinear' good for small dataset, 'sage' good for large set
@@ -300,9 +336,9 @@ class LogisticReg(Classifier):
         y_test_hat_prob = LR.predict_proba(x_test)
 
         # update model performance attributes
-        self._update_binary_performance_plot_roc_curve(
-            y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
-            model_name='logistic regression', display_roc_curve=display_roc_curve)
+        self.performanceTest = ClassifierPerformance(y_test=y_test,
+                                                     y_test_hat=y_test_hat,
+                                                     y_test_hat_prob=y_test_hat_prob)
 
 
 class MultiLogisticReg(MultiClassifiers):
@@ -317,7 +353,7 @@ class MultiLogisticReg(MultiClassifiers):
 
         performance_test_list = []
         i = 0
-        model = LogisticReg(df=self.df, features=self.features, y_name=self.y_name)
+        model = LogisticReg(df=self.df, feature_names=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
             model.run(random_state=i, test_size=test_size,
@@ -332,8 +368,8 @@ class MultiLogisticReg(MultiClassifiers):
 
 
 class NNRegression(Classifier):
-    def __init__(self, df, features, y_name, len_neurons=None):
-        super().__init__(df, features, y_name)
+    def __init__(self, df, feature_names, y_name, len_neurons=None):
+        super().__init__(df, feature_names, y_name)
 
         self.len_neurons = len_neurons if len_neurons is not None else len(self.features) + 2
 
@@ -380,7 +416,7 @@ class MultiNNRegression(MultiClassifiers):
                  alpha=0.0001, max_iter=1000, test_size=0.2):
         performance_test_list = []
         i = 0
-        model = NNRegression(df=self.df, features=self.features, y_name=self.y_name)
+        model = NNRegression(df=self.df, feature_names=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
             model.run(random_state=i, test_size=test_size,
@@ -394,12 +430,12 @@ class MultiNNRegression(MultiClassifiers):
 
 
 class NNClassification(Classifier):
-    def __init__(self, df, features, y_name, len_neurons=None):
-        super().__init__(df, features, y_name)
+    def __init__(self, df, feature_names, y_name, len_neurons=None):
+        super().__init__(df, feature_names, y_name)
 
         self.len_neurons = len_neurons
 
-    def run(self, random_state, test_size=0.2, activation='logistic', solver='adam', display_roc_curve=True):
+    def run(self, random_state, test_size=0.2, activation='logistic', solver='adam'):
         # split train vs. test set
         x_train, x_test, y_train, y_test = train_test_split(self.X, self.y,
                                                             test_size=test_size,
@@ -421,20 +457,9 @@ class NNClassification(Classifier):
         y_test_hat_prob = clf.predict_proba(X=x_test)
 
         # update model performance attributes
-        self._update_binary_performance_plot_roc_curve(
-            y_test=y_test, y_test_hat=y_test_hat, y_test_hat_prob=y_test_hat_prob,
-            model_name='neural network', display_roc_curve=display_roc_curve)
-
-
-class PerformanceSummary:
-    def __init__(self, y_test, y_test_hat, y_test_hat_prob=None):
-        """
-        :param y_test: list of true ys for model validation
-        :param y_test_hat: list of predicted ys (binary)
-        """
-        self.y_test = y_test
-        self.y_test_hat = y_test_hat
-        self.y_test_hat_prob = y_test_hat_prob
+        self.performanceTest = ClassifierPerformance(y_test=y_test,
+                                                     y_test_hat=y_test_hat,
+                                                     y_test_hat_prob=y_test_hat_prob)
 
 
 class BootstrapPerformanceSummary:
@@ -443,7 +468,7 @@ class BootstrapPerformanceSummary:
         self.performances = performance_list
 
 
-class LinearPerformanceSummary(PerformanceSummary):
+class LinearPerformanceSummary(ClassifierPerformance):
     def __init__(self, y_test, y_test_hat, cv_score):
         super().__init__(y_test, y_test_hat)
         self.r2 = r2_score(y_true=y_test, y_pred=y_test_hat)
@@ -473,33 +498,6 @@ class BootstrapLinearPerformanceSummary(BootstrapPerformanceSummary):
         print('R2:', self.statR2.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         print('CV-R2:', self.statCV.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
         # print('MSE:', self.statMSE.get_formatted_mean_and_interval(deci=decimal, interval_type="p"))
-
-
-class BinaryPerformanceSummary(PerformanceSummary):
-    def __init__(self, y_test, y_test_hat, y_test_hat_prob):
-        super().__init__(y_test, y_test_hat, y_test_hat_prob)
-        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
-        self.sen = tp / (tp + fn)
-        self.spe = tn / (tn + fp)
-        self.fpr, self.tpr, threshold = roc_curve(y_test, y_test_hat_prob[:, 1], drop_intermediate=False)
-        self.roc_auc = auc(self.fpr, self.tpr)
-
-    def print(self):
-        # print("Sensitivity:", self.sen)
-        # print("Specificity:", self.spe)
-        print("AUC:", self.roc_auc)
-
-    def plot_roc_curve(self, model_name):
-        fpr, tpr, threshold = roc_curve(self.y_test, self.y_test_hat_prob[:, 1])
-        plt.plot(fpr, tpr, color='green', lw=1, alpha=1)
-        plt.plot([0, 1], [0, 1], color='blue', lw=1, alpha=1, linestyle='--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('ROC curve for {} model'.format(model_name))
-        plt.text(0.7, 0.1, 'AUC: {}'.format(round(self.roc_auc, 2)))
-        plt.show()
 
 
 class BootstrapBinaryPerformanceSummary(BootstrapPerformanceSummary):
@@ -532,9 +530,6 @@ class BootstrapBinaryPerformanceSummary(BootstrapPerformanceSummary):
                                            round(auc_PI[0], 2), round(auc_PI[1], 2)),
                  ha="right", va="bottom", fontsize=10)
         plt.show()
-
-
-
 
 
 class BootstrapTreePerformanceSummary(BootstrapPerformanceSummary):

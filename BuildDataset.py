@@ -76,7 +76,7 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
         ],
         info_of_prev_fs=[
             ('Obs: Cumulative hospitalization rate', 100000),
-            ('Obs: Cumulative vaccination rate', 100000),
+            ('Obs: Cumulative vaccination rate', 1),
             ('Obs: Prevalence susceptible', err_prev_susc)],
         info_of_parameter_fs=[
             'R0',
