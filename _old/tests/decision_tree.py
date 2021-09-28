@@ -58,6 +58,6 @@ graph.write_png('diabetes.png')
 dt = DecisionTree(df=pima, features=feature_cols, y_name='Outcome')
 dt.run(test_size=0.3, criterion="entropy", max_depth=3)
 dt.performanceTest.print()
-dt.plot_decision_path(file_name='diabetes2.png', class_names=['0', '1'], impurity=False, proportion=False,
-                      label='none')
+dt.plot_decision_path(file_name='diabetes2.png', simple=True, class_names=['0', '1'],
+                      impurity=False, proportion=False, label='none')
 

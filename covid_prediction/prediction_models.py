@@ -86,7 +86,7 @@ class DecisionTree(Classifier):
             #                             file_name='{}tree{}.png'.format(output_path, i))
             #     i += 1
 
-    def plot_decision_path(self, file_name, class_names=None, proportion=True, impurity=False, label=None):
+    def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True, impurity=False, label=None):
         # ref: https://stackoverflow.com/questions/55878247/how-to-display-the-path-of-a-decision-tree-for-test-samples
         # print graph of decision tree path
         # a visited node is colored in green, all other nodes are white.
@@ -96,26 +96,21 @@ class DecisionTree(Classifier):
                                    filled=True, rounded=True, special_characters=True)
         graph = pydotplus.graph_from_dot_data(dot_data)
 
-        for node in graph.get_node_list():
-            if node.get_attributes().get('label') is None:
-                continue
-            else:
-                split_label = node.get_attributes().get('label').split('<br/>')
-                if len(split_label) == 4:
-                    del(split_label[1])
-                    del(split_label[1])
-                elif len(split_label) == 3:
-                    del(split_label[0])
-                    del(split_label[0])
+        if simple:
+            for node in graph.get_node_list():
+                if node.get_attributes().get('label') is None:
+                    continue
+                else:
+                    split_label = node.get_attributes().get('label').split('<br/>')
+                    if len(split_label) == 4:
+                        del(split_label[1])
+                        del(split_label[1])
+                    elif len(split_label) == 3:
+                        del(split_label[0])
+                        del(split_label[0])
+                        split_label[0] = '<' + split_label[0]
 
-                # i = 0
-                # while i < len(split_label):
-                #     if split_label[i].startswith('samples') or split_label[i].startswith('value'):
-                #         del(split_label[i])
-                #     else:
-                #         i += 1
-
-                node.set('label', '<br/>'.join(split_label))
+                    node.set('label', '<br/>'.join(split_label))
 
         # # empty all nodes, i.e.set color to white and number of samples to zero
         # for node in graph.get_node_list():
