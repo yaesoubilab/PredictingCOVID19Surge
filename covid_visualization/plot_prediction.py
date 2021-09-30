@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from SimPy.InOutFunctions import read_csv_rows
+from SimPy.Statistics import SummaryStat
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange', 'red', 'brown']
@@ -19,7 +20,7 @@ def add_to_ax(ax, title, panel_label, x_labels, ys, errs, colors,
     x_pos = np.arange(len(x_labels))
     ax.scatter(x_pos, ys, c=colors)
     for pos, y, err, color in zip(x_pos, ys, errs, colors):
-        ax.errorbar(pos, y, yerr=err, fmt="o", c=color)
+        ax.errorbar(pos, y, yerr=[[err[0]], [err[1]]], fmt="o", c=color)
 
     # labels
     ax.text(-0.05, 1.05, panel_label, transform=ax.transAxes,
@@ -46,7 +47,7 @@ def add_performance_for_outcome(axes, short_outcome, panel_labels, show_x_label,
 
     # read data
     data = read_csv_rows(
-        file_name=ROOT_DIR+'/outputs/prediction_summary/predicting {}-summary{}.csv'.format(short_outcome, label),
+        file_name=ROOT_DIR+'/outputs/prediction_summary/neu_net/predicting {}-summary{}.csv'.format(short_outcome, label),
         if_ignore_first_row=True, if_convert_float=True)
 
     dict_of_figs = {}
@@ -56,11 +57,15 @@ def add_performance_for_outcome(axes, short_outcome, panel_labels, show_x_label,
         else:
             title = '{} Weeks into Fall'.format(int(row[0]))
 
+        # error in form [a, b]
+        err = SummaryStat.get_array_from_formatted_interval(interval=row[3])
+
         if title in dict_of_figs:
-            dict_of_figs[title].append([row[1], row[2], row[3]])
+
+            dict_of_figs[title].append([row[1], row[2], err])
         else:
             # (model, mean, error)
-            dict_of_figs[title] = [[row[1], row[2], row[3]]]
+            dict_of_figs[title] = [[row[1], row[2], err]]
 
     i = 0
     for key, value in dict_of_figs.items():
@@ -128,12 +133,12 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
     label = get_dataset_labels(
         week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
     fig.tight_layout()
-    fig.savefig(ROOT_DIR +'/outputs/figures/prediction/{}-performance{}.png'.format(short_outcome, label))
+    fig.savefig(ROOT_DIR +'/outputs/figures/prediction/neu_net/{}-performance{}.png'.format(short_outcome, label))
     fig.show()
 
 
 if __name__ == '__main__':
 
     plot_performance(noise_coeff=None, fig_size=FIG_SIZE)
-    plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
-    plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)
+    # plot_performance(noise_coeff=1, fig_size=FIG_SIZE)
+    # plot_performance(noise_coeff=0.5, bias_delay=4, fig_size=FIG_SIZE)

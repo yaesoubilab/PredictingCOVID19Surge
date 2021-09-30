@@ -23,7 +23,7 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     # read dataset
     label = get_dataset_labels(
         week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
-    df = pd.read_csv('{}/outputs/prediction_datasets/data-{}.csv'.format(ROOT_DIR, label))
+    df = pd.read_csv('{}/outputs/prediction_datasets/time_to_peak/data-{}.csv'.format(ROOT_DIR, label))
 
     # use all features if no feature name is provided
     if model_spec.features is None:
@@ -49,21 +49,21 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     short_outcome = get_short_outcome(outcome_name)
 
     # find the best specification
-    cv = CV.NeuralNetSpecOptimizer(data=df, feature_names=model_spec.features,
-                                   outcome_name=outcome_name, if_outcome_binary=if_outcome_binary,
-                                   list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
-                                   list_of_alphas=list_of_alphas,
-                                   list_of_n_neurons=model_spec.listNumOfNeurons,
-                                   feature_selection_method=feature_selection,
-                                   cv_fold=cv_fold,
-                                   scoring=scoring,
-                                   if_standardize=if_standardize)
+    cv = CV.NeuralNetParameterOptimizer(df=df, feature_names=model_spec.features,
+                                        outcome_name=outcome_name, if_outcome_binary=if_outcome_binary,
+                                        list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
+                                        list_of_alphas=list_of_alphas,
+                                        list_of_n_neurons=model_spec.listNumOfNeurons,
+                                        feature_selection_method=feature_selection,
+                                        cv_fold=cv_fold,
+                                        scoring=scoring,
+                                        if_standardize=if_standardize)
 
     best_spec = cv.find_best_spec(
         run_in_parallel=if_parallel,
-        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/cv/eval-predicting {}-{}-{}.csv'
+        save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/neu_net/cv/eval-predicting {}-{}-{}.csv'
             .format(short_outcome, model_spec.name, label),
-        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/features/features-predicting {}-{}-{}.csv'
+        save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/neu_net/features/features-predicting {}-{}-{}.csv'
             .format(short_outcome, model_spec.name, label)
     )
 

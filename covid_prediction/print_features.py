@@ -55,7 +55,7 @@ def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_dela
                 label = get_dataset_labels(week=week, noise_coeff=None, bias_delay=None)
             else:
                 label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
-            filename = '/outputs/prediction_summary/features/features-predicting {}-{}-{}.csv'.format(
+            filename = '/outputs/prediction_summary/neu_net/features/features-predicting {}-{}-{}.csv'.format(
                 short_outcome, model.name, label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
             col_names.append(col_name)
