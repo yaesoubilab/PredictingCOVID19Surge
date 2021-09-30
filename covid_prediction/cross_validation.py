@@ -2,6 +2,7 @@ import multiprocessing as mp
 
 from sklearn.model_selection import cross_val_score
 from sklearn.neural_network import MLPRegressor
+from sklearn.tree import DecisionTreeClassifier
 
 from SimPy.InOutFunctions import write_csv
 from SimPy.Statistics import SummaryStat
@@ -11,7 +12,7 @@ MAX_PROCESSES = mp.cpu_count()  # maximum number of processors
 
 
 class _CrossValidSummary:
-    """ cross validation information """
+    """ cross validation results """
     def __init__(self, n_features):
         """
         :param n_features: (int) number of features
@@ -19,13 +20,12 @@ class _CrossValidSummary:
 
         self.nFeatures = n_features
 
-        self.scores = None
-        self.summaryStat = None
-        self.selectedFeatures = None
-        self.meanScore = None
-        self.error = None
+        self.scores = None  # list of scores (R2, ROC_AUC, etc.) from cross validation iterations
+        self.summaryStat = None  # summary statistics of scores
+        self.selectedFeatures = None  # features uses in the model evaluated in cross validation
+        self.meanScore = None   # mean of scores
         self.PI = None
-        self.formattedMeanPI = None
+        self.formattedMeanPI = None  # formatted mean and percentile interval for the score
 
     def add_cv_performance(self, scores, deci=4, selected_features=None):
         """
@@ -40,12 +40,11 @@ class _CrossValidSummary:
         self.selectedFeatures = selected_features
         self.meanScore = self.summaryStat.get_mean()
         self.PI = self.summaryStat.get_PI(alpha=0.05)
-        self.error = 0.5*(self.PI[1] - self.PI[0])
         self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type='c')
 
 
 class LinRegCVSummary(_CrossValidSummary):
-    """ linear regression cross-validation performance summary """
+    """ results of linear regression cross-validation """
 
     def __init__(self, penalty, poly_degree, n_features, f_s_method):
 
@@ -57,7 +56,7 @@ class LinRegCVSummary(_CrossValidSummary):
 
 
 class NeuralNetCVSummary(_CrossValidSummary):
-    """ neural network cross-validation performance summary """
+    """ results of neural network cross-validation """
 
     def __init__(self, n_features, alpha, n_neurons):
 
@@ -66,45 +65,43 @@ class NeuralNetCVSummary(_CrossValidSummary):
         self.nNeurons = n_neurons
 
 
-class NeuralNetCrossValidator:
-    """ class to run cross validation on a neural network model """
+class DecTreeCVSummary(_CrossValidSummary):
+    """ results of decision tree cross-validation """
 
-    def __init__(self, preprocessed_data,
-                 n_features_wanted, alpha, n_neurons,
-                 feature_selection_method, cv_fold, scoring=None):
+    def __init__(self, n_features, max_depth):
+        # TODO: max_depth is a parameter that could be optimized through cross-validation,
+        #   what are the other parameters of decision trees that should be optimize?
+
+        super().__init__(n_features=n_features)
+        self.maxDepth = max_depth
+
+
+class CrossValidator:
+    """ class to run cross validation """
+
+    def __init__(self, preprocessed_data, n_features_wanted, feature_selection_method, cv_fold, scoring):
         """
         :param preprocessed_data: (PreProcessor)
-        :param n_features_wanted:
-        :param alpha:
-        :param n_neurons:
-        :param feature_selection_method:
+        :param n_features_wanted: (int)
+        :param feature_selection_method: (string) 'rfe', 'lasso', or 'pi'
         :param cv_fold: (int) number of cross validation folds
-        :param scoring: (string) if not specified, will use 'R2 score' for prediction problem.
-                Set to 'roc_auc' for classification problem
+        :param scoring: (string) from: https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
         """
+
         assert isinstance(preprocessed_data, PreProcessor)
 
         self.preProcessedData = preprocessed_data
         self.nFeatures = n_features_wanted
-        self.alpha = alpha
-        self.nNeurons = n_neurons
         self.featureSelection = feature_selection_method
         self.cvFold = cv_fold
         self.scoring = scoring
-
         self.performanceSummary = None
 
-    def go(self):
-        """ performs cross validation and calculates the R2 scores """
-
-        # make a performance object
-        self.performanceSummary = NeuralNetCVSummary(
-            n_features=self.nFeatures, alpha=self.alpha, n_neurons=self.nNeurons)
-
-        # construct a neural network model
-        model = MLPRegressor(alpha=self.alpha, hidden_layer_sizes=(self.nNeurons,),
-                             max_iter=1000, solver='sgd', activation='logistic',
-                             random_state=0)
+    def _do_cross_validation(self, model):
+        """
+        performs cross validation on the provided model
+        :param model: (regression or classification model)
+        """
 
         # feature selection
         self.preProcessedData.feature_selection(
@@ -121,6 +118,82 @@ class NeuralNetCrossValidator:
         self.performanceSummary.add_cv_performance(scores=cv_score_list,
                                                    deci=2,
                                                    selected_features=self.preProcessedData.selectedFeatureNames)
+
+
+class NeuralNetCrossValidator(CrossValidator):
+    """ class to run cross validation on a neural network model """
+
+    def __init__(self, preprocessed_data, feature_selection_method, cv_fold, scoring, n_features_wanted,
+                 alpha, n_neurons):
+        """
+        :param preprocessed_data: (PreProcessor)
+        :param n_features_wanted: (int)
+        :param feature_selection_method: (string) 'rfe', 'lasso', or 'pi'
+        :param cv_fold: (int) number of cross validation folds
+        :param scoring: (string) from: https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
+        :param alpha:
+        :param n_neurons:
+        """
+
+        CrossValidator.__init__(self,
+                                preprocessed_data=preprocessed_data,
+                                n_features_wanted=n_features_wanted,
+                                feature_selection_method=feature_selection_method,
+                                cv_fold=cv_fold, scoring=scoring)
+
+        self.alpha = alpha
+        self.nNeurons = n_neurons
+
+    def go(self):
+        """ performs cross validation and calculates the scores """
+
+        # make a performance object
+        self.performanceSummary = NeuralNetCVSummary(
+            n_features=self.nFeatures, alpha=self.alpha, n_neurons=self.nNeurons)
+
+        # construct a neural network model
+        model = MLPRegressor(alpha=self.alpha, hidden_layer_sizes=(self.nNeurons,),
+                             max_iter=1000, solver='sgd', activation='logistic',
+                             random_state=0)
+
+        # perform cross validation on this model
+        self._do_cross_validation(model=model)
+
+
+class DecTreeCrossValidator(CrossValidator):
+    """ class to run cross validation on a decision tree model """
+
+    def __init__(self, preprocessed_data, feature_selection_method, cv_fold, scoring, n_features_wanted,
+                 max_depth):
+        """
+        :param preprocessed_data: (PreProcessor)
+        :param n_features_wanted: (int)
+        :param feature_selection_method: (string) 'rfe', 'lasso', or 'pi'
+        :param cv_fold: (int) number of cross validation folds
+        :param scoring: (string) from: https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
+        :param max_depth: (int) maximum depth of the decision tree
+        """
+
+        CrossValidator.__init__(self,
+                                preprocessed_data=preprocessed_data,
+                                n_features_wanted=n_features_wanted,
+                                feature_selection_method=feature_selection_method,
+                                cv_fold=cv_fold, scoring=scoring)
+
+        self.maxDepth = max_depth
+
+    def go(self):
+        """ performs cross validation and calculates the scores """
+
+        # make a performance object
+        self.performanceSummary = DecTreeCVSummary(
+            n_features=self.nFeatures, max_depth=self.maxDepth)
+
+        # construct a decision tree model
+        model = DecisionTreeClassifier(max_depth=self.maxDepth, random_state=0)
+
+        # perform cross validation on this model
+        self._do_cross_validation(model=model)
 
 
 def run_this_cross_validator(cross_validator, i):

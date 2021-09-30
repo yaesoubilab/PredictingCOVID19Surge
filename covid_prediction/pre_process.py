@@ -10,7 +10,13 @@ def standardize(x):
 
 
 class PreProcessor:
+    """ class to perform pre-processing steps """
     def __init__(self, df, feature_names, y_name):
+        """
+        :param df: (panda DataFrame)
+        :param feature_names: (list) of feature names to be included
+        :param y_name: (string) name of the outcome
+        """
 
         self._df = df
         self._feature_names = feature_names
@@ -18,9 +24,10 @@ class PreProcessor:
         self._X = np.asarray(self._df[self._feature_names])
         self._y = np.asarray(self._df[self._yName])
 
-        # x, df, features after preprocess
+        # x, df, features after preprocessing
+        # for now, we set them to the default values
         self.df = self._df
-        self.X = self._X        # X after standardization
+        self.X = self._X
         self.y = self._y.ravel()
         self.feature_name = self._feature_names
 
@@ -30,7 +37,7 @@ class PreProcessor:
 
     def preprocess(self, y_is_binary=False, if_standardize=False, degree_of_polynomial=None):
         """
-        :param y_is_binary: (bool) set True if y is a binary variable
+        :param y_is_binary: (bool) set True if outcome is a binary variable
         :param if_standardize: (bool) set True to standardize features and outcome
         :param degree_of_polynomial: (int >=1 ) to add polynomial terms
         """
@@ -52,7 +59,8 @@ class PreProcessor:
 
     def feature_selection(self, estimator, method, num_fs_wanted=10):
         """
-        :param estimator
+        :param estimator: a supervised learning estimator with a fit method that provides
+            information about feature importance
         :param method: 'rfe', 'lasso', and 'pi'
         :param num_fs_wanted: number of significant features want to select
         """

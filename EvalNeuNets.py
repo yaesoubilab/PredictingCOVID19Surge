@@ -26,7 +26,7 @@ def evaluate(noise_coeff, bias_delay=None):
     for outcome in OUTCOMES:
         short_outcome = get_short_outcome(outcome)
         # make prediction at different weeks
-        rows = [['Week', 'Model', 'Score', 'error', 'PI']]
+        rows = [['Week', 'Model', 'Score', 'PI', 'Formatted PI']]
 
         for week in WEEKS:
             for model in MODELS:
@@ -54,7 +54,7 @@ def evaluate(noise_coeff, bias_delay=None):
                         if_standardize=IF_STANDARDIZED, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 
                 # store outcomes
-                rows.append([week, model.name, best_spec.meanScore, best_spec.error, best_spec.formattedMeanPI])
+                rows.append([week, model.name, best_spec.meanScore, best_spec.PI, best_spec.formattedMeanPI])
 
             # print summary of results
             label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
