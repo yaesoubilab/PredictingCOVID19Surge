@@ -96,7 +96,7 @@ def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_dela
 
     label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
     write_csv(rows=result,
-              file_name=ROOT_DIR+'/outputs/prediction_summary/selected features for predicting {}-{}.csv'.format(
+              file_name=ROOT_DIR+'/outputs/prediction_summary/neu_net/selected features for predicting {}-{}.csv'.format(
                   short_outcome, label))
 
 

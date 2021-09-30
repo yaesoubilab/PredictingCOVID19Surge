@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from SimPy.InOutFunctions import read_csv_rows
+from SimPy.Plots.FigSupport import output_figure
 from SimPy.Statistics import SummaryStat
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
@@ -58,14 +59,15 @@ def add_performance_for_outcome(axes, short_outcome, panel_labels, show_x_label,
             title = '{} Weeks into Fall'.format(int(row[0]))
 
         # error in form [a, b]
-        err = SummaryStat.get_array_from_formatted_interval(interval=row[3])
+        confidence_interval = SummaryStat.get_array_from_formatted_interval(interval=row[3])
+        error = [row[2]-confidence_interval[0], confidence_interval[1]-row[2]]
 
         if title in dict_of_figs:
-
-            dict_of_figs[title].append([row[1], row[2], err])
+            # (model, mean, error)
+            dict_of_figs[title].append([row[1], row[2], error])
         else:
             # (model, mean, error)
-            dict_of_figs[title] = [[row[1], row[2], err]]
+            dict_of_figs[title] = [[row[1], row[2], error]]
 
     i = 0
     for key, value in dict_of_figs.items():
@@ -133,7 +135,11 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
     label = get_dataset_labels(
         week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
     fig.tight_layout()
-    fig.savefig(ROOT_DIR +'/outputs/figures/prediction/neu_net/{}-performance{}.png'.format(short_outcome, label))
+    output_figure(plt=fig,
+                  filename=ROOT_DIR + '/outputs/figures/prediction/neu_net/performance{}.png'
+                  .format(label))
+    # fig.savefig(
+    #     )
     fig.show()
 
 
