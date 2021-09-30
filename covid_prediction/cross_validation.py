@@ -11,8 +11,11 @@ MAX_PROCESSES = mp.cpu_count()  # maximum number of processors
 
 
 class _CrossValidSummary:
-    """ cross validation and specification information """
+    """ cross validation information """
     def __init__(self, n_features):
+        """
+        :param n_features: (int) number of features
+        """
 
         self.nFeatures = n_features
 

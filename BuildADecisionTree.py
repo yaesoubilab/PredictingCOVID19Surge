@@ -30,6 +30,6 @@ if __name__ == '__main__':
     for model in (A, B3):
         build_a_decision_tree(feature_names=model.features,
                               outcome_name='If hospitalization threshold passed',
-                              max_depth=4,
+                              max_depth=3,
                               fig_filename=ROOT_DIR+'/outputs/figures/trees/model-{}.png'.format(model.name))
 
