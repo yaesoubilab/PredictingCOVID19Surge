@@ -3,7 +3,7 @@ from covid_prediction.model_specs import *
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 WEEKS = (-12, -8, -4)
-MODELS = (Zero, A, B1, B2, B3, B4, C1, C2)
+MODELS = (A, B1, B2) # (Zero, A, B1, B2, B3, B4, C1, C2)
 
 ORDER_OF_FEATURES = [
     'New hospitalization rate (2-wk average)',
@@ -22,7 +22,7 @@ ORDER_OF_FEATURES = [
 ]
 
 
-def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_delay):
+def get_all_feature_names():
 
     # read feature names
     feature_names = read_csv_rows(
@@ -40,6 +40,14 @@ def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_dela
     for row in f_names_and_cleaned_names:
         dict_cleaned_feature_names[row[0]] = row[1]
 
+    return feature_names, dict_cleaned_feature_names
+
+
+def print_selected_features_neu_nets(short_outcome, weeks, models, noise_coeff, bias_delay):
+
+    # get the names of all features
+    feature_names, dict_cleaned_feature_names = get_all_feature_names()
+
     # make a dictionary with all (cleaned) feature names as key
     dic_cleaned_features_and_selection_results = {}
     for r, v in dict_cleaned_feature_names.items():
@@ -51,7 +59,7 @@ def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_dela
     for model in models:
         for week in weeks:
 
-            if model == Zero:
+            if model == Zero: # no error or bias for the Zero model
                 label = get_dataset_labels(week=week, noise_coeff=None, bias_delay=None)
             else:
                 label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
@@ -103,10 +111,15 @@ def print_selected_features(short_outcome, weeks, models, noise_coeff, bias_dela
 if __name__ == '__main__':
 
     for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
+
         short_outcome = get_short_outcome(outcome=outcome)
-        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
-                                models=MODELS, noise_coeff=None, bias_delay=None)
-        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
-                                models=MODELS, noise_coeff=1, bias_delay=None)
-        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
-                                models=MODELS, noise_coeff=0.5, bias_delay=4)
+
+        # without noise or delay
+        print_selected_features_neu_nets(short_outcome=short_outcome, weeks=WEEKS,
+                                         models=MODELS, noise_coeff=None, bias_delay=None)
+        # # with noise
+        # print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+        #                         models=MODELS, noise_coeff=1, bias_delay=None)
+        # # with noise and delay
+        # print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+        #                         models=MODELS, noise_coeff=0.5, bias_delay=4)
