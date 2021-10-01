@@ -334,7 +334,7 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
     """ class to find the optimal parameters for a decision tree using cross validation """
 
     def __init__(self, df, feature_names, outcome_name, if_outcome_binary, list_of_n_features_wanted,
-                 list_of_max_depths, feature_selection_method, cv_fold, scoring=None, if_standardize=True):
+                 list_of_max_depths, feature_selection_method, cv_fold, scoring=None):
         """
         :param df: (panda DataFrame)
         :param feature_names: (list) of feature names to be included in the analysis
@@ -345,14 +345,13 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         :param feature_selection_method: (string) 'rfe', 'lasso', or 'pi'
         :param cv_fold: (int) number of cross validation folds
         :param scoring: (string) from: https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
-        :param if_standardize: (bool) if inputs should be standardized
         """
 
         _ParameterOptimizer.__init__(self, df=df,
                                      feature_names=feature_names,
                                      outcome_name=outcome_name,
                                      if_outcome_binary=if_outcome_binary,
-                                     if_standardize=if_standardize)
+                                     if_standardize=False)
 
         for n_fs in list_of_n_features_wanted:
             for max_depth in list_of_max_depths:
@@ -361,7 +360,7 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                         preprocessed_data=self.preprocessedData,
                         feature_selection_method=feature_selection_method,
                         n_features_wanted=n_fs, cv_fold=cv_fold,
-                        scoring=scoring,max_depth=max_depth))
+                        scoring=scoring, max_depth=max_depth))
 
     def find_best_spec(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
         """ find the best specification for the neural network model
