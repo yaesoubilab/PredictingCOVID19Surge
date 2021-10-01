@@ -5,7 +5,7 @@ from covid_prediction.prediction_models import DecisionTree
 from definitions import ROOT_DIR
 
 
-def build_a_decision_tree(feature_names, outcome_name, max_depth, fig_filename):
+def build_a_decision_tree(feature_names, outcome_name, max_depth,ccp_alpha, fig_filename):
 
     # read data
     dataset = pd.read_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv')
@@ -14,7 +14,7 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth, fig_filename):
     dt = DecisionTree(df=dataset, feature_names=feature_names, y_name=outcome_name)
 
     # train the decision tree
-    dt.run(test_size=0.2, criterion="entropy", max_depth=max_depth)
+    dt.run(test_size=0.2, max_depth=max_depth, ccp_alpha=ccp_alpha)
 
     # report the performance of the decision tree on the testing set
     dt.performanceTest.print()
@@ -31,5 +31,6 @@ if __name__ == '__main__':
         build_a_decision_tree(feature_names=model.features,
                               outcome_name='If hospitalization threshold passed',
                               max_depth=3,
+                              ccp_alpha=0.05,
                               fig_filename=ROOT_DIR+'/outputs/figures/trees/model-{}.png'.format(model.name))
 

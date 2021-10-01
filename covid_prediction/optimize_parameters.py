@@ -70,14 +70,16 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     return best_spec
 
 
-def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, feature_selection, cv_fold, if_parallel=False):
+def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, list_of_ccp_alphas,
+                               feature_selection, cv_fold, if_parallel=False, shorten_feature_names=None):
     """
     :param model_spec: (ModelSpec) model specifications
     :param list_of_max_depths: (list) of maximum depths
+    :param list_of_ccp_alphas: (list) of ccp alphas
     :param feature_selection: (string) feature selection method
     :param cv_fold: (int) number of cross validation folds
     :param if_parallel: (bool) set True to run code in parallel
-    :return: the final model performance
+    :return: (best specification, the final model performance)
     """
 
     # number of features
@@ -101,6 +103,7 @@ def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, feature_selection
         if_outcome_binary=True,
         list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
         list_of_max_depths=list_of_max_depths,
+        list_of_ccp_alphas=list_of_ccp_alphas,
         feature_selection_method=feature_selection,
         cv_fold=cv_fold,
         scoring='accuracy')
@@ -114,11 +117,18 @@ def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, feature_selection
     )
 
     # train the model model and evaluate it on the validation dataset
-    final_model = cv.evaluate_on_validation_set(
+    final_model = cv.evaluate_tree_on_validation_set(
         df_training=df_training,
         df_validation=df_validation,
         selected_features=best_spec.selectedFeatures,
         y_name='If hospitalization threshold passed',
-        max_depth=best_spec.maxDepth)
+        max_depth=best_spec.maxDepth,
+        ccp_alpha=best_spec.ccpAlpha)
 
-    return final_model.performanceTest
+    # save the best tree
+    final_model.plot_decision_path(
+        file_name=ROOT_DIR + '/outputs/figures/trees/model-{}.png'.format(model_spec.name),
+        simple=True, class_names=['Yes', 'No'],
+        precision=2, shorten_feature_names=shorten_feature_names)
+
+    return best_spec, final_model.performanceTest

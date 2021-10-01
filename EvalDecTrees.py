@@ -10,6 +10,7 @@ OUTCOMES = 'If hospitalization threshold passed'
 CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = False
 MAX_DEPTHS = [3, 4, 5]
+ALPHAS = [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
 
 
@@ -20,23 +21,28 @@ def evaluate(noise_coeff):
     """
 
     # make prediction at different weeks
-    rows = [['Model', 'Score', 'PI', 'Formatted PI']]
+    rows = [['Model', 'CV-Score', 'CV-PI', 'CV-Formatted PI', 'Validation-Accuracy']]
 
     for model in MODELS:
 
         print("Evaluating model {}.".format(model.name))
 
         # model zero assumes no noise or bias
-        best_spec = optimize_and_eval_dec_tree(
-            model_spec=model, list_of_max_depths=MAX_DEPTHS,
-            feature_selection=FEATURE_SELECTION, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
+        best_spec, final_model_performance = optimize_and_eval_dec_tree(
+            model_spec=model, list_of_max_depths=MAX_DEPTHS, list_of_ccp_alphas=ALPHAS,
+            feature_selection=FEATURE_SELECTION, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL,
+            shorten_feature_names=SHORT_FEATURE_NAMES)
 
         # store outcomes
-        rows.append([model.name, best_spec.meanScore, best_spec.PI, best_spec.formattedMeanPI])
+        rows.append([model.name,
+                     best_spec.meanScore,
+                     best_spec.PI,
+                     best_spec.formattedMeanPI,
+                     final_model_performance.accuracy])
 
-        # print summary of results
-        write_csv(rows=rows,
-                  file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary.csv')
+    # print summary of results
+    write_csv(rows=rows,
+              file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary.csv')
 
     # print features by model
 
