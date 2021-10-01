@@ -59,7 +59,7 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
                                         scoring=scoring,
                                         if_standardize=if_standardize)
 
-    best_spec = cv.find_best_spec(
+    best_spec = cv.find_best_parameters(
         run_in_parallel=if_parallel,
         save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/neu_net/cv/eval-predicting {}-{}-{}.csv'
             .format(short_outcome, model_spec.name, label),
@@ -70,27 +70,33 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     return best_spec
 
 
-def get_dec_tree_best_spec(model_spec, list_of_max_depths, feature_selection, cv_fold, if_parallel=False):
+def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, feature_selection, cv_fold, if_parallel=False):
     """
     :param model_spec: (ModelSpec) model specifications
     :param list_of_max_depths: (list) of maximum depths
     :param feature_selection: (string) feature selection method
     :param cv_fold: (int) number of cross validation folds
     :param if_parallel: (bool) set True to run code in parallel
-    :return: (ModelSpec) the optimal model specification based on R2 score
+    :return: the final model performance
     """
-
-    # read dataset
-    df = pd.read_csv('{}/outputs/prediction_datasets/week_into_fall/combined_data.csv'.format(ROOT_DIR))
 
     # number of features
     print('Number of features:', len(model_spec.features))
+
+    # read dataset
+    df = pd.read_csv('{}/outputs/prediction_datasets/week_into_fall/combined_data.csv'.format(ROOT_DIR))
     # randomize rows (since the dataset is ordered based on the likelihood weights)
     df = df.sample(frac=1, random_state=1)
 
+    # number of rows
+    n_rows = df.shape[0]
+    df_training = df.head(int(n_rows*0.8))
+    df_validation = df.tail(n_rows - int(n_rows*0.8))
+
     # find the best specification
     cv = CV.DecTreeParameterOptimizer(
-        df=df, feature_names=model_spec.features,
+        df=df_training,
+        feature_names=model_spec.features,
         outcome_name='If hospitalization threshold passed',
         if_outcome_binary=True,
         list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
@@ -99,7 +105,7 @@ def get_dec_tree_best_spec(model_spec, list_of_max_depths, feature_selection, cv
         cv_fold=cv_fold,
         scoring='accuracy')
 
-    best_spec = cv.find_best_spec(
+    best_spec = cv.find_best_parameters(
         run_in_parallel=if_parallel,
         save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/dec_tree/cv/eval-{}.csv'
             .format(model_spec.name),
@@ -107,4 +113,12 @@ def get_dec_tree_best_spec(model_spec, list_of_max_depths, feature_selection, cv
             .format(model_spec.name)
     )
 
-    return best_spec
+    # train the model model and evaluate it on the validation dataset
+    final_model = cv.evaluate_on_validation_set(
+        df_training=df_training,
+        df_validation=df_validation,
+        selected_features=best_spec.selectedFeatures,
+        y_name='If hospitalization threshold passed',
+        max_depth=best_spec.maxDepth)
+
+    return final_model.performanceTest

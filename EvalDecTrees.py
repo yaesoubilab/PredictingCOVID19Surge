@@ -1,6 +1,6 @@
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
-from covid_prediction.optimize_parameters import get_dec_tree_best_spec
+from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
 from covid_prediction.print_features import print_selected_features_dec_trees
 from definitions import ROOT_DIR
 
@@ -27,7 +27,7 @@ def evaluate(noise_coeff):
         print("Evaluating model {}.".format(model.name))
 
         # model zero assumes no noise or bias
-        best_spec = get_dec_tree_best_spec(
+        best_spec = optimize_and_eval_dec_tree(
             model_spec=model, list_of_max_depths=MAX_DEPTHS,
             feature_selection=FEATURE_SELECTION, cv_fold=CV_FOLD, if_parallel=IF_PARALLEL)
 

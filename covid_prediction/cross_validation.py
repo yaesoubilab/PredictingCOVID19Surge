@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from SimPy.InOutFunctions import write_csv
 from SimPy.Statistics import SummaryStat
 from covid_prediction.pre_process import PreProcessor
+from covid_prediction.prediction_models import DecisionTree
 
 MAX_PROCESSES = mp.cpu_count()  # maximum number of processors
 
@@ -70,7 +71,7 @@ class DecTreeCVSummary(_CrossValidSummary):
 
     def __init__(self, n_features, max_depth):
         # TODO: max_depth is a parameter that could be optimized through cross-validation,
-        #   what are the other parameters of decision trees that should be optimize?
+        #   what are the other parameters of decision trees that should be optimized?
 
         super().__init__(n_features=n_features)
         self.maxDepth = max_depth
@@ -302,7 +303,7 @@ class NeuralNetParameterOptimizer(_ParameterOptimizer):
                             feature_selection_method=feature_selection_method,
                             cv_fold=cv_fold, scoring=scoring))
 
-    def find_best_spec(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
+    def find_best_parameters(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
         """ find the best specification for the neural network model
         :param run_in_parallel: (bool) set to True to run the cross validation in parallel
         :param save_to_file_performance: (string) filename where the performance results should be saved.
@@ -333,8 +334,9 @@ class NeuralNetParameterOptimizer(_ParameterOptimizer):
 class DecTreeParameterOptimizer(_ParameterOptimizer):
     """ class to find the optimal parameters for a decision tree using cross validation """
 
-    def __init__(self, df, feature_names, outcome_name, if_outcome_binary, list_of_n_features_wanted,
-                 list_of_max_depths, feature_selection_method, cv_fold, scoring=None):
+    def __init__(self, df, feature_names, outcome_name, if_outcome_binary,
+                 list_of_n_features_wanted, list_of_max_depths,
+                 feature_selection_method, cv_fold, scoring=None):
         """
         :param df: (panda DataFrame)
         :param feature_names: (list) of feature names to be included in the analysis
@@ -362,7 +364,7 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                         n_features_wanted=n_fs, cv_fold=cv_fold,
                         scoring=scoring, max_depth=max_depth))
 
-    def find_best_spec(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
+    def find_best_parameters(self, run_in_parallel=False, save_to_file_performance=None, save_to_file_features=None):
         """ find the best specification for the neural network model
         :param run_in_parallel: (bool) set to True to run the cross validation in parallel
         :param save_to_file_performance: (string) filename where the performance results should be saved.
@@ -389,3 +391,22 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
 
         return best_spec
 
+    @staticmethod
+    def evaluate_on_validation_set(df_training, df_validation, selected_features, y_name, max_depth):
+        """
+        :param df_training:
+        :param df_validation:
+        :param selected_features:
+        :param y_name:
+        :param max_depth:
+        :return: the trained model (with performance calculated on the validation dataset)
+        """
+
+        # make a decision tree model
+        model = DecisionTree(df=df_training, feature_names=selected_features, y_name=y_name)
+
+        # train the model
+        model.run(max_depth=max_depth, df_validation=df_validation)
+
+        # return the trained model
+        return model

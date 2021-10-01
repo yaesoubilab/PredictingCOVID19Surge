@@ -78,14 +78,21 @@ class DecisionTree(Classifier):
         super().__init__(df, feature_names, y_name)
         self.model = None
 
-    def run(self, test_size=0.2, criterion="mse", max_depth=None):
+    def run(self, criterion="mse", max_depth=None, test_size=0.2, df_validation=None):
         """ train the decision tree and store the summary of performance """
 
         X = np.asarray(self.df[self.features])
         y = np.asarray(self.df[self.yName])
 
-        # split train vs. test set
-        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
+        # if dataframe for validation is provided
+        if df_validation is not None:
+            x_train = X
+            y_train = y
+            x_test = np.asarray(df_validation[self.features])
+            y_test = np.asarray(df_validation[self.yName])
+        else:
+            # split train vs. test set
+            x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
 
         # fit model
         self.model = DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, random_state=1)
@@ -236,7 +243,7 @@ class LinearReg(Classifier):
     def __init__(self, df, feature_names, y_name):
         super().__init__(df, feature_names, y_name)
 
-        self.selected_features = None
+        self.selectedFeatures = None
 
     def run(self, random_state, test_size=0.2,
             penalty='none', alpha=0.1, cv=False):
