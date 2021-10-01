@@ -108,6 +108,10 @@ def print_selected_features_neu_nets(short_outcome, weeks, models, noise_coeff, 
                   short_outcome, label))
 
 
+def print_selected_features_dec_trees(models):
+    print('Needs to be implemented.')
+
+
 if __name__ == '__main__':
 
     for outcome in ('Maximum hospitalization rate', 'If hospitalization threshold passed'):
@@ -117,9 +121,9 @@ if __name__ == '__main__':
         # without noise or delay
         print_selected_features_neu_nets(short_outcome=short_outcome, weeks=WEEKS,
                                          models=MODELS, noise_coeff=None, bias_delay=None)
-        # # with noise
-        # print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
-        #                         models=MODELS, noise_coeff=1, bias_delay=None)
-        # # with noise and delay
-        # print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
-        #                         models=MODELS, noise_coeff=0.5, bias_delay=4)
+        # with noise
+        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+                                models=MODELS, noise_coeff=1, bias_delay=None)
+        # with noise and delay
+        print_selected_features(short_outcome=short_outcome, weeks=WEEKS,
+                                models=MODELS, noise_coeff=0.5, bias_delay=4)

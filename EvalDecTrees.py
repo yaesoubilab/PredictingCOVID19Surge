@@ -1,7 +1,7 @@
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import get_dec_tree_best_spec
-from covid_prediction.print_features import print_selected_features_neu_nets
+from covid_prediction.print_features import print_selected_features_dec_trees
 from definitions import ROOT_DIR
 
 MODELS = (A, B3)
@@ -39,9 +39,8 @@ def evaluate(noise_coeff):
                   file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary.csv')
 
     # print features by model
-    print_selected_features_neu_nets(short_outcome=short_outcome,
-                                     weeks=WEEKS, models=MODELS,
-                                     noise_coeff=noise_coeff, bias_delay=bias_delay)
+
+    print_selected_features_dec_trees(models=MODELS)
     #
     # # plot
     # plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)

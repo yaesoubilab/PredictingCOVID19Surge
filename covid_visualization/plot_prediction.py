@@ -138,8 +138,6 @@ def plot_performance(noise_coeff=None, bias_delay=None, fig_size=None):
     output_figure(plt=fig,
                   filename=ROOT_DIR + '/outputs/figures/prediction/neu_net/performance{}.png'
                   .format(label))
-    # fig.savefig(
-    #     )
     fig.show()
 
 
