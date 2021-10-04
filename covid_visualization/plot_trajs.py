@@ -81,7 +81,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
     obs_hosp_rate = A.TrajPlotInfo(
         outcome_name='Obs: New hospitalization rate',
-        title='Hospitalization rate\n(per 100,000 population)',
+        title='New hospitalization rate\n(per 100,000 population)',
         y_range=(0, MAX_HOSP_RATE_OVERALL * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             feasible_range_info=A.FeasibleRangeInfo(
@@ -94,6 +94,11 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         calibration_info=A.CalibrationTargetPlotInfo(
             rows_of_data=CUM_HOSP_RATE_OVERALL
         ))
+    obs_hosp_occ_rate = A.TrajPlotInfo(
+        outcome_name='Obs: Hospital occupancy rate',
+        title='Rate of hospitalization occupancy\n(per 100,000 population)',
+        y_range=(0, 10*20), y_multiplier=100000, x_multiplier=prev_multiplier)
+
     obs_prev_immune_from_inf = A.TrajPlotInfo(
         outcome_name='Obs: Prevalence with immunity from infection',
         title='Prevalence of population with\nimmunity from infection (%)',
@@ -121,13 +126,13 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
             if_connect_obss=False))
 
     # summary
-    sim_outcomes.plot_multi_panel(n_rows=1, n_cols=3,
+    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
                                   list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
-                                                  obs_cum_vacc_rate],
+                                                  obs_hosp_occ_rate, obs_cum_vacc_rate],
                                   file_name=ROOT_DIR+'/outputs/figures/summary3.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
-                                  figure_size=(2.3*3, 2.4)
+                                  figure_size=(2.3*2, 2.4*2)
                                   )
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
                                   list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate, obs_prev_immune_from_inf,
@@ -202,8 +207,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         str_a = indexer.get_str_age(age_group=a)
 
         hosp_rate_by_age.append(A.TrajPlotInfo(
-            outcome_name='Hospitalization rate-{}'.format(str_a),
-            title=str_a, y_label='Hospitalization rate\n(per 100,000 population)' if a == 0 else None,
+            outcome_name='New hospitalization rate-{}'.format(str_a),
+            title=str_a, y_label='New hospitalization rate\n(per 100,000 population)' if a == 0 else None,
             y_range=(0, 1000), y_multiplier=100000, x_multiplier=incd_multiplier,
             # calibration_info=A.CalibrationTargetPlotInfo(
             #     feasible_range_info=A.FeasibleRangeInfo(

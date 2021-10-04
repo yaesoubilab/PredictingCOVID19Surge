@@ -197,8 +197,10 @@ def build_covid_model(model):
     compartments = Ss + Vs + Es + Is + Hs + Rs + Ds
 
     # lists to contain summation statistics
+    # counts
     all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_dom + counting_vacc_in_R_nov
     pop_size_by_age = []
+    hosp_occupancy = None
     incd_by_age = []
     new_hosp_by_age = []
     cum_incd_by_age = []
@@ -206,6 +208,7 @@ def build_covid_model(model):
     cum_death_by_age = []
     cum_vaccine_by_age = []
     # rates
+    hosp_occupancy_rate = None
     incd_rate_by_age = []
     new_hosp_rate_by_age = []
     cum_hosp_rate_by_age = []
@@ -218,6 +221,8 @@ def build_covid_model(model):
 
     pop_size_by_age.append(SumPrevalence(
         name='Population size', compartments=compartments))
+    hosp_occupancy = SumPrevalence(
+        name='Hospital occupancy', compartments=Hs)
     num_susp = SumPrevalence(
         name='Individuals susceptible', compartments=Ss)
     num_immune_from_inf = SumPrevalence(
@@ -235,6 +240,10 @@ def build_covid_model(model):
     cum_vaccine_by_age.append(SumCumulativeIncidence(
         name='Cumulative vaccination', compartments=all_vaccinations, if_surveyed=True))
 
+    hosp_occupancy_rate = RatioTimeSeries(name='Hospital occupancy rate',
+                                          numerator_sum_time_series=hosp_occupancy,
+                                          denominator_sum_time_series=pop_size_by_age[0],
+                                          if_surveyed=True)
     prev_susp = RatioTimeSeries(name='Prevalence susceptible',
                                 numerator_sum_time_series=num_susp,
                                 denominator_sum_time_series=pop_size_by_age[0],
@@ -387,7 +396,7 @@ def build_covid_model(model):
             name='New hospitalizations-' + str_a, compartments=Hs_this_age))
         # rate of new hospitalizations
         new_hosp_rate_by_age.append(RatioTimeSeries(
-            name='Hospitalization rate-'+str_a,
+            name='New hospitalization rate-'+str_a,
             numerator_sum_time_series=new_hosp_by_age[-1],
             denominator_sum_time_series=pop_size_by_age[-1],
             if_surveyed=True))
@@ -486,6 +495,7 @@ def build_covid_model(model):
     # summation-time series
     list_of_sum_time_series = []
     list_of_sum_time_series.extend(pop_size_by_age)
+    list_of_sum_time_series.append(hosp_occupancy)
     list_of_sum_time_series.extend([num_susp, num_immune_from_inf])
     list_of_sum_time_series.extend(incd_by_age)
     list_of_sum_time_series.extend(new_hosp_by_age)
@@ -499,6 +509,7 @@ def build_covid_model(model):
 
     # ratio time-series
     list_of_ratio_time_series = []
+    list_of_ratio_time_series.append(hosp_occupancy_rate)
     list_of_ratio_time_series.extend(incd_rate_by_age)
     list_of_ratio_time_series.extend([prev_susp, prev_immune_from_inf])
     list_of_ratio_time_series.extend(new_hosp_rate_by_age)
