@@ -248,7 +248,7 @@ plot_sigmoid_functions(b=7, bs=[5, 7, 9],
                        y_label=r'$\gamma(t)$',
                        x_range=[T0, SIM_DURATION],
                        x_label='Simulation Year ' + r'$(t)$',
-                       vertical_line = SEPTEMBER_FIRST,
+                       vertical_line=SEPTEMBER_FIRST,
                        fig_size=(5.5, 3))
 
 # rate of vaccination
@@ -262,7 +262,7 @@ plot_sigmoid_functions(b=-7.5, bs=[-10, -7.5, -5],
                        y_label=r'$v(t)$',
                        x_range=[T0, SIM_DURATION],
                        x_label='Simulation Year ' + r'$(t)$',
-                       vertical_line = SEPTEMBER_FIRST,
+                       vertical_line=SEPTEMBER_FIRST,
                        fig_size=(9, 3))
 
 # effectiveness of control strategies
@@ -274,7 +274,7 @@ plot_alpha_h(h_max=15, alpha_max=0.7,
              y_label=r'$\alpha(h)$',
              x_range=[0, 40],
              x_label='Hospital occupancy ' + r'$(h)$',
-             fig_size=(5.5, 3))
+             fig_size=(4.5, 3))
 
 # # seasonality
 # Y_RANGE = (0, 3)
