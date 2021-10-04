@@ -1,6 +1,7 @@
 from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Logit, Product, \
     OneMinus, MatrixOfParams, TimeDependentSigmoid, \
-    Beta, Uniform, UniformDiscrete, Gamma, Equal, OneMinusTimes
+    Beta, Uniform, UniformDiscrete, Gamma, Equal, OneMinusTimes, \
+    SigmoidOnModelOutput
 from apace.Inputs import EpiParameters
 from apace.Inputs import InfectivityFromR0
 from definitions import AgeGroups, Profiles
@@ -91,8 +92,16 @@ class COVIDParameters(EpiParameters):
         ]
 
         self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        self.percChangeInContactY1 = Uniform(-0.75, -0.25)
-        self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
+        # self.percChangeInContactY1 = Uniform(-0.75, -0.25)
+        # self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
+        self.maxHospOcc = Uniform(10, 20)
+        self.maxEff = Uniform(0.5, 0.75)
+        self.effOfControlMeasures = SigmoidOnModelOutput(
+            par_b=self.maxHospOcc,
+            par_max=self.maxEff)
+        self.percChangeInContactY1 = Product(parameters=[Constant(-1), self.effOfControlMeasures])
+        # TODO: fix this
+        self.percChangeInContactY1Plus =None
 
         # ------------------------------
         # calculate dependent parameters
@@ -323,6 +332,9 @@ class COVIDParameters(EpiParameters):
              'Rate of losing vaccine immunity': self.rateOfLosingVacImmunity,
 
              'PD Y1 thresholds': self.pdY1Thresholds,
+             'Maximum hosp occupancy': self.maxHospOcc,
+             'Max effectiveness of control measures': self.maxEff,
+             'Effectiveness of control measures': self.effOfControlMeasures,
              'Change in contacts - PD Y1': self.percChangeInContactY1,
              'Change in contacts - PD Y1+': self.percChangeInContactY1Plus,
              'Matrix of change in contacts - PD Y1': self.matrixOfPercChangeInContactsY1,
