@@ -36,10 +36,11 @@ def cos(t, phase, scale, f_min, f_max):
 
 def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
                            bs, f_mins, f_maxs, t_mids, t_mins,
-                           y_label, fig_size=(7.5, 3.2)):
+                           x_range, y_label, x_label,
+                           vertical_line=None, fig_size=(7.5, 3.2), round_b=None):
 
     # ------------------
-    ts = np.linspace(start=T0, stop=SIM_DURATION)
+    ts = np.linspace(start=x_range[0], stop=x_range[1])
     fs = []
     legends = []
     titles = []
@@ -50,7 +51,10 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
         legs = []  # legends
         ys = []
         for v in bs:
-            legs.append(r'$b=$' + str(v))
+            if round_b is None:
+                legs.append(r'$b=$' + str(v))
+            else:
+                legs.append(r'$b=$' + str(round(v, round_b)))
             ys.append([sigmoid(t, b=v, t_mid=t_mid, f_min=f_min, f_max=f_max, t_min=t_min) for t in ts])
         legends.append(legs)
         fs.append(ys)
@@ -109,8 +113,62 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
 
         ax.set_ylim(Y_RANGE)
         ax.set_xlim(X_RANGE)
-        ax.axvline(x=SEPTEMBER_FIRST, c='k', linestyle='--', linewidth=0.5)
-        ax.set_xlabel('Simulation Year ' + r'$(t)$')
+        if vertical_line is not None:
+            ax.axvline(x=vertical_line, c='k', linestyle='--', linewidth=0.5)
+        ax.set_xlabel(x_label)
+        ax.legend(fontsize='x-small') # loc=2
+
+    axarr[0].set_ylabel(y_label)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_alpha_h(h_max, alpha_max,
+                 h_maxs, alpha_maxs,
+                 x_range, y_label, x_label,
+                 vertical_line=None, fig_size=(7.5, 3.2)):
+
+    # ------------------
+    hs = np.linspace(start=x_range[0], stop=x_range[1])
+    fs = []
+    legends = []
+    titles = []
+
+    # varying alpha
+    if alpha_maxs is not None:
+        titles.append('Varying ' + r'$\bar\alpha$')
+        legs = []  # legends
+        ys = []
+        for v in alpha_maxs:
+            legs.append(r'$\bar\alpha=$' + str(v))
+            ys.append([sigmoid(h, b=4/h_max, f_min=0, f_max=v, t_mid=0) for h in hs])
+        legends.append(legs)
+        fs.append(ys)
+
+    # varying h_max
+    if h_maxs is not None:
+        titles.append('Varying ' + r'$\bar h$')
+        legs = []  # legends
+        ys = []
+        for v in h_maxs:
+            legs.append(r'$\bar h=$' + str(v))
+            ys.append([sigmoid(h, b=4/v, f_min=0, f_max=alpha_max, t_mid=0) for h in hs])
+        legends.append(legs)
+        fs.append(ys)
+
+    # plot
+    fig, axarr = plt.subplots(1, len(fs), sharey=True, figsize=fig_size)
+    for i, ax in enumerate(axarr):
+        ax.set_title(titles[i])
+
+        for j in range(3):
+            ax.plot(hs, fs[i][j], label=legends[i][j])  # color='b', linestyle='-')
+
+        ax.set_ylim(Y_RANGE)
+        ax.set_xlim(X_RANGE)
+        if vertical_line is not None:
+            ax.axvline(x=vertical_line, c='k', linestyle='--', linewidth=0.5)
+        ax.set_xlabel(x_label)
         ax.legend(fontsize='x-small') # loc=2
 
     axarr[0].set_ylabel(y_label)
@@ -187,24 +245,44 @@ plot_sigmoid_functions(b=7, bs=[5, 7, 9],
                        f_max=0.5, f_maxs=[0.4, 0.5, 0.6],
                        t_mid=1.75, t_mids=[1.5, 1.75, 2.0],
                        t_min=0, t_mins=None,
-                       y_label=r'$\gamma(t)$', fig_size=(5.5, 3))
-#
-# plot_sigmoid_functions(b=7, t0=1.25, b_min=0, b_max=0.5,
-#                        bs=[5, 7, 9], t0s=[1, 1.25, 1.5], b_mins=[0, 0.1, 0.2], b_maxs=[0.4, 0.5, 0.6])
+                       y_label=r'$\gamma(t)$',
+                       x_range=[T0, SIM_DURATION],
+                       x_label='Simulation Year ' + r'$(t)$',
+                       vertical_line = SEPTEMBER_FIRST,
+                       fig_size=(5.5, 3))
 
-Y_RANGE = (0, 3)
 # rate of vaccination
+Y_RANGE = (0, 3)
 plot_sigmoid_functions(b=-7.5, bs=[-10, -7.5, -5],
                        f_min=0.1, f_mins=[0, 0.1, 0.2],
                        f_max=2.5, f_maxs=[2, 2.5, 3],
                        t_mid=0.75, t_mids=[0.5, 0.75, 1],
                        t_min=1, t_mins=[0.8, 1, 1.2],
                        # t_min=0, t_mins=None,
-                       y_label=r'$v(t)$', fig_size=(9, 3))
+                       y_label=r'$v(t)$',
+                       x_range=[T0, SIM_DURATION],
+                       x_label='Simulation Year ' + r'$(t)$',
+                       vertical_line = SEPTEMBER_FIRST,
+                       fig_size=(9, 3))
 
-# seasonality
-Y_RANGE = (0, 3)
-plot_cos_functions(phase=0, phases=[-0.1, 0, 0.1],
-                   f_min=1, f_mins=None,
-                   f_max=2, f_maxes=[1.5, 2, 2.5],
-                   y_label=r'$\sigma(t)$', fig_size=(5.3, 3))
+# effectiveness of control strategies
+X_RANGE = (-0.1, 30)
+Y_RANGE = (0, 1)
+MAX_OCC = (10, 15, 20)
+plot_alpha_h(h_max=15, alpha_max=0.7,
+             h_maxs=[10, 15, 20], alpha_maxs=[0.5, 0.7, 0.9],
+             y_label=r'$\alpha(h)$',
+             x_range=[0, 40],
+             x_label='Hospital occupancy ' + r'$(h)$',
+             fig_size=(5.5, 3))
+
+# # seasonality
+# Y_RANGE = (0, 3)
+# plot_cos_functions(phase=0, phases=[-0.1, 0, 0.1],
+#                    f_min=1, f_mins=None,
+#                    f_max=2, f_maxes=[1.5, 2, 2.5],
+#                    y_label=r'$\sigma(t)$',
+#                    x_range=[T0, SIM_DURATION],
+#                    x_label='Simulation Year ' + r'$(t)$',
+#                    vertical_line = SEPTEMBER_FIRST,
+#                    fig_size=(5.3, 3))
