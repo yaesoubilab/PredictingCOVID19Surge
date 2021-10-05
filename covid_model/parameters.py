@@ -91,17 +91,23 @@ class COVIDParameters(EpiParameters):
             Uniform(minimum=0.7, maximum=1.1)   # 75+
         ]
 
-        self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        # self.percChangeInContactY1 = Uniform(-0.75, -0.25)
-        # self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
-        self.maxHospOcc = Uniform(4*10/100000, 4*20/100000)
-        self.maxEff = Uniform(0.5, 0.75)
-        self.effOfControlMeasures = SigmoidOnModelOutput(
-            par_b=self.maxHospOcc,
-            par_max=self.maxEff)
-        self.percChangeInContactY1 = Product(parameters=[Constant(-1), self.effOfControlMeasures])
-        # TODO: fix this
-        self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
+        # year 1 physical distancing properties
+        self.y1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
+        self.y1MaxHospOcc = Uniform(4 * 10 / 100000, 4 * 20 / 100000)
+        self.y1MaxEff = Uniform(0.5, 0.75)
+        self.y1EffOfControlMeasures = SigmoidOnModelOutput(
+            par_b=self.y1MaxHospOcc,
+            par_max=self.y1MaxEff)
+        self.y1PercChangeInContact = Product(parameters=[Constant(-1), self.y1EffOfControlMeasures])
+
+        # year 2 physical distancing properties
+        self.y2Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
+        self.y2MaxHospOcc = Uniform(4 * 10 / 100000, 4 * 20 / 100000)
+        self.y2MaxEff = Uniform(0.5, 0.75)
+        self.y2EffOfControlMeasures = SigmoidOnModelOutput(
+            par_b=self.y2MaxHospOcc,
+            par_max=self.y2MaxEff)
+        self.y2PercChangeInContactY1Plus = Product(parameters=[Constant(-1), self.y2EffOfControlMeasures])
 
         # ------------------------------
         # calculate dependent parameters
@@ -240,8 +246,8 @@ class COVIDParameters(EpiParameters):
                     par_max=self.vaccRateParams[3])
 
         # change in contact matrices
-        matrix_of_params_y1 = [[self.percChangeInContactY1] * self.nAgeGroups] * self.nAgeGroups
-        matrix_of_params_y1_plus = [[self.percChangeInContactY1] * self.nAgeGroups] * self.nAgeGroups
+        matrix_of_params_y1 = [[self.y1PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
+        matrix_of_params_y1_plus = [[self.y1PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
         self.matrixOfPercChangeInContactsY1 = MatrixOfParams(
             matrix_of_params_or_values=matrix_of_params_y1)
         self.matrixOfPercChangeInContactsY1Plus = MatrixOfParams(
@@ -331,12 +337,17 @@ class COVIDParameters(EpiParameters):
              'Vaccination rate': self.vaccRateByAge,
              'Rate of losing vaccine immunity': self.rateOfLosingVacImmunity,
 
-             'PD Y1 thresholds': self.pdY1Thresholds,
-             'Maximum hosp occupancy': self.maxHospOcc,
-             'Max effectiveness of control measures': self.maxEff,
-             'Effectiveness of control measures': self.effOfControlMeasures,
-             'Change in contacts - PD Y1': self.percChangeInContactY1,
-             'Change in contacts - PD Y1+': self.percChangeInContactY1Plus,
+             'Y1 thresholds': self.y1Thresholds,
+             'Y1 Maximum hosp occupancy': self.y1MaxHospOcc,
+             'Y1 Max effectiveness of control measures': self.y1MaxEff,
+             'Y1 Effectiveness of control measures': self.y1EffOfControlMeasures,
+             'Y1+ thresholds': self.y2Thresholds,
+             'Y1+ Maximum hosp occupancy': self.y2MaxHospOcc,
+             'Y1+ Max effectiveness of control measures': self.y2MaxEff,
+             'Y1+ Effectiveness of control measures': self.y2EffOfControlMeasures,
+
+             'Change in contacts - PD Y1': self.y1PercChangeInContact,
+             'Change in contacts - PD Y1+': self.y2PercChangeInContactY1Plus,
              'Matrix of change in contacts - PD Y1': self.matrixOfPercChangeInContactsY1,
              'Matrix of change in contacts - PD Y1+': self.matrixOfPercChangeInContactsY1Plus
              })

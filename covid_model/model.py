@@ -242,7 +242,8 @@ def build_covid_model(model):
                                           numerator_sum_time_series=hosp_occupancy,
                                           denominator_sum_time_series=pop_size_by_age[0],
                                           if_surveyed=True)
-    params.effOfControlMeasures.assign_sim_output(sim_output=hosp_occupancy_rate)
+    params.y1EffOfControlMeasures.assign_sim_output(sim_output=hosp_occupancy_rate)
+    params.y2EffOfControlMeasures.assign_sim_output(sim_output=hosp_occupancy_rate)
 
     prev_susp = RatioTimeSeries(name='Prevalence susceptible',
                                 numerator_sum_time_series=num_susp,
@@ -583,12 +584,12 @@ def get_interventions_features_conditions(settings, params, in_hosp_rate):
             name='turn on pd',
             features=[feature_on_epi_time, feature_on_pd, feature_on_surveyed_hosp],
             signs=['l', 'e', 'ge'],
-            thresholds=[FEASIBILITY_PERIOD, 0, params.pdY1Thresholds[0]])
+            thresholds=[FEASIBILITY_PERIOD, 0, params.y1Thresholds[0]])
         off_condition = ConditionOnFeatures(
             name='turn off pd',
             features=[feature_on_pd, feature_on_surveyed_hosp],
             signs=['e', 'l'],
-            thresholds=[1, params.pdY1Thresholds[1]])
+            thresholds=[1, params.y1Thresholds[1]])
         off_condition_during_y1 = ConditionOnConditions(
             name='turn off pd Y1',
             conditions=[pass_feas_period, off_condition],
