@@ -142,7 +142,7 @@ class COVIDParameters(EpiParameters):
         self.rateOfLosingVacImmunity = None
 
         self.matrixOfPercChangeInContactsY1 = None
-        self.matrixOfPercChangeInContactsY1Plus = None
+        self.matrixOfPercChangeInContactsY2 = None
 
         self.calculate_dependent_params(us_age_dist=us_age_dist,
                                         hosp_relative_risk=hosp_relative_risk,
@@ -250,7 +250,7 @@ class COVIDParameters(EpiParameters):
         matrix_of_params_y1_plus = [[self.y1PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
         self.matrixOfPercChangeInContactsY1 = MatrixOfParams(
             matrix_of_params_or_values=matrix_of_params_y1)
-        self.matrixOfPercChangeInContactsY1Plus = MatrixOfParams(
+        self.matrixOfPercChangeInContactsY2 = MatrixOfParams(
             matrix_of_params_or_values=matrix_of_params_y1_plus)
 
         # rates of leaving compartments
@@ -349,7 +349,7 @@ class COVIDParameters(EpiParameters):
              'Change in contacts - PD Y1': self.y1PercChangeInContact,
              'Change in contacts - PD Y1+': self.y2PercChangeInContactY1Plus,
              'Matrix of change in contacts - PD Y1': self.matrixOfPercChangeInContactsY1,
-             'Matrix of change in contacts - PD Y1+': self.matrixOfPercChangeInContactsY1Plus
+             'Matrix of change in contacts - PD Y1+': self.matrixOfPercChangeInContactsY2
              })
 
         for a in range(self.nAgeGroups):

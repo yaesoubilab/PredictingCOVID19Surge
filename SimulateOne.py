@@ -15,7 +15,7 @@ def simulate():
     M.build_covid_model(model)
 
     # simulate
-    model.simulate(seed=398764591)
+    model.simulate(seed=1027629257)
     # print trajectories
     model.export_trajectories(delete_existing_files=True)
 
