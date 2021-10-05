@@ -200,7 +200,6 @@ def build_covid_model(model):
     # counts
     all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_dom + counting_vacc_in_R_nov
     pop_size_by_age = []
-    hosp_occupancy = None
     incd_by_age = []
     new_hosp_by_age = []
     cum_incd_by_age = []
@@ -208,7 +207,6 @@ def build_covid_model(model):
     cum_death_by_age = []
     cum_vaccine_by_age = []
     # rates
-    hosp_occupancy_rate = None
     incd_rate_by_age = []
     new_hosp_rate_by_age = []
     cum_hosp_rate_by_age = []
@@ -244,6 +242,8 @@ def build_covid_model(model):
                                           numerator_sum_time_series=hosp_occupancy,
                                           denominator_sum_time_series=pop_size_by_age[0],
                                           if_surveyed=True)
+    params.effOfControlMeasures.assign_sim_output(sim_output=hosp_occupancy_rate)
+
     prev_susp = RatioTimeSeries(name='Prevalence susceptible',
                                 numerator_sum_time_series=num_susp,
                                 denominator_sum_time_series=pop_size_by_age[0],

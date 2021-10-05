@@ -94,14 +94,14 @@ class COVIDParameters(EpiParameters):
         self.pdY1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
         # self.percChangeInContactY1 = Uniform(-0.75, -0.25)
         # self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
-        self.maxHospOcc = Uniform(10, 20)
+        self.maxHospOcc = Uniform(4*10/100000, 4*20/100000)
         self.maxEff = Uniform(0.5, 0.75)
         self.effOfControlMeasures = SigmoidOnModelOutput(
             par_b=self.maxHospOcc,
             par_max=self.maxEff)
         self.percChangeInContactY1 = Product(parameters=[Constant(-1), self.effOfControlMeasures])
         # TODO: fix this
-        self.percChangeInContactY1Plus =None
+        self.percChangeInContactY1Plus = Uniform(-0.75, -0.25)
 
         # ------------------------------
         # calculate dependent parameters
