@@ -77,6 +77,7 @@ class DecisionTree(Classifier):
 
         super().__init__(df, feature_names, y_name)
         self.model = None
+        self.selectedFeatures = None
 
     def run(self, criterion="gini", max_depth=None, ccp_alpha=0, test_size=0.2, df_validation=None):
         """ train the decision tree and store the summary of performance """
@@ -96,8 +97,14 @@ class DecisionTree(Classifier):
 
         # fit model
         self.model = DecisionTreeClassifier(
-            criterion=criterion, max_depth=max_depth, ccp_alpha=ccp_alpha, random_state=1)
+            criterion=criterion, max_depth=max_depth, ccp_alpha=ccp_alpha, random_state=0)
         self.model.fit(X=x_train, y=y_train)
+
+        # get selected features
+        self.selectedFeatures = []
+        for i, v in enumerate(self.model.feature_importances_):
+            if v > 0:
+                self.selectedFeatures.append(self.features[i])
 
         # prediction
         y_test_hat = self.model.predict(x_test)

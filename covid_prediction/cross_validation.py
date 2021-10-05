@@ -163,14 +163,15 @@ class NeuralNetCrossValidator(_CrossValidator):
 class DecTreeCrossValidator(_CrossValidator):
     """ class to run cross validation on a decision tree model """
 
-    def __init__(self, preprocessed_data, feature_selection_method, cv_fold, scoring, n_features_wanted,
-                 max_depth, ccp_alpha):
+    def __init__(self, preprocessed_data, cv_fold, scoring,
+                 feature_selection_method=None, n_features_wanted=None,
+                 max_depth=None, ccp_alpha=0.0):
         """
         :param preprocessed_data: (PreProcessor)
-        :param n_features_wanted: (int)
-        :param feature_selection_method: (string) 'rfe', 'lasso', or 'pi'
+        :param n_features_wanted: (int or None)
         :param cv_fold: (int) number of cross validation folds
         :param scoring: (string) from: https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
+        :param feature_selection_method: (string or None) 'rfe', 'lasso', or 'pi'
         :param max_depth: (int) maximum depth of the decision tree
         :param ccp_alpha: (float) Complexity parameter used for Minimal Cost-Complexity Pruning
         """
@@ -194,8 +195,29 @@ class DecTreeCrossValidator(_CrossValidator):
         # construct a decision tree model
         model = DecisionTreeClassifier(max_depth=self.maxDepth, ccp_alpha=self.ccpAlpha, random_state=0)
 
+        # fit the model to find the strongest features on the entire dataset
+        model.fit(X=self.preProcessedData.X, y=self.preProcessedData.y)
+
+        # get selected features
+        selected_features = []
+        for i, v in enumerate(model.feature_importances_):
+            if v > 0:
+                selected_features.append(self.preProcessedData.featureName[i])
+
+        # update selected features and predictors
+        self.preProcessedData.update_selected_features(selected_features=selected_features)
+
         # perform cross validation on this model
-        self._do_cross_validation(model=model)
+        cv_scores = cross_val_score(estimator=model,
+                                    X=self.preProcessedData.selectedX,
+                                    y=self.preProcessedData.y,
+                                    cv=self.cvFold,
+                                    scoring=self.scoring)
+
+        # store the performance of this specification
+        self.performanceSummary.add_cv_performance(scores=cv_scores,
+                                                   deci=2,
+                                                   selected_features=self.preProcessedData.selectedFeatureNames)
 
 
 def run_this_cross_validator(cross_validator, i):
