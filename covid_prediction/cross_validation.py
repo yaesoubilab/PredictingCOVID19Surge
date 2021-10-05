@@ -380,9 +380,9 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                                      if_standardize=False)
 
         if list_of_n_features_wanted is None:
-            list_of_n_features_wanted = []
+            list_of_n_features_wanted = [None]
         if list_of_max_depths is None:
-            list_of_max_depths = []
+            list_of_max_depths = [None]
 
         for n_fs in list_of_n_features_wanted:
             for max_depth in list_of_max_depths:

@@ -124,7 +124,7 @@ def optimize_and_eval_dec_tree(model_spec, outcome_name, list_of_max_depths, lis
         df_training=df_training,
         df_validation=df_validation,
         selected_features=best_spec.selectedFeatures,
-        y_name='If hospitalization threshold passed',
+        y_name=outcome_name,
         max_depth=best_spec.maxDepth,
         ccp_alpha=best_spec.ccpAlpha)
 
