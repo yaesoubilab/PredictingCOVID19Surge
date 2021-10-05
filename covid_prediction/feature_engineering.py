@@ -8,8 +8,7 @@ from numpy.random import RandomState
 from scipy.stats import pearsonr
 
 from SimPy.InOutFunctions import write_csv
-
-OUTCOME_LABELS = ['Maximum rate of hospital occupancy', 'If threshold passed (0:Yes)']
+from definitions import HOSP_OCCUPANCY_IN_TRAJ_FILE, OUTCOMES_IN_DATASET
 
 
 class ErrorModel:
@@ -88,7 +87,7 @@ class FeatureEngineering:
         write_csv(rows=[[c] for c in col_labels],
                   file_name='outputs/prediction_datasets/features.csv')
 
-        col_labels.extend(OUTCOME_LABELS)
+        col_labels.extend(OUTCOMES_IN_DATASET)
 
         # read dataset of the parameter features
         param_df = pd.read_csv('outputs/summary/parameter_values.csv')
@@ -149,7 +148,7 @@ class FeatureEngineering:
 
         # report correlations
         if report_corr:
-            report_corrs(df=df, outcomes=OUTCOME_LABELS,
+            report_corrs(df=df, outcomes=OUTCOMES_IN_DATASET,
                          csv_file_name=output_dir / 'corrs-{}'.format(output_file))
 
     def _get_if_threshold_passed_and_max_and_week_of_peak(self, df):
@@ -160,7 +159,7 @@ class FeatureEngineering:
         obs_times = df['Observation Time']
         obs_weeks = df['Observation Period']
         # hosp_rates = df['Obs: New hospitalization rate']
-        hosp_rates = df['Obs: Hospital occupancy rate']
+        hosp_rates = df[HOSP_OCCUPANCY_IN_TRAJ_FILE]
 
         # get maximum hospitalization rate during the prediction period
         maximum = 0

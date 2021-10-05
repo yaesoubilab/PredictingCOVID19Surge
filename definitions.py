@@ -8,6 +8,11 @@ CALIB_PERIOD = 2  #
 PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
+HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
+OUTCOMES_IN_DATASET = ['Maximum rate of hospital occupancy',
+                       'If threshold passed (0:Yes)']
+
+
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
 PROFILES = ['Dominant-UV', 'Novel-UV',
             'Dominant-V', 'Novel-V']

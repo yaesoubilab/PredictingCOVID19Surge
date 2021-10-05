@@ -70,15 +70,18 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     return best_spec
 
 
-def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, list_of_ccp_alphas,
+def optimize_and_eval_dec_tree(model_spec, outcome_name, list_of_max_depths, list_of_ccp_alphas,
                                feature_selection, cv_fold, if_parallel=False, shorten_feature_names=None):
     """
     :param model_spec: (ModelSpec) model specifications
+    :param outcome_name: (string) outcome to predict 
     :param list_of_max_depths: (list) of maximum depths
     :param list_of_ccp_alphas: (list) of ccp alphas
     :param feature_selection: (string) feature selection method
     :param cv_fold: (int) number of cross validation folds
     :param if_parallel: (bool) set True to run code in parallel
+    :param shorten_feature_names: (dictionary) with keys as features names in the dataset and
+        values as alternative names to replace the original names with
     :return: (best specification, the final model performance)
     """
 
@@ -99,9 +102,9 @@ def optimize_and_eval_dec_tree(model_spec, list_of_max_depths, list_of_ccp_alpha
     cv = CV.DecTreeParameterOptimizer(
         df=df_training,
         feature_names=model_spec.features,
-        outcome_name='If hospitalization threshold passed',
+        outcome_name=outcome_name,
         if_outcome_binary=True,
-        list_of_n_features_wanted=model_spec.listNumOfFeaturesWanted,
+        list_of_n_features_wanted=None,
         list_of_max_depths=list_of_max_depths,
         list_of_ccp_alphas=list_of_ccp_alphas,
         feature_selection_method=feature_selection,

@@ -379,6 +379,11 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                                      if_outcome_binary=if_outcome_binary,
                                      if_standardize=False)
 
+        if list_of_n_features_wanted is None:
+            list_of_n_features_wanted = []
+        if list_of_max_depths is None:
+            list_of_max_depths = []
+
         for n_fs in list_of_n_features_wanted:
             for max_depth in list_of_max_depths:
                 for alpha in list_of_ccp_alphas:
