@@ -29,8 +29,6 @@ class COVIDSettings(ModelSettings):
         self.collectEconEval = False  # to collect cost and health outcomes
         self.annualDiscountRate = 0.0
 
-        # if physical distancing was in effect in the first 1.5 years
-        self.ifPDInCalibrationPeriod = True
         self.calibrationPeriod = D.CALIB_PERIOD
 
         # parameter values

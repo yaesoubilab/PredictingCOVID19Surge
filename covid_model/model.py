@@ -476,13 +476,13 @@ def build_covid_model(model):
         cum_vaccine_rate_by_age[0].add_calibration_targets(
             ratios=sets.cumVaccRateMean, survey_sizes=sets.cumVaccRateN)
 
-        # calibration information for the percentage of infection associated with the novel variant
-        perc_incd_novel.add_calibration_targets(
-            ratios=sets.percInfWithNovelMean, survey_sizes=sets.percInfWithNovelN)
+        # # calibration information for the percentage of infection associated with the novel variant
+        # perc_incd_novel.add_calibration_targets(
+        #     ratios=sets.percInfWithNovelMean, survey_sizes=sets.percInfWithNovelN)
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
-        settings=sets, params=params, in_hosp_rate=new_hosp_rate_by_age[0])
+        settings=sets, params=params, hosp_occupancy_rate=hosp_occupancy_rate)
 
     # --------- populate the model ---------
     # change nodes
@@ -536,76 +536,117 @@ def build_covid_model(model):
                    conditions=conditions)
 
 
-def get_interventions_features_conditions(settings, params, in_hosp_rate):
+def get_interventions_features_conditions(settings, params, hosp_occupancy_rate):
+    """
+    :param settings: model settings
+    :param params: model parameters
+    :param hosp_occupancy_rate:
+    :return: (interventions, features, conditions)
+    """
 
     # --------- set up modeling physical distancing ---------
 
     # features
-    feature_on_surveyed_hosp = None
-    feature_on_epi_time = None
-    feature_on_pd = None
+    f_on_surveyed_hosp = None
+    f_on_epi_time = None
+    f_on_y1_intv = None
+    f_on_y2_intv = None
 
     # conditions
-    pass_feas_period = None
-    on_condition_during_y1 = None
-    off_condition = None
-    off_condition_during_y1 = None
+    con_feasibility_period_passed = None
+    con_on_intv_y1 = None
+    con_off_intv_y1_ever = None
+    con_off_intv_y1 = None
+    con_on_intv_y2 = None
+    con_off_intv_y2_ever = None
+    con_off_intv_y2 = None
 
     # interventions
-    physical_dist = None
+    y1_intv = None
+    y2_intv = None
 
     # --------- features ---------
     # defined on surveyed in hospital
-    feature_on_surveyed_hosp = FeatureSurveillance(name='Surveyed number in ICU',
-                                                   ratio_time_series_with_surveillance=in_hosp_rate)
+    f_on_surveyed_hosp = FeatureSurveillance(
+        name='Surveyed number in ICU',
+        ratio_time_series_with_surveillance=hosp_occupancy_rate)
     # feature on time
-    feature_on_epi_time = FeatureEpidemicTime(name='epidemic time')
+    f_on_epi_time = FeatureEpidemicTime(name='epidemic time')
 
     # if feasibility period has passed
-    pass_feas_period = ConditionOnFeatures(
+    con_feasibility_period_passed = ConditionOnFeatures(
         name='if year {} has passed'.format(FEASIBILITY_PERIOD),
-        features=[feature_on_epi_time],
+        features=[f_on_epi_time],
         signs=['ge'],
         thresholds=[FEASIBILITY_PERIOD])
 
     # use of physical distancing during FEASIBILITY_PERIOD
-    if settings.ifPDInCalibrationPeriod:
-        # ---------- intervention -------
-        physical_dist = InterventionAffectingContacts(
-            name='Physical distancing during calibration period',
-            par_perc_change_in_contact_matrix=params.matrixOfPercChangeInContactsY1)
+    # ---------- intervention -------
+    y1_intv = InterventionAffectingContacts(
+        name='Physical distancing during calibration period',
+        par_perc_change_in_contact_matrix=params.matrixOfPercChangeInContactsY1)
+    y2_intv = InterventionAffectingContacts(
+        name='Physical distancing during fall/winter',
+        par_perc_change_in_contact_matrix=params.matrixOfPercChangeInContactsY2)
 
-        # --------- features ---------
-        # feature defined on the intervention
-        feature_on_pd = FeatureIntervention(name='Status of pd',
-                                            intervention=physical_dist)
-        # --------- conditions ---------
-        on_condition_during_y1 = ConditionOnFeatures(
-            name='turn on pd',
-            features=[feature_on_epi_time, feature_on_pd, feature_on_surveyed_hosp],
-            signs=['l', 'e', 'ge'],
-            thresholds=[FEASIBILITY_PERIOD, 0, params.y1Thresholds[0]])
-        off_condition = ConditionOnFeatures(
-            name='turn off pd',
-            features=[feature_on_pd, feature_on_surveyed_hosp],
-            signs=['e', 'l'],
-            thresholds=[1, params.y1Thresholds[1]])
-        off_condition_during_y1 = ConditionOnConditions(
-            name='turn off pd Y1',
-            conditions=[pass_feas_period, off_condition],
-            logic='or')
+    # --------- features ---------
+    # feature defined on the intervention
+    f_on_y1_intv = FeatureIntervention(name='Status of pd in year 1',
+                                       intervention=y1_intv)
+    f_on_y2_intv = FeatureIntervention(name='Status of pd in year 2',
+                                       intervention=y2_intv)
 
-        # --------- decision rule ---------
-        decision_rule = ConditionBasedDecisionRule(
-            default_switch_value=0,
-            condition_to_turn_on=on_condition_during_y1,
-            condition_to_turn_off=off_condition_during_y1)
-        physical_dist.add_decision_rule(decision_rule=decision_rule)
+    # --------- conditions ---------
+    con_on_intv_y1 = ConditionOnFeatures(
+        name='turn on pd y1',
+        features=[f_on_epi_time, f_on_y1_intv, f_on_surveyed_hosp],
+        signs=['l', 'e', 'ge'],
+        thresholds=[FEASIBILITY_PERIOD, 0, params.y1Thresholds[0]])
+    con_on_intv_y2 = ConditionOnFeatures(
+        name='turn on pd y2',
+        features=[f_on_epi_time, f_on_y2_intv, f_on_surveyed_hosp],
+        signs=['ge', 'e', 'ge'],
+        thresholds=[FEASIBILITY_PERIOD, 0, params.y2Thresholds[0]])
+
+    con_off_intv_y1_ever = ConditionOnFeatures(
+        name='turn off pd y1 (ever)',
+        features=[f_on_y1_intv, f_on_surveyed_hosp],
+        signs=['e', 'l'],
+        thresholds=[1, params.y1Thresholds[1]])
+    con_off_intv_y2_ever = ConditionOnFeatures(
+        name='turn off pd y2 (ever)',
+        features=[f_on_y2_intv, f_on_surveyed_hosp],
+        signs=['e', 'l'],
+        thresholds=[1, params.y2Thresholds[1]])
+
+    con_off_intv_y1 = ConditionOnConditions(
+        name='turn off pd y1',
+        conditions=[con_feasibility_period_passed, con_off_intv_y1_ever],
+        logic='or')
+    con_off_intv_y2 = ConditionOnConditions(
+        name='turn off pd y2',
+        conditions=[con_off_intv_y2_ever],
+        logic='or')
+
+    # --------- decision rule ---------
+    decision_rule_y1 = ConditionBasedDecisionRule(
+        default_switch_value=0,
+        condition_to_turn_on=con_on_intv_y1,
+        condition_to_turn_off=con_off_intv_y1)
+    y1_intv.add_decision_rule(decision_rule=decision_rule_y1)
+
+    decision_rule_y2 = ConditionBasedDecisionRule(
+        default_switch_value=0,
+        condition_to_turn_on=con_on_intv_y2,
+        condition_to_turn_off=con_off_intv_y2)
+    y2_intv.add_decision_rule(decision_rule=decision_rule_y2)
 
     # make the list of features, conditions, and interventions
-    features = [feature_on_surveyed_hosp, feature_on_epi_time, feature_on_pd]
-    conditions = [pass_feas_period, on_condition_during_y1, off_condition, off_condition_during_y1]
+    features = [f_on_surveyed_hosp, f_on_epi_time, f_on_y1_intv, f_on_y2_intv]
+    conditions = [con_feasibility_period_passed,
+                  con_on_intv_y1, con_off_intv_y1_ever, con_off_intv_y1,
+                  con_on_intv_y2, con_off_intv_y2_ever, con_off_intv_y2]
 
-    interventions = [physical_dist]
+    interventions = [y1_intv, y2_intv]
 
     return interventions, features, conditions
