@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     # build datasets for prediction at certain weeks:
     build_and_combine_datasets(weeks_in_fall=(8, 16, 24, 32),
-                               weeks_to_predict=8)
+                               weeks_to_predict=4)
 
     # datasets for prediction at cetain weeks until peak
     datasets_for_pred_negative_weeks = False
