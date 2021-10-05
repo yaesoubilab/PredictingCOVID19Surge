@@ -9,7 +9,7 @@ from scipy.stats import pearsonr
 
 from SimPy.InOutFunctions import write_csv
 
-OUTCOME_LABELS = ['Maximum hospitalization rate', 'If hospitalization threshold passed']
+OUTCOME_LABELS = ['Maximum rate of hospital occupancy', 'If threshold passed (0:Yes)']
 
 
 class ErrorModel:
@@ -159,7 +159,8 @@ class FeatureEngineering:
 
         obs_times = df['Observation Time']
         obs_weeks = df['Observation Period']
-        hosp_rates = df['Obs: New hospitalization rate']
+        # hosp_rates = df['Obs: New hospitalization rate']
+        hosp_rates = df['Obs: Hospital occupancy rate']
 
         # get maximum hospitalization rate during the prediction period
         maximum = 0
@@ -174,6 +175,7 @@ class FeatureEngineering:
                 break
 
         # decide if surpass the hospitalization threshold
+        # 0 if yes, 1 if not
         if_surpass_threshold = 1
         if maximum > self.hospThreshold:
             if_surpass_threshold = 0

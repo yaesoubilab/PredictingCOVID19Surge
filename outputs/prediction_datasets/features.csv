@@ -69,6 +69,7 @@ Vaccination rate t_min by age-4
 Vaccination rate t_min by age-5
 Vaccination rate t_min by age-6
 Vaccination rate t_min by age-7
-PD Y1 thresholds-0
-PD Y1 thresholds-1
-Change in contacts - PD Y1
+Y1 thresholds-0
+Y1 thresholds-1
+Y1 Maximum hosp occupancy
+Y1 Max effectiveness of control measures

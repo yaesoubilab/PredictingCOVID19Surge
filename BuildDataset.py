@@ -129,22 +129,23 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
             'Vaccination rate t_min by age-5',
             'Vaccination rate t_min by age-6',
             'Vaccination rate t_min by age-7',
-            'PD Y1 thresholds-0',
-            'PD Y1 thresholds-1',
-            'Change in contacts - PD Y1'
+            'Y1 thresholds-0',
+            'Y1 thresholds-1',
+            'Y1 Maximum hosp occupancy',
+            'Y1 Max effectiveness of control measures'
         ],
         output_file=output_file,
         report_corr=report_corr)
 
 
-def build_and_combine_datasets(weeks_in_fall, weeks_to_predict=4):
+def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_threshold):
 
     # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
     for week_in_fall in weeks_in_fall:
         time_of_prediction = TIME_OF_FALL + week_in_fall / 52
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(time_of_prediction, time_of_prediction + weeks_to_predict / 52),
-                      hosp_threshold=HOSPITALIZATION_THRESHOLD,
+                      hosp_threshold=hosp_threshold,
                       report_corr=False)
 
     # merge the data collected at different weeks to from a
@@ -157,6 +158,9 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict=4):
     dataset.to_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv',
                    index=False)
 
+    print('% observations where threshold is not passed:',
+          round(dataset['If threshold passed (0:Yes)'].mean()*100, 1))
+
     # report correlation
     report_corrs(df=dataset, outcomes=OUTCOME_LABELS,
                  csv_file_name=ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/corr.csv')
@@ -165,8 +169,10 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict=4):
 if __name__ == "__main__":
 
     # build datasets for prediction at certain weeks:
-    build_and_combine_datasets(weeks_in_fall=(8, 16, 24, 32),
-                               weeks_to_predict=4)
+    # fall/winter start in week 78 and end on 117
+    build_and_combine_datasets(weeks_in_fall=(8, 12, 16, 20, 24, 28, 32),
+                               weeks_to_predict=4,
+                               hosp_threshold=HOSPITALIZATION_THRESHOLD)
 
     # datasets for prediction at cetain weeks until peak
     datasets_for_pred_negative_weeks = False
