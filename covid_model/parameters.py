@@ -35,7 +35,7 @@ class COVIDParameters(EpiParameters):
         ]
 
         # initial size of S and I
-        self.sizeS0 = Constant(500000)
+        self.sizeS0 = Uniform(250000, 1250000)
         self.sizeI0 = UniformDiscrete(minimum=1, maximum=5)
 
         # dominant strain
@@ -48,10 +48,10 @@ class COVIDParameters(EpiParameters):
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)]
-        self.durHospByProfile = [Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
-                                 Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
-                                 Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d),
-                                 Beta(mean=12 * d, st_dev=1 * d, minimum=7 * d, maximum=17 * d)]
+        self.durHospByProfile = [Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d),
+                                 Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d),
+                                 Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d),
+                                 Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d)]
         # self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
         #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
         #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
