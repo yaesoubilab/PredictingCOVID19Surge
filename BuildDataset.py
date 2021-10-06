@@ -1,5 +1,5 @@
 from covid_prediction.feature_engineering import *
-from definitions import ROOT_DIR, get_dataset_labels, FEASIBILITY_PERIOD, SIM_DURATION
+from definitions import ROOT_DIR, get_dataset_labels, FEASIBILITY_PERIOD, SIM_DURATION, OUTCOMES_IN_DATASET
 
 
 HOSPITALIZATION_THRESHOLD = 10.3/100000  # per 100,000 population
@@ -75,6 +75,7 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
             ('Obs: % of new hospitalizations due to Novel-V', err_hosp_vacc, ('ave', 2), ('slope', 4)),
         ],
         info_of_prev_fs=[
+            ('Obs: Hospital occupancy rate', 100000),
             ('Obs: Cumulative hospitalization rate', 100000),
             ('Obs: Cumulative vaccination rate', 1),
             ('Obs: Prevalence susceptible', err_prev_susc)],
@@ -159,10 +160,10 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_threshold):
                    index=False)
 
     print('% observations where threshold is not passed:',
-          round(dataset['If threshold passed (0:Yes)'].mean()*100, 1))
+          round(dataset[OUTCOMES_IN_DATASET[1]].mean()*100, 1))
 
     # report correlation
-    report_corrs(df=dataset, outcomes=OUTCOME_LABELS,
+    report_corrs(df=dataset, outcomes=OUTCOMES_IN_DATASET,
                  csv_file_name=ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/corr.csv')
 
 

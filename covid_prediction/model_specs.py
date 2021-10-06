@@ -1,5 +1,6 @@
 
 SHORT_FEATURE_NAMES = {
+    'Obs: Hospital occupancy rate': 'inHosp',
     'Obs: New hospitalization rate-slope-4wk': 'dHosp',
     'Obs: New hospitalization rate-ave-2wk': 'Hosp',
     'Obs: Cumulative hospitalization rate': 'sumHosp',
@@ -104,9 +105,10 @@ Zero = ModelSpec(name='O',
 
 A = ModelSpec(name='A',
               features=[
+                  'Obs: Hospital occupancy rate',
                   'Obs: New hospitalization rate-ave-2wk',
                   'Obs: New hospitalization rate-slope-4wk',
-                  'Obs: Cumulative hospitalization rate',
+                  # 'Obs: Cumulative hospitalization rate',
                   'Obs: Cumulative vaccination rate',
               ],
               list_num_of_features_wanted=[4],
@@ -137,9 +139,10 @@ B2 = ModelSpec(name='B2',
 
 B3 = ModelSpec(name='B3',
                features=[
+                   'Obs: Hospital occupancy rate',
                    'Obs: New hospitalization rate-ave-2wk',
                    'Obs: New hospitalization rate-slope-4wk',
-                   'Obs: Cumulative hospitalization rate',
+                   # 'Obs: Cumulative hospitalization rate',
                    'Obs: Cumulative vaccination rate',
                    'Obs: % of incidence due to novel variant-ave-2wk',
                    'Obs: % of incidence due to novel variant-slope-4wk'
