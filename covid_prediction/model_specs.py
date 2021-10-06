@@ -114,6 +114,19 @@ A = ModelSpec(name='A',
               list_num_of_features_wanted=[4],
               list_num_of_neurons=[5, 7])
 
+B = ModelSpec(name='B',
+              features=[
+                  'Obs: Hospital occupancy rate',
+                  'Obs: New hospitalization rate-ave-2wk',
+                  'Obs: New hospitalization rate-slope-4wk',
+                  # 'Obs: Cumulative hospitalization rate',
+                  'Obs: Cumulative vaccination rate',
+                  'Obs: % of incidence due to novel variant-ave-2wk',
+                  'Obs: % of incidence due to novel variant-slope-4wk'
+              ],
+              list_num_of_features_wanted=[5, 6],
+              list_num_of_neurons=[7, 8])
+
 B1 = ModelSpec(name='B1',
                features=[
                    'Obs: New hospitalization rate-ave-2wk',

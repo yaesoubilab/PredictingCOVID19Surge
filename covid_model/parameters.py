@@ -82,7 +82,7 @@ class COVIDParameters(EpiParameters):
                                Uniform(minimum=2, maximum=3)]       # max
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
-            Uniform(minimum=1.5, maximum=2),    # 5-12
+            Uniform(minimum=1.75, maximum=2.25),    # 5-12
             Uniform(minimum=1.0, maximum=1.4),  # 13-17
             Uniform(minimum=1.0, maximum=1.4),  # 18-29
             Uniform(minimum=0.9, maximum=1.3),  # 30-49
