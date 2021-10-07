@@ -97,7 +97,12 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
     obs_hosp_occ_rate = A.TrajPlotInfo(
         outcome_name='Obs: Hospital occupancy rate',
         title='Rate of hospitalization occupancy\n(per 100,000 population)',
-        y_range=(0, 10*20), y_multiplier=100000, x_multiplier=prev_multiplier)
+        y_range=(0, 10*20), y_multiplier=100000, x_multiplier=prev_multiplier,
+        calibration_info=A.CalibrationTargetPlotInfo(
+            feasible_range_info=A.FeasibleRangeInfo(
+                x_range=HOSP_OCC_DURATION,
+                y_range=[MIN_HOSP_OCC_RATE, MAX_HOSP_OCC_RATE]))
+    )
 
     obs_prev_immune_from_inf = A.TrajPlotInfo(
         outcome_name='Obs: Prevalence with immunity from infection',
