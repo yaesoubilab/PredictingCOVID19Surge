@@ -80,17 +80,17 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         title='Incidence rate\n(per 100,000 population)',
         y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
     obs_hosp_occ_rate = A.TrajPlotInfo(
-        outcome_name='Obs: Hospital occupancy rate',
+        outcome_name='Hospital occupancy rate',
         title='Rate of hospital occupancy\n(per 100,000 population)',
         y_range=(0, 150), y_multiplier=100000, x_multiplier=prev_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             feasible_range_info=A.FeasibleRangeInfo(
-                x_range=HOSP_OCC_DURATION,
+                x_range=[0, FEASIBILITY_PERIOD*52],
                 y_range=[MIN_HOSP_OCC_RATE, MAX_HOSP_OCC_RATE]))
     )
     obs_hosp_rate = A.TrajPlotInfo(
         outcome_name='Obs: New hospitalization rate',
-        title='New hospitalization rate\n(per 100,000 population)',
+        title='Rate of new hospitalizations\n(per 100,000 population)',
         y_range=(0, 150), y_multiplier=100000, x_multiplier=incd_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             feasible_range_info=A.FeasibleRangeInfo(
@@ -98,7 +98,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
                 y_range=[MIN_HOSP_RATE_OVERALL, MAX_HOSP_RATE_OVERALL])))
     obs_cum_hosp_rate = A.TrajPlotInfo(
         outcome_name='Obs: Cumulative hospitalization rate',
-        title='Cumulative hospitalization rate\n(per 100,000 population)',
+        title='Rate of cumulative hospitalizations\n(per 100,000 population)',
         y_range=(0, 1000*3), y_multiplier=100000, x_multiplier=prev_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             rows_of_data=CUM_HOSP_RATE_OVERALL
@@ -114,7 +114,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
                 y_range=[0, MAX_PREV_IMMUNE_FROM_INF])))
     obs_cum_vacc_rate = A.TrajPlotInfo(
         outcome_name='Obs: Cumulative vaccination rate',
-        title='Cumulative vaccination rate (%)',
+        title='Prevalence of vaccinated individuals (%)',
         y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             rows_of_data=D.VACCINE_COVERAGE_OVER_TIME,

@@ -2,8 +2,7 @@ from apace.CalibrationSupport import FeasibleConditions
 from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
-from covid_model.data import MAX_HOSP_OCC_RATE, MIN_HOSP_OCC_RATE, HOSP_OCC_DURATION, \
-    MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, MAX_PREV_IMMUNE_FROM_INF
+from covid_model.data import MAX_HOSP_OCC_RATE, MIN_HOSP_OCC_RATE, MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, MAX_PREV_IMMUNE_FROM_INF
 from definitions import FEASIBILITY_PERIOD
 
 
@@ -136,7 +135,7 @@ def add_calibration_info(settings,
         feasible_conditions=FeasibleConditions(
             feasible_max=MAX_HOSP_OCC_RATE / 100000,
             min_threshold_to_hit=MIN_HOSP_OCC_RATE / 100000,
-            period=[v/52 for v in HOSP_OCC_DURATION]))
+            period=[0, FEASIBILITY_PERIOD]))
 
     # feasible ranges of hospitalization rate
     new_hosp_rate_by_age[0].add_feasible_conditions(
