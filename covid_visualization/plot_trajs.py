@@ -79,10 +79,19 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         outcome_name='Obs: Incidence rate',
         title='Incidence rate\n(per 100,000 population)',
         y_range=(0, 25000), y_multiplier=100000, x_multiplier=obs_incd_multiplier)
+    obs_hosp_occ_rate = A.TrajPlotInfo(
+        outcome_name='Obs: Hospital occupancy rate',
+        title='Rate of hospital occupancy\n(per 100,000 population)',
+        y_range=(0, 150), y_multiplier=100000, x_multiplier=prev_multiplier,
+        calibration_info=A.CalibrationTargetPlotInfo(
+            feasible_range_info=A.FeasibleRangeInfo(
+                x_range=HOSP_OCC_DURATION,
+                y_range=[MIN_HOSP_OCC_RATE, MAX_HOSP_OCC_RATE]))
+    )
     obs_hosp_rate = A.TrajPlotInfo(
         outcome_name='Obs: New hospitalization rate',
         title='New hospitalization rate\n(per 100,000 population)',
-        y_range=(0, MAX_HOSP_RATE_OVERALL * 4), y_multiplier=100000, x_multiplier=incd_multiplier,
+        y_range=(0, 150), y_multiplier=100000, x_multiplier=incd_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             feasible_range_info=A.FeasibleRangeInfo(
                 x_range=[0, FEASIBILITY_PERIOD*52],
@@ -94,16 +103,6 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
         calibration_info=A.CalibrationTargetPlotInfo(
             rows_of_data=CUM_HOSP_RATE_OVERALL
         ))
-    obs_hosp_occ_rate = A.TrajPlotInfo(
-        outcome_name='Obs: Hospital occupancy rate',
-        title='Rate of hospitalization occupancy\n(per 100,000 population)',
-        y_range=(0, 10*20), y_multiplier=100000, x_multiplier=prev_multiplier,
-        calibration_info=A.CalibrationTargetPlotInfo(
-            feasible_range_info=A.FeasibleRangeInfo(
-                x_range=HOSP_OCC_DURATION,
-                y_range=[MIN_HOSP_OCC_RATE, MAX_HOSP_OCC_RATE]))
-    )
-
     obs_prev_immune_from_inf = A.TrajPlotInfo(
         outcome_name='Obs: Prevalence with immunity from infection',
         title='Prevalence of population with\nimmunity from infection (%)',
@@ -140,8 +139,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
                                   figure_size=(2.3*2, 2.4*2)
                                   )
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
-                                  list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate, obs_prev_immune_from_inf,
-                                                  obs_cum_vacc_rate, obs_incd_novel],
+                                  list_plot_info=[obs_hosp_occ_rate, obs_hosp_rate, obs_cum_hosp_rate,
+                                                  obs_prev_immune_from_inf, obs_cum_vacc_rate, obs_incd_novel],
                                   file_name=ROOT_DIR+'/outputs/figures/summary.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
