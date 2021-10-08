@@ -114,7 +114,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
                 y_range=[0, MAX_PREV_IMMUNE_FROM_INF])))
     obs_cum_vacc_rate = A.TrajPlotInfo(
         outcome_name='Obs: Cumulative vaccination rate',
-        title='Prevalence of vaccinated individuals (%)',
+        title='Prevalence of vaccinated\nindividuals (%)',
         y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
             rows_of_data=D.VACCINE_COVERAGE_OVER_TIME,
