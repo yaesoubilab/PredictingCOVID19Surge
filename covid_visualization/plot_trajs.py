@@ -139,8 +139,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
                                   figure_size=(2.3*2, 2.4*2)
                                   )
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
-                                  list_plot_info=[obs_hosp_occ_rate, obs_hosp_rate, obs_cum_hosp_rate,
-                                                  obs_prev_immune_from_inf, obs_cum_vacc_rate, obs_incd_novel],
+                                  list_plot_info=[obs_hosp_occ_rate, obs_hosp_rate, obs_prev_immune_from_inf,
+                                                  obs_cum_hosp_rate, obs_cum_vacc_rate, obs_incd_novel],
                                   file_name=ROOT_DIR+'/outputs/figures/summary.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
