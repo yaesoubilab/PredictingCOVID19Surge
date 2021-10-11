@@ -2,7 +2,7 @@ from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
 from covid_prediction.print_features import print_selected_features_dec_trees
-from definitions import ROOT_DIR, OUTCOMES_IN_DATASET
+from definitions import ROOT_DIR, OUTCOME_NAME_IN_DATASET
 
 MODELS = (A, B3)
 
@@ -29,7 +29,7 @@ def evaluate(noise_coeff):
         # model zero assumes no noise or bias
         best_spec, final_model_performance = optimize_and_eval_dec_tree(
             model_spec=model,
-            outcome_name=OUTCOMES_IN_DATASET[1],
+            outcome_name=OUTCOME_NAME_IN_DATASET[1],
             list_of_max_depths=None,
             list_of_ccp_alphas=ALPHAS,
             feature_selection=None,

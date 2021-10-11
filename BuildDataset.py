@@ -1,27 +1,22 @@
 from covid_prediction.feature_engineering import *
-from definitions import ROOT_DIR, get_dataset_labels, FEASIBILITY_PERIOD, SIM_DURATION, OUTCOMES_IN_DATASET
+from definitions import ROOT_DIR, get_dataset_labels, get_outcome_label, \
+    FEASIBILITY_PERIOD, OUTCOME_NAME_IN_DATASET
 
 
-HOSPITALIZATION_THRESHOLD = 10.3/100000  # per 100,000 population
+HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 TIME_OF_FALL = FEASIBILITY_PERIOD
 
-# survey sizes
-N_NOVEL_INCD = 1521
-N_PREV_SUSC = 481
-N_HOSP_UNVAC = 864
 
-
-def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
-                  noise_coeff=None, bias_delay=None, report_corr=True):
+def build_dataset(week_of_prediction_in_fall,
+                  pred_period,
+                  hosp_thresholds,
+                  report_corr=True):
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                              a negative int for number of weeks before the peak
     :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends;
         it is assumed that prediction is made at time y0 for an outcome observed during (y0, y1).
-    :param hosp_threshold: threshold of hospitalization capacity
-    :param noise_coeff: (None or int) if None, the noise model is not added, otherwise, the noise model is
-        added with survey size multiplied by add_noise.
-    :param bias_delay: (None or int) delay (in weeks) of observing the true value
+    :param hosp_thresholds: (list) of thresholds of hospitalization capacity
     :param report_corr: (bool) whether to report correlations between features and outcomes
     """
     # read dataset
@@ -29,32 +24,10 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
         dir_of_trajs='outputs/trajectories',
         week_of_prediction_in_fall=week_of_prediction_in_fall,
         pred_period=pred_period,
-        hosp_threshold=hosp_threshold)
-
-    # error models
-    err_novel_incd = None   # error model for % of incidence with novel variant
-    err_prev_susc = None    # error model for prevalence susceptible
-    err_hosp_vacc = None  # error model for the % of hospitalized patients who are vaccinated
-    # if bias needs to be added
-    if bias_delay is not None:
-        # and if noise needs to be added
-        if noise_coeff is not None:
-            err_novel_incd = ErrorModel(
-                survey_size=N_NOVEL_INCD * noise_coeff, bias_delay=bias_delay)
-            err_prev_susc = ErrorModel(
-                survey_size=N_PREV_SUSC * noise_coeff, bias_delay=bias_delay)
-            err_hosp_vacc = ErrorModel(
-                survey_size=N_HOSP_UNVAC, bias_delay=bias_delay)
-    else:  # no bias (only noise)
-        # if noise needs to be added
-        if noise_coeff is not None:
-            err_novel_incd = ErrorModel(survey_size=N_NOVEL_INCD * noise_coeff)
-            err_prev_susc = ErrorModel(survey_size=N_PREV_SUSC * noise_coeff)
-            err_hosp_vacc = None  # no error
+        hosp_thresholds=hosp_thresholds)
 
     # find output file name
-    label = get_dataset_labels(
-        week=week_of_prediction_in_fall, noise_coeff=noise_coeff, bias_delay=bias_delay)
+    label = get_dataset_labels(week=week_of_prediction_in_fall)
     output_file = 'data-{}.csv'.format(label)
 
     # create new dataset based on raw data
@@ -69,16 +42,17 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
         info_of_incd_fs=[
             ('Obs: Incidence rate', 100000, ('ave', 2), ('slope', 4)),
             ('Obs: New hospitalization rate', 100000, ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations that are vaccinated', err_hosp_vacc, ('ave', 2), ('slope', 4)),
-            ('Obs: % of incidence due to novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
-            ('Obs: % of new hospitalizations due to Novel-V', err_hosp_vacc, ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations that are vaccinated', ('ave', 2), ('slope', 4)),
+            ('Obs: % of incidence due to novel variant', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to novel variant', ('ave', 2), ('slope', 4)),
+            ('Obs: % of new hospitalizations due to Novel-V', ('ave', 2), ('slope', 4)),
         ],
         info_of_prev_fs=[
             ('Obs: Hospital occupancy rate', 100000),
             ('Obs: Cumulative hospitalization rate', 100000),
             ('Obs: Cumulative vaccination rate', 1),
-            ('Obs: Prevalence susceptible', err_prev_susc)],
+            ('Obs: Prevalence susceptible', 1)
+        ],
         info_of_parameter_fs=[
             'R0',
             'Duration of infectiousness-dominant',
@@ -139,14 +113,23 @@ def build_dataset(week_of_prediction_in_fall, pred_period, hosp_threshold,
         report_corr=report_corr)
 
 
-def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_threshold):
+def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresholds):
+    """
+    :param weeks_in_fall: (list) of weeks into fall where feature values should be recorded
+    :param weeks_to_predict: (int) number of weeks in future when outcomes should be predicted
+    :param hosp_occu_thresholds: (list) of thresholds for hospital occupancy
+    """
 
     # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
     for week_in_fall in weeks_in_fall:
+
+        # find the time (year) for which the prediction should be made
         time_of_prediction = TIME_OF_FALL + week_in_fall / 52
+
+        # build the dataset
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(time_of_prediction, time_of_prediction + weeks_to_predict / 52),
-                      hosp_threshold=hosp_threshold,
+                      hosp_thresholds=hosp_occu_thresholds,
                       report_corr=False)
 
     # merge the data collected at different weeks to from a
@@ -159,11 +142,15 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_threshold):
     dataset.to_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv',
                    index=False)
 
-    print('% observations where threshold is not passed:',
-          round(dataset[OUTCOMES_IN_DATASET[1]].mean()*100, 1))
+    # report the % of observations where hospital occupancy threshold passes
+    for t in hosp_occu_thresholds:
+        print('% observations where threshold is not passed:',
+              round(dataset[OUTCOME_NAME_IN_DATASET + ' {}'.format(t)].mean() * 100, 1))
 
     # report correlation
-    report_corrs(df=dataset, outcomes=OUTCOMES_IN_DATASET,
+    outcomes = [get_outcome_label(threshold=t) for t in hosp_occu_thresholds]
+    report_corrs(df=dataset,
+                 outcomes=outcomes,
                  csv_file_name=ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/corr.csv')
 
 
@@ -173,24 +160,5 @@ if __name__ == "__main__":
     # fall/winter start in week 78 and end on 117
     build_and_combine_datasets(weeks_in_fall=(8, 12, 16, 20, 24, 28, 32),
                                weeks_to_predict=4,
-                               hosp_threshold=HOSPITALIZATION_THRESHOLD)
+                               hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS)
 
-    # datasets for prediction at cetain weeks until peak
-    datasets_for_pred_negative_weeks = False
-    if datasets_for_pred_negative_weeks:
-        # datasets for prediction made at weeks with certain duration until peak
-        for week_until_peak in (-4, -8, -12):
-
-            build_dataset(week_of_prediction_in_fall=week_until_peak,
-                          pred_period=(TIME_OF_FALL, SIM_DURATION),
-                          hosp_threshold=HOSPITALIZATION_THRESHOLD)
-
-            build_dataset(week_of_prediction_in_fall=week_until_peak,
-                          pred_period=(TIME_OF_FALL, SIM_DURATION),
-                          hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                          noise_coeff=1)
-
-            build_dataset(week_of_prediction_in_fall=week_until_peak,
-                          pred_period=(TIME_OF_FALL, SIM_DURATION),
-                          hosp_threshold=HOSPITALIZATION_THRESHOLD,
-                          noise_coeff=0.5, bias_delay=4)

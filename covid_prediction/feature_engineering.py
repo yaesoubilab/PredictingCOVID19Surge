@@ -8,7 +8,7 @@ from numpy.random import RandomState
 from scipy.stats import pearsonr
 
 from SimPy.InOutFunctions import write_csv
-from definitions import HOSP_OCCUPANCY_IN_TRAJ_FILE, OUTCOMES_IN_DATASET
+from definitions import HOSP_OCCUPANCY_IN_TRAJ_FILE, OUTCOME_NAME_IN_DATASET, get_outcome_label
 
 
 class ErrorModel:
@@ -52,18 +52,18 @@ class ErrorModel:
 
 
 class FeatureEngineering:
-    def __init__(self, dir_of_trajs, week_of_prediction_in_fall, pred_period, hosp_threshold):
+    def __init__(self, dir_of_trajs, week_of_prediction_in_fall, pred_period, hosp_thresholds):
         """ create the dataset needed to develop the predictive models
         :param dir_of_trajs: (string) the name of directory where trajectories are located
         :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                                  a negative int for number of weeks before the peak
         :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
-        :param hosp_threshold: threshold of hospitalization capacity
+        :param hosp_thresholds: (list) of thresholds for hospitalization capacity
         """
         self.directoryName = dir_of_trajs
         self.weekOfPredInFall = week_of_prediction_in_fall
-        self.predictionPeriodWeek = (round(pred_period[0]*52, 0), round(pred_period[1]*52, 0))
-        self.hospThreshold = hosp_threshold
+        self.weeksOfPredictionPeriod = (round(pred_period[0] * 52, 0), round(pred_period[1] * 52, 0))
+        self.hospThresholds = hosp_thresholds
         self.namesOfTrajFiles = os.listdir(dir_of_trajs)
 
     def pre_process(self, info_of_incd_fs, info_of_prev_fs, info_of_parameter_fs, output_file, report_corr=True):
@@ -87,7 +87,9 @@ class FeatureEngineering:
         write_csv(rows=[[c] for c in col_labels],
                   file_name='outputs/prediction_datasets/features.csv')
 
-        col_labels.extend(OUTCOMES_IN_DATASET)
+        # add columns for outcomes
+        for t in self.hospThresholds:
+            col_labels.append(get_outcome_label(threshold=t))
 
         # read dataset of the parameter features
         param_df = pd.read_csv('outputs/summary/parameter_values.csv')
@@ -111,7 +113,7 @@ class FeatureEngineering:
             if self.weekOfPredInFall < 0:
                 pred_week = peak_week + self.weekOfPredInFall
             else:
-                pred_week = self.predictionPeriodWeek[0]
+                pred_week = self.weeksOfPredictionPeriod[0]
 
             # read values of incidence and prevalence features for this trajectory
             incd_fs = self._get_feature_values(df=df, week=pred_week,
@@ -148,7 +150,7 @@ class FeatureEngineering:
 
         # report correlations
         if report_corr:
-            report_corrs(df=df, outcomes=OUTCOMES_IN_DATASET,
+            report_corrs(df=df, outcomes=OUTCOME_NAME_IN_DATASET,
                          csv_file_name=output_dir / 'corrs-{}'.format(output_file))
 
     def _get_if_threshold_passed_and_max_and_week_of_peak(self, df):
@@ -159,27 +161,28 @@ class FeatureEngineering:
         obs_times = df['Observation Time']
         obs_weeks = df['Observation Period']
         # hosp_rates = df['Obs: New hospitalization rate']
-        hosp_rates = df[HOSP_OCCUPANCY_IN_TRAJ_FILE]
+        hosp_occu_rates = df[HOSP_OCCUPANCY_IN_TRAJ_FILE]
 
         # get maximum hospitalization rate during the prediction period
         maximum = 0
-        week = None
-        for pair in zip(obs_times, obs_weeks, hosp_rates):
-            if self.predictionPeriodWeek[0] <= pair[1] <= self.predictionPeriodWeek[1]:
+        week_of_peak = None
+        for pair in zip(obs_times, obs_weeks, hosp_occu_rates):
+            if self.weeksOfPredictionPeriod[0] <= pair[1] <= self.weeksOfPredictionPeriod[1]:
                 if pair[2] > maximum:
-                    week = pair[1]
+                    week_of_peak = pair[1]
                     maximum = pair[2]
             # exit loop if prediction period has passed
-            if pair[1] > self.predictionPeriodWeek[1]:
+            if pair[1] > self.weeksOfPredictionPeriod[1]:
                 break
 
         # decide if surpass the hospitalization threshold
         # 0 if yes, 1 if not
-        if_surpass_threshold = 1
-        if maximum > self.hospThreshold:
-            if_surpass_threshold = 0
+        if_surpass_thresholds = [1] * len(self.hospThresholds)
+        for i, t in enumerate(self.hospThresholds):
+            if maximum * 100000 > t:
+                if_surpass_thresholds[i] = 0
 
-        return if_surpass_threshold, maximum, week
+        return if_surpass_thresholds, maximum, week_of_peak
 
     @staticmethod
     def _get_feature_values(df, week, info_of_features, incd_or_prev):
@@ -192,7 +195,7 @@ class FeatureEngineering:
         :return: list of values for features
         """
 
-        err_model = None # error model
+        err_model = None  # error model
         f_values = []   # feature values
         for info in info_of_features:
             # multiplier to multiply the value of this column by

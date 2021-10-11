@@ -8,10 +8,12 @@ CALIB_PERIOD = 2  #
 PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
+# columns in datasets
 HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
-OUTCOMES_IN_DATASET = ['Maximum rate of hospital occupancy',
-                       'If threshold passed (0:Yes)']
+OUTCOME_NAME_IN_DATASET = 'If threshold passed (0:Yes)'
 
+# survey sizes
+N_NOVEL_INCD = 1521
 
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
 PROFILES = ['Dominant-UV', 'Novel-UV',
@@ -51,7 +53,6 @@ class AgeGroupsProfiles:
         return int(i/self.nProfiles), i % self.nAgeGroups
 
     def get_str_age_profile(self, age_group, profile):
-
         return AGES[age_group] + '-' + PROFILES[profile]
 
     def get_str_age(self, age_group):
@@ -61,7 +62,7 @@ class AgeGroupsProfiles:
         return PROFILES[profile]
 
 
-def get_dataset_labels(week, noise_coeff, bias_delay):
+def get_dataset_labels(week, noise_coeff=None, bias_delay=None):
 
     if bias_delay is not None and noise_coeff is not None:
         label = ' with noise {} and bias {}'.format(noise_coeff, bias_delay)
@@ -84,3 +85,8 @@ def get_short_outcome(outcome):
         return 'prob'
     else:
         raise ValueError('Invalid outcome to predict.')
+
+
+def get_outcome_label(threshold):
+
+    return OUTCOME_NAME_IN_DATASET + ' {}'.format(threshold)
