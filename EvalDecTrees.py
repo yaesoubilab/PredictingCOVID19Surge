@@ -47,7 +47,8 @@ def evaluate(hosp_occu_threshold, survey_size_novel_inf):
 
     # print summary of results
     write_csv(rows=rows,
-              file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary.csv')
+              file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary-threshold {}.csv'.format(
+                  hosp_occu_threshold))
 
     # print features by model
 

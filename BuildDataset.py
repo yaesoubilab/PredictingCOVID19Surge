@@ -1,3 +1,4 @@
+from SimPy.InOutFunctions import delete_file
 from covid_prediction.feature_engineering import *
 from definitions import ROOT_DIR, get_dataset_labels, get_outcome_label, \
     FEASIBILITY_PERIOD, N_NOVEL_INCD
@@ -118,8 +119,10 @@ def build_dataset(week_of_prediction_in_fall,
         report_corr=report_corr)
 
 
-def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresholds, survey_size_novel_inf):
+def build_and_combine_datasets(
+        type_of_dataset, weeks_in_fall, weeks_to_predict, hosp_occu_thresholds, survey_size_novel_inf):
     """
+    :param type_of_dataset: (string) 'training dataset' or 'validation'
     :param weeks_in_fall: (list) of weeks into fall where feature values should be recorded
     :param weeks_to_predict: (int) number of weeks in future when outcomes should be predicted
     :param hosp_occu_thresholds: (list) of thresholds for hospital occupancy
@@ -144,11 +147,16 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresh
     dataframes = []
     prefix = '/outputs/prediction_datasets/week_into_fall/'
     for w in weeks_in_fall:
+        # file name
         label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)
-        dataframes.append(pd.read_csv(
-            ROOT_DIR + prefix + 'data-{}.csv'.format(label)))
+        file_name = ROOT_DIR + prefix + 'data-{}.csv'.format(label)
+        # read and store
+        dataframes.append(pd.read_csv(file_name))
+        # delete file
+        delete_file(file_name=file_name)
+
     dataset = pd.concat(dataframes)
-    dataset.to_csv(ROOT_DIR + prefix + 'combined data-sample size {}.csv'.format(survey_size_novel_inf),
+    dataset.to_csv(ROOT_DIR + prefix + '{}.csv'.format(type_of_dataset),
                    index=False)
 
     # report the % of observations where hospital occupancy threshold passes
@@ -160,15 +168,22 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresh
     outcomes = [get_outcome_label(threshold=t) for t in hosp_occu_thresholds]
     report_corrs(df=dataset,
                  outcomes=outcomes,
-                 csv_file_name=ROOT_DIR + prefix + 'corr-sample size {}.csv'.format(survey_size_novel_inf))
+                 csv_file_name=ROOT_DIR + prefix + 'corr in {}.csv'.format(type_of_dataset))
 
 
 if __name__ == "__main__":
 
+    data_type = 'training dataset'
+    # data_type = 'no control measure'
+    # data_type = 'no novel variant'
+    # data_type = 'survey size 200'
+
     # build datasets for prediction at certain weeks:
     # fall/winter start in week 78 and end on 117
-    build_and_combine_datasets(weeks_in_fall=(8, 12, 16, 20, 24, 28, 32),
-                               weeks_to_predict=4,
-                               hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
-                               survey_size_novel_inf=N_NOVEL_INCD)
+    build_and_combine_datasets(
+        type_of_dataset=data_type,
+        weeks_in_fall=(8, 12, 16, 20, 24, 28, 32),
+        weeks_to_predict=4,
+        hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
+        survey_size_novel_inf=N_NOVEL_INCD)
 
