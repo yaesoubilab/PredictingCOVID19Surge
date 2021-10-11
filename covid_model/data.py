@@ -98,19 +98,17 @@ VACCINE_COVERAGE_BY_AGE = [
 ]
 
 
+# ranges on weekly hospitalization rates
 UP_FACTOR = 1.25
 DOWN_FACTOR = 0.75
-
-# ranges on weekly hospitalization rates
 MAX_HOSP_RATE_OVERALL = 51 * UP_FACTOR  # per 100,000 population https://gis.cdc.gov/grasp/COVIDNet/COVID19_3.html
 MIN_HOSP_RATE_OVERALL = 9.0 * DOWN_FACTOR
 MAX_HOSP_RATE_BY_AGE = np.array([24.3, 9.0, 10.9, 14.1, 41.2, 66.3, 124.6, 318.0])*UP_FACTOR
 MIN_HOSP_RATE_BY_AGE = [0]*8  # np.array([2, 0.9, 1.7, 2.8, 5.7, 11.1, 24.7, 71.5]) * DOWN_FACTOR
 
 # ranges of weekly hospital occupancy
-HOSP_OCC_DURATION = [0, 20]   # April-1 to July-7 2020
-MAX_HOSP_OCC_RATE = 30 * 2
-MIN_HOSP_OCC_RATE = 10
+MAX_HOSP_OCC_RATE = 61.1
+MIN_HOSP_OCC_RATE = 1.1
 
 CUM_HOSP_RATE_OVERALL = [[76, 610.8, 238.1, 943.7]]  # Overall
 CUM_HOSP_RATE_BY_AGE = [
@@ -125,8 +123,7 @@ CUM_HOSP_RATE_BY_AGE = [
     [[76, 2462.9, 1179.8, 3660.8]]  # 75+
 ]
 
-# TODO: to update
-MAX_PREV_IMMUNE_FROM_INF = 40
+MAX_PREV_IMMUNE_FROM_INF = 35
 PREV_IMMUNE_FROM_INF = [
     # [24, 5.9, 5.5, 6.3],
     # [32, 6.8, 6.5, 7.2],
@@ -134,7 +131,7 @@ PREV_IMMUNE_FROM_INF = [
     # [50, 20, 19.5, 20.5],
     # [58, 21.8, 21.2, 22.2],
     # [66, 21.6, 21.2, 22.2],
-    [72, 20.6, 4.6, 34.1]
+    [72, 20.6, 1.6, 34.1]
 ]
 
 # age distribution of hospitalization (%)
