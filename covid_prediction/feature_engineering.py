@@ -88,6 +88,7 @@ class FeatureEngineering:
                   file_name='outputs/prediction_datasets/features.csv')
 
         # add columns for outcomes
+        col_labels.append('Max ' + HOSP_OCCUPANCY_IN_TRAJ_FILE)
         for t in self.hospThresholds:
             col_labels.append(get_outcome_label(threshold=t))
 
@@ -128,7 +129,8 @@ class FeatureEngineering:
             for col in param_cols:
                 row.append(col[i])
             # max hospital rate and whether surpass capacity
-            row.extend([hosp_max, if_hosp_threshold_passed])
+            row.append(hosp_max)
+            row.extend(if_hosp_threshold_passed)
 
             # store this row of feature values
             all_feature_values.append(row)
@@ -315,7 +317,7 @@ def report_corrs(df, outcomes, csv_file_name):
                 if f_name != o:
                     # correlation and p-value
                     corr, p = pearsonr(df[f_name], y)
-                    row.extend([corr, p])
+                    row.extend([round(corr, 3), round(p, 3)])
             rows.append(row)
 
     df = pd.DataFrame(data=rows,

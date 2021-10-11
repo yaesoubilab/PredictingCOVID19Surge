@@ -33,7 +33,7 @@ def evaluate(noise_coeff, bias_delay=None):
 
                 # find the label
                 label = get_dataset_labels(
-                    week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
+                    week=week, survey_size=noise_coeff, bias_delay=bias_delay)
 
                 print("Evaluating model {} with outcome '{}' at {}.".format(
                     model.name, outcome, label))
@@ -57,7 +57,7 @@ def evaluate(noise_coeff, bias_delay=None):
                 rows.append([week, model.name, best_spec.meanScore, best_spec.PI, best_spec.formattedMeanPI])
 
             # print summary of results
-            label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
+            label = get_dataset_labels(week=None, survey_size=noise_coeff, bias_delay=bias_delay)
             write_csv(rows=rows,
                       file_name=ROOT_DIR+'/outputs/prediction_summary/neu_net/predicting {}-summary{}.csv'
                       .format(short_outcome, label))

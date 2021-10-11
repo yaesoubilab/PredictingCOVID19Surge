@@ -60,9 +60,9 @@ def print_selected_features_neu_nets(short_outcome, weeks, models, noise_coeff, 
         for week in weeks:
 
             if model == Zero: # no error or bias for the Zero model
-                label = get_dataset_labels(week=week, noise_coeff=None, bias_delay=None)
+                label = get_dataset_labels(week=week, survey_size=None, bias_delay=None)
             else:
-                label = get_dataset_labels(week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
+                label = get_dataset_labels(week=week, survey_size=noise_coeff, bias_delay=bias_delay)
             filename = '/outputs/prediction_summary/neu_net/features/features-predicting {}-{}-{}.csv'.format(
                 short_outcome, model.name, label)
             col_name = '{} weeks until peak | model {}'.format(-week, model.name)
@@ -102,7 +102,7 @@ def print_selected_features_neu_nets(short_outcome, weeks, models, noise_coeff, 
         row.extend(dict_result[f])
         result.append(row)
 
-    label = get_dataset_labels(week=None, noise_coeff=noise_coeff, bias_delay=bias_delay)
+    label = get_dataset_labels(week=None, survey_size=noise_coeff, bias_delay=bias_delay)
     write_csv(rows=result,
               file_name=ROOT_DIR+'/outputs/prediction_summary/neu_net/selected features for predicting {}-{}.csv'.format(
                   short_outcome, label))

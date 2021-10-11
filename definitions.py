@@ -12,8 +12,6 @@ SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
 OUTCOME_NAME_IN_DATASET = 'If threshold passed (0:Yes)'
 
-# survey sizes
-N_NOVEL_INCD = 1521
 
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
 PROFILES = ['Dominant-UV', 'Novel-UV',
@@ -62,12 +60,12 @@ class AgeGroupsProfiles:
         return PROFILES[profile]
 
 
-def get_dataset_labels(week, noise_coeff=None, bias_delay=None):
+def get_dataset_labels(week, survey_size=None, bias_delay=None):
 
-    if bias_delay is not None and noise_coeff is not None:
-        label = ' with noise {} and bias {}'.format(noise_coeff, bias_delay)
-    elif noise_coeff is not None:
-        label = ' with noise {}'.format(noise_coeff)
+    if bias_delay is not None and survey_size is not None:
+        label = ' sample size {} and bias {}'.format(survey_size, bias_delay)
+    elif survey_size is not None:
+        label = ' sample size {}'.format(survey_size)
     else:
         label = ''
 

@@ -1,15 +1,18 @@
 from covid_prediction.feature_engineering import *
 from definitions import ROOT_DIR, get_dataset_labels, get_outcome_label, \
-    FEASIBILITY_PERIOD, OUTCOME_NAME_IN_DATASET
-
+    FEASIBILITY_PERIOD
 
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 TIME_OF_FALL = FEASIBILITY_PERIOD
+
+# survey sizes
+N_NOVEL_INCD = 1521
 
 
 def build_dataset(week_of_prediction_in_fall,
                   pred_period,
                   hosp_thresholds,
+                  survey_size_novel_inf,
                   report_corr=True):
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
@@ -17,8 +20,10 @@ def build_dataset(week_of_prediction_in_fall,
     :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends;
         it is assumed that prediction is made at time y0 for an outcome observed during (y0, y1).
     :param hosp_thresholds: (list) of thresholds of hospitalization capacity
+    :param survey_size_novel_inf: (int) survey size of novel infection surveillance
     :param report_corr: (bool) whether to report correlations between features and outcomes
     """
+
     # read dataset
     feature_engineer = FeatureEngineering(
         dir_of_trajs='outputs/trajectories',
@@ -26,8 +31,11 @@ def build_dataset(week_of_prediction_in_fall,
         pred_period=pred_period,
         hosp_thresholds=hosp_thresholds)
 
+    # error model for novel variant surveillance
+    err_novel_incd = ErrorModel(survey_size=survey_size_novel_inf)
+
     # find output file name
-    label = get_dataset_labels(week=week_of_prediction_in_fall)
+    label = get_dataset_labels(week=week_of_prediction_in_fall, survey_size=survey_size_novel_inf)
     output_file = 'data-{}.csv'.format(label)
 
     # create new dataset based on raw data
@@ -43,7 +51,7 @@ def build_dataset(week_of_prediction_in_fall,
             ('Obs: Incidence rate', 100000, ('ave', 2), ('slope', 4)),
             ('Obs: New hospitalization rate', 100000, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations that are vaccinated', ('ave', 2), ('slope', 4)),
-            ('Obs: % of incidence due to novel variant', ('ave', 2), ('slope', 4)),
+            ('Obs: % of incidence due to novel variant', err_novel_incd, ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to novel variant', ('ave', 2), ('slope', 4)),
             ('Obs: % of new hospitalizations due to Novel-V', ('ave', 2), ('slope', 4)),
         ],
@@ -113,11 +121,12 @@ def build_dataset(week_of_prediction_in_fall,
         report_corr=report_corr)
 
 
-def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresholds):
+def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresholds, survey_size_novel_inf):
     """
     :param weeks_in_fall: (list) of weeks into fall where feature values should be recorded
     :param weeks_to_predict: (int) number of weeks in future when outcomes should be predicted
     :param hosp_occu_thresholds: (list) of thresholds for hospital occupancy
+    :param survey_size_novel_inf: (int) survey size of novel infection surveillance
     """
 
     # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
@@ -130,22 +139,24 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresh
         build_dataset(week_of_prediction_in_fall=week_in_fall,
                       pred_period=(time_of_prediction, time_of_prediction + weeks_to_predict / 52),
                       hosp_thresholds=hosp_occu_thresholds,
+                      survey_size_novel_inf=survey_size_novel_inf,
                       report_corr=False)
 
     # merge the data collected at different weeks to from a
     # single dataset for training the model
     dataframes = []
     for w in weeks_in_fall:
+        label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)
         dataframes.append(pd.read_csv(
-            ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/data-wk {}.csv'.format(w)))
+            ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/data-{}.csv'.format(label)))
     dataset = pd.concat(dataframes)
     dataset.to_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv',
                    index=False)
 
     # report the % of observations where hospital occupancy threshold passes
     for t in hosp_occu_thresholds:
-        print('% observations where threshold is not passed:',
-              round(dataset[OUTCOME_NAME_IN_DATASET + ' {}'.format(t)].mean() * 100, 1))
+        print('% observations where threshold {} is passed:'.format(t),
+              round(100 * (1 - dataset[get_outcome_label(threshold=t)].mean()), 1))
 
     # report correlation
     outcomes = [get_outcome_label(threshold=t) for t in hosp_occu_thresholds]
@@ -160,5 +171,6 @@ if __name__ == "__main__":
     # fall/winter start in week 78 and end on 117
     build_and_combine_datasets(weeks_in_fall=(8, 12, 16, 20, 24, 28, 32),
                                weeks_to_predict=4,
-                               hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS)
+                               hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
+                               survey_size_novel_inf=N_NOVEL_INCD)
 

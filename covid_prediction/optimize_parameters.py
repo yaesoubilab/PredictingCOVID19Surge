@@ -22,7 +22,7 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
 
     # read dataset
     label = get_dataset_labels(
-        week=week, noise_coeff=noise_coeff, bias_delay=bias_delay)
+        week=week, survey_size=noise_coeff, bias_delay=bias_delay)
     df = pd.read_csv('{}/outputs/prediction_datasets/time_to_peak/data-{}.csv'.format(ROOT_DIR, label))
 
     # use all features if no feature name is provided
