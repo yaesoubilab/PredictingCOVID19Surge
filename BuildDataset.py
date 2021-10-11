@@ -1,12 +1,9 @@
 from covid_prediction.feature_engineering import *
 from definitions import ROOT_DIR, get_dataset_labels, get_outcome_label, \
-    FEASIBILITY_PERIOD
+    FEASIBILITY_PERIOD, N_NOVEL_INCD
 
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 TIME_OF_FALL = FEASIBILITY_PERIOD
-
-# survey sizes
-N_NOVEL_INCD = 1521
 
 
 def build_dataset(week_of_prediction_in_fall,
@@ -145,12 +142,13 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresh
     # merge the data collected at different weeks to from a
     # single dataset for training the model
     dataframes = []
+    prefix = '/outputs/prediction_datasets/week_into_fall/'
     for w in weeks_in_fall:
         label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)
         dataframes.append(pd.read_csv(
-            ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/data-{}.csv'.format(label)))
+            ROOT_DIR + prefix + 'data-{}.csv'.format(label)))
     dataset = pd.concat(dataframes)
-    dataset.to_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv',
+    dataset.to_csv(ROOT_DIR + prefix + 'combined data-sample size {}.csv'.format(survey_size_novel_inf),
                    index=False)
 
     # report the % of observations where hospital occupancy threshold passes
@@ -162,7 +160,7 @@ def build_and_combine_datasets(weeks_in_fall, weeks_to_predict, hosp_occu_thresh
     outcomes = [get_outcome_label(threshold=t) for t in hosp_occu_thresholds]
     report_corrs(df=dataset,
                  outcomes=outcomes,
-                 csv_file_name=ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/corr.csv')
+                 csv_file_name=ROOT_DIR + prefix + 'corr-sample size {}.csv'.format(survey_size_novel_inf))
 
 
 if __name__ == "__main__":

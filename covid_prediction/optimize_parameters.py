@@ -70,10 +70,19 @@ def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_d
     return best_spec
 
 
-def optimize_and_eval_dec_tree(model_spec, outcome_name, list_of_max_depths, list_of_ccp_alphas,
-                               feature_selection, cv_fold, if_parallel=False, shorten_feature_names=None):
+def optimize_and_eval_dec_tree(
+        model_spec,
+        survey_size_novel_inf,
+        outcome_name,
+        list_of_max_depths,
+        list_of_ccp_alphas,
+        feature_selection,
+        cv_fold,
+        if_parallel=False,
+        shorten_feature_names=None):
     """
     :param model_spec: (ModelSpec) model specifications
+    :param survey_size_novel_inf: (int) survey size of novel infection surveillance
     :param outcome_name: (string) outcome to predict 
     :param list_of_max_depths: (list) of maximum depths
     :param list_of_ccp_alphas: (list) of ccp alphas
@@ -89,7 +98,10 @@ def optimize_and_eval_dec_tree(model_spec, outcome_name, list_of_max_depths, lis
     print('Number of features:', len(model_spec.features))
 
     # read dataset
-    df = pd.read_csv('{}/outputs/prediction_datasets/week_into_fall/combined_data.csv'.format(ROOT_DIR))
+    df = pd.read_csv(
+        '{}/outputs/prediction_datasets/week_into_fall/combined data-sample size {}.csv'.format(
+            ROOT_DIR, survey_size_novel_inf))
+
     # randomize rows (since the dataset is ordered based on the likelihood weights)
     df = df.sample(frac=1, random_state=1)
 

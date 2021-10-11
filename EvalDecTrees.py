@@ -1,22 +1,22 @@
+import numpy as np
+
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
 from covid_prediction.print_features import print_selected_features_dec_trees
-from definitions import ROOT_DIR, OUTCOME_NAME_IN_DATASET
+from definitions import ROOT_DIR, get_outcome_label, N_NOVEL_INCD
 
 MODELS = (A, B3)
 
-ALPHAS = [0, 0.01, 0.02, 0.03, 0.04, 0.05]
+ALPHAS = np.arange(0, 0.1, 0.005) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = False
-# MAX_DEPTHS = [3, 4, 5]
-# FEATURE_SELECTION = 'pi'  # could be 'rfe', 'lasso', or 'pi'
 
 
-def evaluate(noise_coeff):
+def evaluate(hosp_occu_threshold, survey_size_novel_inf):
     """
-    :param noise_coeff: (None or int) if None, the noise model is not added, otherwise, the noise model is
-        added with survey size multiplied by add_noise.
+    :param hosp_occu_threshold: (float) threshold for hospital occupancy (per 100,000 population)
+    :param survey_size_novel_inf: (int) survey size of novel infection surveillance
     """
 
     # make prediction at different weeks
@@ -29,7 +29,8 @@ def evaluate(noise_coeff):
         # model zero assumes no noise or bias
         best_spec, final_model_performance = optimize_and_eval_dec_tree(
             model_spec=model,
-            outcome_name=OUTCOME_NAME_IN_DATASET[1],
+            survey_size_novel_inf=survey_size_novel_inf,
+            outcome_name=get_outcome_label(threshold=hosp_occu_threshold),
             list_of_max_depths=None,
             list_of_ccp_alphas=ALPHAS,
             feature_selection=None,
@@ -58,7 +59,7 @@ def evaluate(noise_coeff):
 
 if __name__ == '__main__':
 
-    evaluate(noise_coeff=None)
+    evaluate(hosp_occu_threshold=10, survey_size_novel_inf=N_NOVEL_INCD)
     # evaluate(noise_coeff=1)
     # evaluate(noise_coeff=0.5, bias_delay=4)
 
