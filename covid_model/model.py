@@ -16,7 +16,7 @@ def build_covid_model(model):
     sets = model.settings
 
     # parameters of the COVID model
-    params = COVIDParameters()
+    params = COVIDParameters(novel_variant_will_emerge=sets.novelVariantWillEmerge)
 
     age_groups_profiles = AgeGroupsProfiles(n_age_groups=params.nAgeGroups, n_profiles=params.nProfiles)
 

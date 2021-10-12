@@ -10,10 +10,11 @@ IF_PARALLEL = True
 USE_CALIBRATED_MODEL = True
 
 
-def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None, sample_seeds_by_weights=False):
+def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
+             sample_seeds_by_weights=False, novel_variant_will_emerge=True):
 
     # get model settings
-    sets = COVIDSettings()
+    sets = COVIDSettings(novel_variant_will_emerge=novel_variant_will_emerge)
 
     # build multiple epidemics
     multi_model = MultiEpidemics(model_settings=sets)

@@ -10,7 +10,7 @@ from definitions import AgeGroups, Profiles
 class COVIDParameters(EpiParameters):
     """ class to contain the parameters of the COVID model """
 
-    def __init__(self):
+    def __init__(self, novel_variant_will_emerge):
         EpiParameters.__init__(self)
 
         self.nProfiles = len(Profiles)
@@ -59,7 +59,7 @@ class COVIDParameters(EpiParameters):
         self.ratioDurImmunityFromInfAndVaccToInf = Uniform(1.0, 1.5)
         self.durRByProfile = [Uniform(0.25, 1.5), Uniform(0.25, 1.5), None, None]
 
-        # probability that an importated case is infected with the novel strain
+        # probability that an imported case is infected with the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
                                       Beta(mean=2, st_dev=0.05, minimum=1.5, maximum=2.25),  # t_middle
                                       Uniform(minimum=0.4, maximum=0.6)]  # max
@@ -148,12 +148,16 @@ class COVIDParameters(EpiParameters):
                                         hosp_relative_risk=hosp_relative_risk,
                                         prob_death=prob_death,
                                         importation_rate=importation_rate,
-                                        contact_matrix=contact_matrix)
+                                        contact_matrix=contact_matrix,
+                                        novel_variant_will_emerge=novel_variant_will_emerge)
 
         # build the dictionary of parameters
         self.build_dict_of_params()
 
-    def calculate_dependent_params(self, us_age_dist, hosp_relative_risk, prob_death, importation_rate, contact_matrix):
+    def calculate_dependent_params(self,
+                                   us_age_dist, hosp_relative_risk,
+                                   prob_death, importation_rate, contact_matrix,
+                                   novel_variant_will_emerge):
 
         self.baseContactMatrix = MatrixOfParams(matrix_of_params_or_values=contact_matrix)
         self.distS0ToSs = Multinomial(par_n=self.sizeS0, p_values=us_age_dist)
@@ -228,10 +232,13 @@ class COVIDParameters(EpiParameters):
             self.durIByProfile[p] = Product(parameters=[self.durI, self.ratioDurInfByProfile[p]])
 
         # probability of novel strain
-        self.probNovelStrain = TimeDependentSigmoid(
-            par_b=self.probNovelStrainParams[0],
-            par_t_middle=self.probNovelStrainParams[1],
-            par_max=self.probNovelStrainParams[2])
+        if novel_variant_will_emerge:
+            self.probNovelStrain = TimeDependentSigmoid(
+                par_b=self.probNovelStrainParams[0],
+                par_t_middle=self.probNovelStrainParams[1],
+                par_max=self.probNovelStrainParams[2])
+        else:
+            self.probNovelStrain = Constant(0)
 
         # vaccination rate
         for a in range(self.nAgeGroups):
