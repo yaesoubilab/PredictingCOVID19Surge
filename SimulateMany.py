@@ -6,8 +6,8 @@ from covid_visualization.plot_trajs import plot
 
 N = 50   # number of trajectories to simulate
 N_TO_DISPLAY = 50  # number of trajectories to display
-IF_NOVEL_VARIANT = True
-IF_MITIGATION = False
+IF_NOVEL_VARIANT = True     # default True
+IF_MITIGATION = True        # default True
 
 IF_PARALLEL = True
 USE_CALIBRATED_MODEL = True

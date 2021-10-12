@@ -61,8 +61,8 @@ class COVIDParameters(EpiParameters):
 
         # probability that an imported case is infected with the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                      Beta(mean=2, st_dev=0.05, minimum=1.5, maximum=2.25),  # t_middle
-                                      Uniform(minimum=0.4, maximum=0.6)]  # max
+                                      Beta(mean=2, st_dev=0.1, minimum=1.75, maximum=2.25),  # t_middle
+                                      Uniform(minimum=0.0, maximum=0.75)]  # max
 
         # parameters related to novel strain
         self.ratioTransmNovel = Uniform(1, 2)
