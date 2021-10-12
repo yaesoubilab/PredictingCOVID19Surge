@@ -8,10 +8,22 @@ CALIB_PERIOD = 2  #
 PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
+# to build datasets for developing predictive models
+WEEKS_IN_FALL = (8, 12, 16, 20, 24, 28, 32)
+HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
+
 # number of simulation runs used for calibration, training and validation
 N_SIM_CALIBRATION = 1000
 N_SIM_TRAINING = 100
 N_SIM_VALIDATION = 10
+
+
+SCENARIOS = {
+    'base': 'base',
+    'smaller survey': 'smaller survey',
+    'no novel variant': 'no novel variant',
+    'no control measure': 'no control measure'
+}
 
 # survey sizes
 N_NOVEL_INCD = 1521

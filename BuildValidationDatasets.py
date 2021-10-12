@@ -1,14 +1,15 @@
 import apace.Calibration as calib
-from BuildTrainingDataset import build_and_combine_datasets, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS
+from BuildTrainingDataset import build_and_combine_datasets
 from SimulateMany import simulate
-from definitions import FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TRAINING, N_NOVEL_INCD
+from definitions import FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TRAINING, \
+    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS
 
 
 def build_validation_datasets():
 
     # ---- build the dataset with smaller survey size ----
     build_and_combine_datasets(
-        name_of_dataset='data-validating smaller survey (N=200)',
+        name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
         time_of_fall=FEASIBILITY_PERIOD,
         weeks_in_fall=WEEKS_IN_FALL,
         weeks_to_predict=4,
@@ -27,7 +28,7 @@ def build_validation_datasets():
              sample_seeds_by_weights=False)
     # build the dataset
     build_and_combine_datasets(
-        name_of_dataset='data-validating base',
+        name_of_dataset='data-validating ' + SCENARIOS['base'],
         time_of_fall=FEASIBILITY_PERIOD,
         weeks_in_fall=WEEKS_IN_FALL,
         weeks_to_predict=4,
