@@ -56,6 +56,19 @@ def build_validation_datasets():
     )
 
     # ---- build the dataset with no mitigating strategies ----
+    # simulate
+    simulate(n=N_SIM_VALIDATION,
+             sample_seeds_by_weights=False,
+             mitigating_strategies_on=False)
+    # build the dataset
+    build_and_combine_datasets(
+        name_of_dataset='data-validating ' + SCENARIOS['no control measure'],
+        time_of_fall=FEASIBILITY_PERIOD,
+        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_to_predict=4,
+        hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
+        survey_size_novel_inf=N_NOVEL_INCD
+    )
 
 
 if __name__ == '__main__':

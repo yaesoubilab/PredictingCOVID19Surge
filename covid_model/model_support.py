@@ -1,16 +1,16 @@
 from apace.CalibrationSupport import FeasibleConditions
-from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule
+from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule, PredeterminedDecisionRule
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from covid_model.data import MAX_HOSP_OCC_RATE, MIN_HOSP_OCC_RATE, MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, MAX_PREV_IMMUNE_FROM_INF
 from definitions import FEASIBILITY_PERIOD
 
 
-def get_interventions_features_conditions(settings, params, hosp_occupancy_rate):
+def get_interventions_features_conditions(params, hosp_occupancy_rate, mitigating_strategies_on):
     """
-    :param settings: model settings
     :param params: model parameters
     :param hosp_occupancy_rate:
+    :param mitigating_strategies_on:
     :return: (interventions, features, conditions)
     """
 
@@ -105,10 +105,13 @@ def get_interventions_features_conditions(settings, params, hosp_occupancy_rate)
         condition_to_turn_off=con_off_intv_y1)
     y1_intv.add_decision_rule(decision_rule=decision_rule_y1)
 
-    decision_rule_y2 = ConditionBasedDecisionRule(
-        default_switch_value=0,
-        condition_to_turn_on=con_on_intv_y2,
-        condition_to_turn_off=con_off_intv_y2)
+    if mitigating_strategies_on:
+        decision_rule_y2 = ConditionBasedDecisionRule(
+            default_switch_value=0,
+            condition_to_turn_on=con_on_intv_y2,
+            condition_to_turn_off=con_off_intv_y2)
+    else:
+        decision_rule_y2 = PredeterminedDecisionRule(predetermined_switch_value=0)
     y2_intv.add_decision_rule(decision_rule=decision_rule_y2)
 
     # make the list of features, conditions, and interventions

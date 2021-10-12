@@ -8,11 +8,14 @@ from definitions import AgeGroups
 class COVIDSettings(ModelSettings):
     """ settings of COVID model """
 
-    def __init__(self, if_calibrating=False, novel_variant_will_emerge=True):
+    def __init__(self, if_calibrating=False,
+                 novel_variant_will_emerge=True,
+                 mitigating_strategies_on=True):
 
         ModelSettings.__init__(self)
 
         self.novelVariantWillEmerge = novel_variant_will_emerge
+        self.mitigatingStrategiesOn = mitigating_strategies_on
 
         # model settings
         self.deltaT = 1 / 364

@@ -6,15 +6,22 @@ from covid_visualization.plot_trajs import plot
 
 N = 50   # number of trajectories to simulate
 N_TO_DISPLAY = 50  # number of trajectories to display
+IF_NOVEL_VARIANT = True
+IF_MITIGATION = False
+
 IF_PARALLEL = True
 USE_CALIBRATED_MODEL = True
 
 
 def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
-             sample_seeds_by_weights=False, novel_variant_will_emerge=True):
+             sample_seeds_by_weights=False,
+             novel_variant_will_emerge=True,
+             mitigating_strategies_on=True):
 
     # get model settings
-    sets = COVIDSettings(novel_variant_will_emerge=novel_variant_will_emerge)
+    sets = COVIDSettings(
+        novel_variant_will_emerge=novel_variant_will_emerge,
+        mitigating_strategies_on=mitigating_strategies_on)
 
     # build multiple epidemics
     multi_model = MultiEpidemics(model_settings=sets)
@@ -47,5 +54,9 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
 
 if __name__ == "__main__":
 
-    simulate(n=N, n_to_display=N_TO_DISPLAY, calibrated=USE_CALIBRATED_MODEL)
+    simulate(n=N,
+             n_to_display=N_TO_DISPLAY,
+             calibrated=USE_CALIBRATED_MODEL,
+             novel_variant_will_emerge=IF_NOVEL_VARIANT,
+             mitigating_strategies_on=IF_MITIGATION)
 

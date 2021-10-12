@@ -449,7 +449,9 @@ def build_covid_model(model):
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
-        settings=sets, params=params, hosp_occupancy_rate=hosp_occupancy_rate)
+        params=params,
+        hosp_occupancy_rate=hosp_occupancy_rate,
+        mitigating_strategies_on=sets.mitigatingStrategiesOn)
 
     # --------- populate the model ---------
     # change nodes
