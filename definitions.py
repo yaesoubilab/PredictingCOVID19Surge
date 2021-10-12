@@ -8,6 +8,11 @@ CALIB_PERIOD = 2  #
 PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
+# number of simulation runs used for calibration, training and validation
+N_SIM_CALIBRATION = 1000
+N_SIM_TRAINING = 100
+N_SIM_VALIDATION = 10
+
 # survey sizes
 N_NOVEL_INCD = 1521
 

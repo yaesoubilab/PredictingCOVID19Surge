@@ -18,7 +18,7 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
     # build multiple epidemics
     multi_model = MultiEpidemics(model_settings=sets)
 
-    if calibrated:
+    if calibrated and seeds is None:
         # get the seeds and probability weights
         seeds, weights = calib.get_seeds_and_probs('outputs/summary/calibration_summary.csv')
 
@@ -36,11 +36,12 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
     multi_model.print_summary_stats()
 
     # plot trajectories
-    plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
-         incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
-         obs_incd_multiplier=sets.observationPeriod*52,
-         n_random_trajs_to_display=n_to_display
-         )
+    if n_to_display is not None:
+        plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
+             incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
+             obs_incd_multiplier=sets.observationPeriod*52,
+             n_random_trajs_to_display=n_to_display
+             )
 
 
 if __name__ == "__main__":
