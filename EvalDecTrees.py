@@ -4,7 +4,7 @@ from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
 from covid_prediction.print_features import print_selected_features_dec_trees
-from definitions import ROOT_DIR, get_outcome_label, N_NOVEL_INCD
+from definitions import ROOT_DIR, N_NOVEL_INCD, HOSP_OCCU_THRESHOLDS
 
 MODELS = (A, B3)
 
@@ -29,11 +29,8 @@ def evaluate(hosp_occu_threshold, survey_size_novel_inf):
         # model zero assumes no noise or bias
         best_spec, final_model_performance = optimize_and_eval_dec_tree(
             model_spec=model,
-            survey_size_novel_inf=survey_size_novel_inf,
-            outcome_name=get_outcome_label(threshold=hosp_occu_threshold),
-            list_of_max_depths=None,
+            hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
             list_of_ccp_alphas=ALPHAS,
-            feature_selection=None,
             cv_fold=CV_FOLD,
             if_parallel=IF_PARALLEL,
             shorten_feature_names=SHORT_FEATURE_NAMES)

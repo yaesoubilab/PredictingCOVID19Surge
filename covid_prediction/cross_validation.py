@@ -357,14 +357,13 @@ class NeuralNetParameterOptimizer(_ParameterOptimizer):
 class DecTreeParameterOptimizer(_ParameterOptimizer):
     """ class to find the optimal parameters for a decision tree using cross validation """
 
-    def __init__(self, df, feature_names, outcome_name, if_outcome_binary,
-                 list_of_n_features_wanted, list_of_max_depths, list_of_ccp_alphas,
-                 feature_selection_method, cv_fold, scoring=None):
+    def __init__(self, df, feature_names, outcome_name,
+                 list_of_n_features_wanted=None, list_of_max_depths=None, list_of_ccp_alphas=None,
+                 feature_selection_method=None, cv_fold=10, scoring=None):
         """
         :param df: (panda DataFrame)
         :param feature_names: (list) of feature names to be included in the analysis
         :param outcome_name: (string) name of the outcome
-        :param if_outcome_binary: (bool) if outcome is binary
         :param list_of_n_features_wanted: (list) of number of features wanted
         :param list_of_max_depths: (list) of maximum depths
         :param list_of_ccp_alphas: (list) of ccp alphas
@@ -376,7 +375,7 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         _ParameterOptimizer.__init__(self, df=df,
                                      feature_names=feature_names,
                                      outcome_name=outcome_name,
-                                     if_outcome_binary=if_outcome_binary,
+                                     if_outcome_binary=True,
                                      if_standardize=False)
 
         if list_of_n_features_wanted is None:
@@ -409,35 +408,41 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         best_spec = None
         max_score = float('-inf')
         summary = [['# features', 'max depth', 'ccp alpha', 'Score', 'Score and PI']]
+
         for s in self.crossValidationSummaries:
             summary.append([s.nFeatures, s.maxDepth, s.ccpAlpha, s.meanScore, s.formattedMeanPI])
             if s.meanScore > max_score:
                 best_spec = s
                 max_score = s.meanScore
 
-        self._save_results(summary=summary, best_spec=best_spec,
+        self._save_results(summary=summary,
+                           best_spec=best_spec,
                            save_to_file_performance=save_to_file_performance,
                            save_to_file_features=save_to_file_features)
 
         return best_spec
 
     @staticmethod
-    def evaluate_tree_on_validation_set(df_training, df_validation, selected_features, y_name, max_depth, ccp_alpha):
+    def evaluate_tree_on_validation_sets(training_df, validation_dfs, selected_features, y_name,
+                                         max_depth=None, ccp_alpha=0):
         """
-        :param df_training:
-        :param df_validation:
-        :param selected_features:
-        :param y_name:
+        :param training_df: (panda.DataFrame)
+        :param validation_dfs: (list of panda.DataFrame)
+        :param selected_features: (list) of features to use
+        :param y_name: (string) outcome column
         :param max_depth:
         :param ccp_alpha:
         :return: the trained model (with performance calculated on the validation dataset)
         """
 
         # make a decision tree model
-        model = DecisionTree(df=df_training, feature_names=selected_features, y_name=y_name)
+        model = DecisionTree(df=training_df, feature_names=selected_features, y_name=y_name)
 
         # train the model
-        model.run(max_depth=max_depth, ccp_alpha=ccp_alpha, df_validation=df_validation)
+        model.train(max_depth=max_depth, ccp_alpha=ccp_alpha)
+
+        # validate
+        model.validate(validation_dfs=validation_dfs)
 
         # return the trained model
         return model

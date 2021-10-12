@@ -14,7 +14,7 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth=None, ccp_alpha
     dt = DecisionTree(df=dataset, feature_names=feature_names, y_name=outcome_name)
 
     # train the decision tree
-    dt.run(test_size=0.2, max_depth=max_depth, ccp_alpha=ccp_alpha)
+    dt.train(test_size=0.2, max_depth=max_depth, ccp_alpha=ccp_alpha)
 
     # print selected features
     print(dt.selectedFeatures)

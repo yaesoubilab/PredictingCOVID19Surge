@@ -21,7 +21,8 @@ class Classifier:
         self.X = np.asarray(self.df[self.features])
         self.y = np.asarray(self.df[self.yName])
 
-        self.performanceTest = None  # performance summary on the test set
+        self.performanceSummary = None  # performance summary on the test set
+        self.validationPerformanceSummaries = []  # list of performance summaries on validation sets
 
 
 class ClassifierPerformance:
@@ -79,28 +80,21 @@ class DecisionTree(Classifier):
         self.model = None
         self.selectedFeatures = None
 
-    def run(self, criterion="gini", max_depth=None, ccp_alpha=0, test_size=0.2, df_validation=None):
+    def train(self, criterion="gini", max_depth=None, ccp_alpha=0, test_size=0.2):
         """ train the decision tree and store the summary of performance """
 
         X = np.asarray(self.df[self.features])
         y = np.asarray(self.df[self.yName])
 
-        # if dataframe for validation is provided
-        if df_validation is not None:
-            x_train = X
-            y_train = y
-            x_test = np.asarray(df_validation[self.features])
-            y_test = np.asarray(df_validation[self.yName])
-        else:
-            # split train vs. test set
-            x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
+        # split train vs. test set
+        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=1)
 
         # fit model
         self.model = DecisionTreeClassifier(
             criterion=criterion, max_depth=max_depth, ccp_alpha=ccp_alpha, random_state=0)
         self.model.fit(X=x_train, y=y_train)
 
-        # get selected features
+        # get important features
         self.selectedFeatures = []
         for i, v in enumerate(self.model.feature_importances_):
             if v > 0:
@@ -110,7 +104,26 @@ class DecisionTree(Classifier):
         y_test_hat = self.model.predict(x_test)
 
         # update model performance attributes
-        self.performanceTest = ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat)
+        self.performanceSummary = ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat)
+
+    def validate(self, validation_dfs):
+        """
+        :param validation_dfs: (list of panda.DataFrame) the validation sets
+        """
+
+        if not isinstance(validation_dfs, list):
+            validation_dfs = [validation_dfs]
+
+        for df in validation_dfs:
+            # validation dataset
+            x_test = np.asarray(df[self.selectedFeatures])
+            y_test = np.asarray(df[self.yName])
+
+            # prediction
+            y_test_hat = self.model.predict(x_test)
+
+            # update model performance attributes
+            self.validationPerformanceSummaries.append(ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat))
 
     def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True,
                            impurity=False, label=None, precision=3, shorten_feature_names=None):
@@ -238,7 +251,7 @@ class MultiDecisionTrees(MultiClassifiers):
         model = DecisionTree(df=self.df, feature_names=self.features, y_name=self.y_name)
 
         while len(performance_test_list) < num_bootstraps:
-            model.run(test_size=test_size, save_decision_path_filename=False)
+            model.train(test_size=test_size, save_decision_path_filename=False)
             # append performance
             performance_test_list.append(model.performanceTest)
 
