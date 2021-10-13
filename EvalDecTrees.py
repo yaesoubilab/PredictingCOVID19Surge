@@ -3,12 +3,11 @@ import numpy as np
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
-from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, SCENARIOS, DIGITS
+from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, SCENARIOS, DIGITS, CV_FOLD
 
 MODELS = (A, B3)
 
 ALPHAS = np.arange(0, 0.1, 0.005) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
-CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = True
 
 
