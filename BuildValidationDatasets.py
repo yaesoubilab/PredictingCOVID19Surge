@@ -4,7 +4,7 @@ import apace.Calibration as calib
 from BuildTrainingDataset import build_and_combine_datasets
 from SimulateMany import simulate
 from definitions import FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TRAINING, \
-    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS
+    N_NOVEL_INCD, SMALLER_N_NOVEL_INCD, SCENARIOS, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS
 
 
 def build_validation_datasets():
@@ -18,7 +18,7 @@ def build_validation_datasets():
         weeks_in_fall=WEEKS_IN_FALL,
         weeks_to_predict=4,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
-        survey_size_novel_inf=200
+        survey_size_novel_inf=SMALLER_N_NOVEL_INCD
     )
 
     # ---- build the dataset for the base scenario ----

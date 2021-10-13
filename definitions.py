@@ -10,7 +10,7 @@ SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
 # to build datasets for developing predictive models
 WEEKS_IN_FALL = (8, 12, 16, 20, 24, 28, 32)
-HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
+HOSP_OCCU_THRESHOLDS = (7.5, 10, 15)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
 N_SIM_CALIBRATION = 2500
@@ -27,6 +27,7 @@ SCENARIOS = {
 
 # survey sizes
 N_NOVEL_INCD = 1521
+SMALLER_N_NOVEL_INCD = 500
 
 # columns in datasets
 HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
