@@ -18,7 +18,7 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
              novel_variant_will_emerge=True,
              mitigating_strategies_on=True,
              print_summary_state=True,
-             save_plots_dir=None):
+             folder_to_save_plots=None):
 
     # get model settings
     sets = COVIDSettings(
@@ -52,7 +52,7 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
              incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
              obs_incd_multiplier=sets.observationPeriod*52,
              n_random_trajs_to_display=n_to_display,
-             save_plots_dir=save_plots_dir
+             save_plots_dir=folder_to_save_plots
              )
 
 

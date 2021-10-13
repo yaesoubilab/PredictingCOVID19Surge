@@ -23,7 +23,7 @@ def build_validation_datasets():
              n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
              print_summary_state=False,
-             save_plots_dir=ROOT_DIR+'/outputs/figures/scenarios/base')
+             folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/base')
 
     # ---- build the dataset for the base scenario ----
     build_and_combine_datasets(
@@ -52,7 +52,7 @@ def build_validation_datasets():
              sample_seeds_by_weights=False,
              novel_variant_will_emerge=False,
              print_summary_state=False,
-             save_plots_dir=ROOT_DIR+'/outputs/figures/scenarios/no_novel_variant')
+             folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/no_novel_variant')
     # build the dataset
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no novel variant'],
@@ -70,7 +70,7 @@ def build_validation_datasets():
              sample_seeds_by_weights=False,
              mitigating_strategies_on=False,
              print_summary_state=False,
-             save_plots_dir=ROOT_DIR+'/outputs/figures/scenarios/no_mitigation')
+             folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/no_mitigation')
     # build the dataset
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no control measure'],
