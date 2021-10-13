@@ -1,0 +1,78 @@
+feature,If threshold passed (0:Yes) 10 | corr,If threshold passed (0:Yes) 10 | p-value,If threshold passed (0:Yes) 15 | corr,If threshold passed (0:Yes) 15 | p-value,If threshold passed (0:Yes) 20 | corr,If threshold passed (0:Yes) 20 | p-value
+Obs: Incidence rate,-0.705,0.0,-0.802,0.0,-0.816,0.0
+Obs: Incidence rate-ave-2wk,-0.701,0.0,-0.803,0.0,-0.817,0.0
+Obs: Incidence rate-slope-4wk,-0.154,0.204,-0.156,0.198,-0.155,0.2
+Obs: New hospitalization rate,-0.666,0.0,-0.776,0.0,-0.79,0.0
+Obs: New hospitalization rate-ave-2wk,-0.665,0.0,-0.772,0.0,-0.788,0.0
+Obs: New hospitalization rate-slope-4wk,-0.166,0.17,-0.227,0.059,-0.231,0.055
+Obs: % of new hospitalizations that are vaccinated,0.008,0.947,0.043,0.725,0.034,0.778
+Obs: % of new hospitalizations that are vaccinated-ave-2wk,0.092,0.448,0.086,0.478,0.08,0.509
+Obs: % of new hospitalizations that are vaccinated-slope-4wk,0.097,0.427,0.109,0.371,0.105,0.385
+Obs: % of incidence due to novel variant,-0.852,0.0,-0.797,0.0,-0.842,0.0
+Obs: % of incidence due to novel variant-ave-2wk,-0.852,0.0,-0.806,0.0,-0.851,0.0
+Obs: % of incidence due to novel variant-slope-4wk,-0.332,0.005,-0.085,0.482,-0.106,0.381
+Obs: % of new hospitalizations due to novel variant,-0.838,0.0,-0.811,0.0,-0.855,0.0
+Obs: % of new hospitalizations due to novel variant-ave-2wk,-0.852,0.0,-0.811,0.0,-0.855,0.0
+Obs: % of new hospitalizations due to novel variant-slope-4wk,-0.256,0.033,-0.095,0.434,-0.106,0.384
+Obs: % of new hospitalizations due to Novel-V,-0.516,0.0,-0.391,0.001,-0.413,0.0
+Obs: % of new hospitalizations due to Novel-V-ave-2wk,-0.442,0.0,-0.32,0.007,-0.34,0.004
+Obs: % of new hospitalizations due to Novel-V-slope-4wk,0.025,0.839,0.148,0.22,0.152,0.209
+Obs: Hospital occupancy rate,-0.708,0.0,-0.815,0.0,-0.825,0.0
+Obs: Cumulative hospitalization rate,-0.53,0.0,-0.485,0.0,-0.468,0.0
+Obs: Cumulative vaccination rate,0.124,0.305,0.019,0.874,0.002,0.988
+Obs: Prevalence susceptible,0.566,0.0,0.661,0.0,0.711,0.0
+R0,0.249,0.037,0.206,0.088,0.213,0.077
+Duration of infectiousness-dominant,0.385,0.001,0.263,0.028,0.255,0.033
+Prob novel strain params-0,0.199,0.099,0.205,0.089,0.156,0.197
+Prob novel strain params-1,0.579,0.0,0.492,0.0,0.493,0.0
+Prob novel strain params-2,-0.061,0.616,-0.045,0.71,-0.004,0.973
+Ratio infectiousness duration of novel to dominant,-0.264,0.027,-0.233,0.052,-0.224,0.062
+Duration of vaccine immunity,0.011,0.928,0.053,0.663,0.065,0.592
+Ratio of duration of immunity from infection+vaccination to infection,-0.26,0.03,-0.243,0.043,-0.274,0.022
+Vaccine effectiveness against infection-0,-0.226,0.06,-0.101,0.404,-0.086,0.48
+Vaccine effectiveness against infection-1,-0.498,0.0,-0.372,0.002,-0.33,0.005
+Ratio transmissibility of novel to dominant,-0.338,0.004,-0.298,0.012,-0.365,0.002
+Vaccine effectiveness in reducing infectiousness-0,-0.173,0.152,-0.101,0.408,-0.143,0.239
+Vaccine effectiveness in reducing infectiousness-1,0.042,0.73,0.002,0.985,0.042,0.732
+Ratio prob of hospitalization of novel to dominant,0.238,0.047,0.254,0.034,0.263,0.028
+Vaccine effectiveness against hospitalization-0,0.111,0.362,0.094,0.439,0.073,0.549
+Vaccine effectiveness against hospitalization-1,0.041,0.738,-0.019,0.878,0.03,0.806
+Prob Hosp for 18-29,0.147,0.225,0.037,0.763,0.015,0.902
+Relative prob hosp by age-0,0.127,0.295,0.21,0.08,0.242,0.043
+Relative prob hosp by age-1,0.09,0.458,0.105,0.386,0.103,0.394
+Relative prob hosp by age-2,0.434,0.0,0.407,0.0,0.482,0.0
+Relative prob hosp by age-4,-0.244,0.042,-0.186,0.123,-0.183,0.13
+Relative prob hosp by age-5,-0.289,0.015,-0.193,0.11,-0.218,0.07
+Relative prob hosp by age-6,0.288,0.016,0.219,0.068,0.226,0.06
+Relative prob hosp by age-7,-0.282,0.018,-0.288,0.016,-0.269,0.024
+Duration of E-0,0.236,0.05,0.093,0.445,0.057,0.641
+Duration of E-1,0.074,0.544,0.138,0.254,0.167,0.166
+Duration of E-2,-0.19,0.114,-0.171,0.156,-0.139,0.251
+Duration of E-3,0.117,0.334,-0.003,0.982,-0.06,0.619
+Duration of I-0,0.385,0.001,0.263,0.028,0.255,0.033
+Duration of I-1,0.131,0.278,0.039,0.748,0.04,0.743
+Duration of I-2,0.385,0.001,0.263,0.028,0.255,0.033
+Duration of I-3,0.131,0.278,0.039,0.748,0.04,0.743
+Duration of Hosp-0,-0.176,0.145,-0.159,0.189,-0.138,0.255
+Duration of Hosp-1,-0.052,0.672,-0.092,0.451,-0.079,0.517
+Duration of Hosp-2,-0.286,0.017,-0.26,0.03,-0.284,0.017
+Duration of Hosp-3,0.116,0.338,0.178,0.139,0.176,0.145
+Duration of R-0,0.323,0.006,0.278,0.02,0.232,0.053
+Duration of R-1,0.332,0.005,0.268,0.025,0.298,0.012
+Duration of R-2,0.254,0.034,0.214,0.075,0.17,0.159
+Duration of R-3,0.268,0.025,0.202,0.094,0.223,0.064
+Vaccination rate params-0,-0.198,0.1,-0.216,0.072,-0.193,0.109
+Vaccination rate params-1,0.27,0.024,0.16,0.186,0.155,0.2
+Vaccination rate params-3,-0.175,0.147,-0.171,0.157,-0.194,0.108
+Vaccination rate t_min by age-1,0.053,0.663,0.075,0.535,0.129,0.287
+Vaccination rate t_min by age-2,0.177,0.143,0.06,0.623,0.071,0.558
+Vaccination rate t_min by age-3,-0.212,0.078,-0.196,0.105,-0.2,0.097
+Vaccination rate t_min by age-4,0.391,0.001,0.325,0.006,0.348,0.003
+Vaccination rate t_min by age-5,-0.075,0.538,-0.044,0.716,-0.001,0.992
+Vaccination rate t_min by age-6,0.153,0.207,0.027,0.825,-0.028,0.819
+Vaccination rate t_min by age-7,-0.143,0.239,-0.01,0.935,0.063,0.602
+Y1 thresholds-0,0.068,0.579,0.05,0.68,0.09,0.46
+Y1 thresholds-1,-0.312,0.009,-0.211,0.08,-0.236,0.049
+Y1 Maximum hosp occupancy,0.245,0.041,0.242,0.044,0.279,0.019
+Y1 Max effectiveness of control measures,-0.087,0.475,-0.125,0.303,-0.131,0.28
+Max Obs: Hospital occupancy rate,-0.795,0.0,-0.882,0.0,-0.898,0.0
