@@ -26,7 +26,7 @@ class _CrossValidSummary:
         self.selectedFeatures = None  # features uses in the model evaluated in cross validation
         self.meanScore = None   # mean of scores
         self.PI = None
-        self.formattedMeanPI = None  # formatted mean and percentile interval for the score
+        # self.formattedMeanPI = None  # formatted mean and percentile interval for the score
 
     def add_cv_performance(self, scores, deci=4, selected_features=None):
         """
@@ -41,7 +41,11 @@ class _CrossValidSummary:
         self.selectedFeatures = selected_features
         self.meanScore = self.summaryStat.get_mean()
         self.PI = self.summaryStat.get_PI(alpha=0.05)
-        self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type='c')
+        # self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type='c')
+
+    def get_formatted_mean_and_interval(self, deci):
+
+        return self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type='c')
 
 
 class LinRegCVSummary(_CrossValidSummary):
@@ -410,7 +414,8 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         summary = [['# features', 'max depth', 'ccp alpha', 'Score', 'Score and PI']]
 
         for s in self.crossValidationSummaries:
-            summary.append([s.nFeatures, s.maxDepth, s.ccpAlpha, s.meanScore, s.formattedMeanPI])
+            summary.append([s.nFeatures, s.maxDepth, s.ccpAlpha, s.meanScore,
+                            s.get_formatted_mean_and_interval(deci=3)])
             if s.meanScore > max_score:
                 best_spec = s
                 max_score = s.meanScore

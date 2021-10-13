@@ -89,9 +89,6 @@ def optimize_and_eval_dec_tree(
     :return: (best specification, the final model performance)
     """
 
-    # number of features
-    print('Number of features:', len(model_spec.features))
-
     # read training dataset
     df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/data-training.csv')
     # randomize rows (since the dataset might have some order)

@@ -116,7 +116,7 @@ class DecisionTree(Classifier):
 
         for df in validation_dfs:
             # validation dataset
-            x_test = np.asarray(df[self.selectedFeatures])
+            x_test = np.asarray(df[self.features])
             y_test = np.asarray(df[self.yName])
 
             # prediction

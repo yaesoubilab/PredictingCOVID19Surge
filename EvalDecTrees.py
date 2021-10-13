@@ -3,7 +3,7 @@ import numpy as np
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
-from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, SCENARIOS
+from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, SCENARIOS, DIGITS
 
 MODELS = (A, B3)
 
@@ -15,9 +15,9 @@ IF_PARALLEL = True
 def evaluate():
 
     # make prediction at different weeks
-    rows = [['Model', 'Threshold', 'CV-Score', 'CV-PI', 'CV-Formatted PI']]
+    rows = [['Model', 'Threshold', 'CV-Formatted PI']] # 'CV-Score', 'CV-PI',
     for key, value in SCENARIOS.items():
-        rows[0].append('Accuracy ' + value)
+        rows[0].extend(['Acc-' + value, 'Sen-' + value, 'Spe-' + value])
 
     for model in MODELS:
 
@@ -39,11 +39,15 @@ def evaluate():
             # store results
             result = [model.name,
                       t,
-                      best_spec.meanScore,
-                      best_spec.PI,
-                      best_spec.formattedMeanPI]
+                      # best_spec.meanScore,
+                      # best_spec.PI,
+                      best_spec.get_formatted_mean_and_interval(deci=DIGITS)]
             for p in performance:
-                result.append(p)
+                result.extend([
+                    round(p.accuracy, DIGITS),
+                    round(p.sen, DIGITS),
+                    round(p.spe, DIGITS)]
+                )
 
             rows.append(result)
 

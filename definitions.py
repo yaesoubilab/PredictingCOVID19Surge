@@ -1,6 +1,7 @@
 import os
 from enum import Enum
 
+DIGITS = 3
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 FEASIBILITY_PERIOD = 1.5 # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
