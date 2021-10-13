@@ -1,3 +1,5 @@
+import warnings
+
 import apace.Calibration as calib
 from SimulateMany import simulate
 from covid_model.model import build_covid_model
@@ -23,14 +25,22 @@ if __name__ == "__main__":
         num_of_iterations=N_SIM_CALIBRATION,
         if_run_in_parallel=RUN_IN_PARALLEL)
 
-    print('Calibration duration: {} seconds.'.format(round(calibration.runTime, 1)))
+    print('Calibration duration (seconds): {}.'.format(round(calibration.runTime, 1)))
     print('Number of trajectories with non-zero probability: {}'.format(calibration.nTrajsWithNonZeroProb))
+    n_trajs_needed = N_SIM_TRAINING+N_SIM_VALIDATION
+    if calibration.nTrajsWithNonZeroProb < n_trajs_needed:
+        warnings.warn('\nNumber of trajectories with non-zero probability ({}) is less than '
+                      'the number of trajectories needed '
+                      'for training and validating the predictive models ({}).'
+                      '\nIncrease the number of trajectories '
+                      'used for calibration from {}.'
+                      .format(calibration.nTrajsWithNonZeroProb,n_trajs_needed, N_SIM_CALIBRATION))
 
     # save calibration results
     calibration.save_results(filename='outputs/summary/calibration_summary.csv')
 
     # simulate the calibrated model
-    simulate(n=N_SIM_TRAINING+N_SIM_VALIDATION,
-             n_to_display=min(200, N_SIM_TRAINING+N_SIM_VALIDATION),
+    simulate(n=N_SIM_TRAINING,
+             n_to_display=min(200, N_SIM_TRAINING),
              calibrated=True,
              sample_seeds_by_weights=False)
