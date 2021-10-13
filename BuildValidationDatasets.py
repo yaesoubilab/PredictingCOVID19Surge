@@ -20,9 +20,10 @@ def build_validation_datasets():
     # simulate a new set of trajectories for validation
     simulate(n=N_SIM_VALIDATION,
              seeds=seeds[-N_SIM_VALIDATION:],
-             n_to_display=None,  # so that trajectory figures are not produced
+             n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
-             print_summary_state=False)
+             print_summary_state=False,
+             save_plots_dir=ROOT_DIR+'/outputs/figures/scenarios/base')
 
     # ---- build the dataset for the base scenario ----
     build_and_combine_datasets(
@@ -47,6 +48,7 @@ def build_validation_datasets():
     # ---- build the dataset with no novel variant ----
     # simulate
     simulate(n=N_SIM_VALIDATION,
+             n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
              novel_variant_will_emerge=False,
              print_summary_state=False,
@@ -64,6 +66,7 @@ def build_validation_datasets():
     # ---- build the dataset with no mitigating strategies ----
     # simulate
     simulate(n=N_SIM_VALIDATION,
+             n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
              mitigating_strategies_on=False,
              print_summary_state=False,
