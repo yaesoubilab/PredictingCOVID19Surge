@@ -16,7 +16,8 @@ USE_CALIBRATED_MODEL = True
 def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
              sample_seeds_by_weights=False,
              novel_variant_will_emerge=True,
-             mitigating_strategies_on=True):
+             mitigating_strategies_on=True,
+             print_summary_state=True):
 
     # get model settings
     sets = COVIDSettings(
@@ -41,7 +42,8 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
     multi_model.save_summary()
 
     # get summary statistics of runtime,
-    multi_model.print_summary_stats()
+    if print_summary_state:
+        multi_model.print_summary_stats()
 
     # plot trajectories
     if n_to_display is not None:

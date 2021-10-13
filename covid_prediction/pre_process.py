@@ -247,7 +247,7 @@ def build_and_combine_datasets(
                    index=False)
 
     # report the % of observations where hospital occupancy threshold passes
-    print('Reporting on: ', name_of_dataset)
+    print("---- summary of '{}' dataset ----".format(name_of_dataset))
     for t in hosp_occu_thresholds:
         print('% observations where threshold {} is passed:'.format(t),
               round(100 * (1 - dataset[get_outcome_label(threshold=t)].mean()), 1))
