@@ -1,7 +1,7 @@
 ---- summary of simulated trajectories ----
+% trajectories passing the hospital occupancy threshold 7.5:  50.0
 % trajectories passing the hospital occupancy threshold 10:  47.0
 % trajectories passing the hospital occupancy threshold 15:  37.0
-% trajectories passing the hospital occupancy threshold 20:  33.0
 % trajectories passing the novel variant threshold 0.05:  76.0
 % trajectories passing the novel variant threshold 0.95:  37.0
 Max rate of hospital occupancy (mean, PI):  17.5 (0.6, 70.9)
@@ -11,6 +11,7 @@ Cumulative vaccinations (mean, PI):  75.8 (52.3, 100.0)
 Range of immunity from infection: [5.8%, 65.5%]
 
 ---- summary of 'data-training' dataset ----
+# of records: 700
+% observations where threshold 7.5 is passed: 20.3
 % observations where threshold 10 is passed: 17.0
 % observations where threshold 15 is passed: 13.7
-% observations where threshold 20 is passed: 11.3

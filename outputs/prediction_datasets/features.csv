@@ -1,76 +1,8 @@
-Obs: Incidence rate
-Obs: Incidence rate-ave-2wk
-Obs: Incidence rate-slope-4wk
 Obs: New hospitalization rate
 Obs: New hospitalization rate-ave-2wk
 Obs: New hospitalization rate-slope-4wk
-Obs: % of new hospitalizations that are vaccinated
-Obs: % of new hospitalizations that are vaccinated-ave-2wk
-Obs: % of new hospitalizations that are vaccinated-slope-4wk
 Obs: % of incidence due to novel variant
 Obs: % of incidence due to novel variant-ave-2wk
 Obs: % of incidence due to novel variant-slope-4wk
-Obs: % of new hospitalizations due to novel variant
-Obs: % of new hospitalizations due to novel variant-ave-2wk
-Obs: % of new hospitalizations due to novel variant-slope-4wk
-Obs: % of new hospitalizations due to Novel-V
-Obs: % of new hospitalizations due to Novel-V-ave-2wk
-Obs: % of new hospitalizations due to Novel-V-slope-4wk
 Obs: Hospital occupancy rate
-Obs: Cumulative hospitalization rate
 Obs: Cumulative vaccination rate
-Obs: Prevalence susceptible
-R0
-Duration of infectiousness-dominant
-Prob novel strain params-0
-Prob novel strain params-1
-Prob novel strain params-2
-Ratio infectiousness duration of novel to dominant
-Duration of vaccine immunity
-Ratio of duration of immunity from infection+vaccination to infection
-Vaccine effectiveness against infection-0
-Vaccine effectiveness against infection-1
-Ratio transmissibility of novel to dominant
-Vaccine effectiveness in reducing infectiousness-0
-Vaccine effectiveness in reducing infectiousness-1
-Ratio prob of hospitalization of novel to dominant
-Vaccine effectiveness against hospitalization-0
-Vaccine effectiveness against hospitalization-1
-Prob Hosp for 18-29
-Relative prob hosp by age-0
-Relative prob hosp by age-1
-Relative prob hosp by age-2
-Relative prob hosp by age-4
-Relative prob hosp by age-5
-Relative prob hosp by age-6
-Relative prob hosp by age-7
-Duration of E-0
-Duration of E-1
-Duration of E-2
-Duration of E-3
-Duration of I-0
-Duration of I-1
-Duration of I-2
-Duration of I-3
-Duration of Hosp-0
-Duration of Hosp-1
-Duration of Hosp-2
-Duration of Hosp-3
-Duration of R-0
-Duration of R-1
-Duration of R-2
-Duration of R-3
-Vaccination rate params-0
-Vaccination rate params-1
-Vaccination rate params-3
-Vaccination rate t_min by age-1
-Vaccination rate t_min by age-2
-Vaccination rate t_min by age-3
-Vaccination rate t_min by age-4
-Vaccination rate t_min by age-5
-Vaccination rate t_min by age-6
-Vaccination rate t_min by age-7
-Y1 thresholds-0
-Y1 thresholds-1
-Y1 Maximum hosp occupancy
-Y1 Max effectiveness of control measures
