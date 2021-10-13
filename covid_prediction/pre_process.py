@@ -250,7 +250,7 @@ def build_and_combine_datasets(
         delete_file(file_name=file_name)
 
     dataset = pd.concat(dataframes)
-    dataset.to_csv(ROOT_DIR + prefix + '{}.csv'.format(name_of_dataset),
+    dataset.to_csv(ROOT_DIR + prefix + '/{}.csv'.format(name_of_dataset),
                    index=False)
 
     # report the % of observations where hospital occupancy threshold passes
@@ -264,5 +264,5 @@ def build_and_combine_datasets(
     outcomes = [get_outcome_label(threshold=t) for t in hosp_occu_thresholds]
     report_corrs(df=dataset,
                  outcomes=outcomes,
-                 csv_file_name=ROOT_DIR + prefix + 'corr in {}.csv'.format(name_of_dataset))
+                 csv_file_name=ROOT_DIR + prefix + '/corr in {}.csv'.format(name_of_dataset))
 
