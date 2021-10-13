@@ -98,12 +98,15 @@ def optimize_and_eval_dec_tree(
     df_training = df.sample(frac=1, random_state=1)
 
     # read validation datasets
-    validation_dfs = {}
+    validation_dfs = [None] * len(SCENARIOS)
+    i = 0
     for key, value in SCENARIOS.items():
-        validation_dfs[key] = pd.read_csv(
+        validation_dfs[i] = pd.read_csv(
             ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/data-validating {}.csv'.format(value))
+        i += 1
 
     # for all thresholds
+    validation_performance = {}
     for t in hosp_occu_thresholds:
 
         # find the best specification
@@ -133,10 +136,13 @@ def optimize_and_eval_dec_tree(
         # validate the final model
         model.validate(validation_dfs=validation_dfs)
 
+        # store summary of validation performance
+        validation_performance[str(t)] = (best_spec, model.validationPerformanceSummaries)
+
         # save the best tree
         model.plot_decision_path(
             file_name=ROOT_DIR + '/outputs/figures/trees/model-{}-{}.png'.format(model_spec.name, t),
             simple=True, class_names=['Yes', 'No'],
             precision=2, shorten_feature_names=shorten_feature_names)
 
-    return best_spec, model.validationPerformanceSummaries
+    return validation_performance

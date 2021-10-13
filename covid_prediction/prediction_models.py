@@ -123,7 +123,8 @@ class DecisionTree(Classifier):
             y_test_hat = self.model.predict(x_test)
 
             # update model performance attributes
-            self.validationPerformanceSummaries.append(ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat))
+            self.validationPerformanceSummaries.append(
+                ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat))
 
     def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True,
                            impurity=False, label=None, precision=3, shorten_feature_names=None):

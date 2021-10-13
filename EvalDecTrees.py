@@ -3,8 +3,7 @@ import numpy as np
 from SimPy.InOutFunctions import write_csv
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
-from covid_prediction.print_features import print_selected_features_dec_trees
-from definitions import ROOT_DIR, N_NOVEL_INCD, HOSP_OCCU_THRESHOLDS
+from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, SCENARIOS
 
 MODELS = (A, B3)
 
@@ -13,21 +12,18 @@ CV_FOLD = 20         # num of splits for cross validation
 IF_PARALLEL = False
 
 
-def evaluate(hosp_occu_threshold, survey_size_novel_inf):
-    """
-    :param hosp_occu_threshold: (float) threshold for hospital occupancy (per 100,000 population)
-    :param survey_size_novel_inf: (int) survey size of novel infection surveillance
-    """
+def evaluate():
 
     # make prediction at different weeks
-    rows = [['Model', 'CV-Score', 'CV-PI', 'CV-Formatted PI', 'Validation-Accuracy']]
+    rows = [['Model', 'Threshold', 'CV-Score', 'CV-PI', 'CV-Formatted PI']]
+    for key, value in SCENARIOS.items():
+        rows[0].append('Accuracy ' + value)
 
     for model in MODELS:
 
         print("Evaluating model {}.".format(model.name))
 
-        # model zero assumes no noise or bias
-        best_spec, final_model_performance = optimize_and_eval_dec_tree(
+        best_spec_and_validation_performance = optimize_and_eval_dec_tree(
             model_spec=model,
             hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
             list_of_ccp_alphas=ALPHAS,
@@ -35,29 +31,30 @@ def evaluate(hosp_occu_threshold, survey_size_novel_inf):
             if_parallel=IF_PARALLEL,
             shorten_feature_names=SHORT_FEATURE_NAMES)
 
-        # store outcomes
-        rows.append([model.name,
-                     best_spec.meanScore,
-                     best_spec.PI,
-                     best_spec.formattedMeanPI,
-                     final_model_performance.accuracy])
+        for t in HOSP_OCCU_THRESHOLDS:
+
+            # best specification and performance
+            best_spec, performance = best_spec_and_validation_performance[str(t)]
+
+            # store results
+            result = [model.name,
+                      t,
+                      best_spec.meanScore,
+                      best_spec.PI,
+                      best_spec.formattedMeanPI]
+            for p in performance:
+                result.append(p)
+
+            rows.append(result)
 
     # print summary of results
     write_csv(rows=rows,
-              file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary-threshold {}.csv'.format(
-                  hosp_occu_threshold))
-
-    # print features by model
-
-    print_selected_features_dec_trees(models=MODELS)
-    #
-    # # plot
-    # plot_performance(noise_coeff=noise_coeff, bias_delay=bias_delay)
+              file_name=ROOT_DIR+'/outputs/prediction_summary/dec_tree/summary.csv')
 
 
 if __name__ == '__main__':
 
-    evaluate(hosp_occu_threshold=10, survey_size_novel_inf=N_NOVEL_INCD)
+    evaluate()
     # evaluate(noise_coeff=1)
     # evaluate(noise_coeff=0.5, bias_delay=4)
 
