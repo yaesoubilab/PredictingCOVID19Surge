@@ -96,7 +96,8 @@ def build_dataset(week_of_prediction_in_fall,
                   pred_period,
                   hosp_thresholds,
                   survey_size_novel_inf,
-                  report_corr=True):
+                  report_corr=True,
+                  n_of_trajs_used=None):
     """ create the dataset needed to develop the predictive models
     :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                              a negative int for number of weeks before the peak
@@ -105,6 +106,8 @@ def build_dataset(week_of_prediction_in_fall,
     :param hosp_thresholds: (list) of thresholds of hospitalization capacity
     :param survey_size_novel_inf: (int) survey size of novel infection surveillance
     :param report_corr: (bool) whether to report correlations between features and outcomes
+    :param n_of_trajs_used: (None or int) number of trajectories used to build the dataset
+        (if None, all trajectories are used)
     """
 
     # read dataset
@@ -112,7 +115,8 @@ def build_dataset(week_of_prediction_in_fall,
         dir_of_trajs='outputs/trajectories',
         week_of_prediction_in_fall=week_of_prediction_in_fall,
         pred_period=pred_period,
-        hosp_thresholds=hosp_thresholds)
+        hosp_thresholds=hosp_thresholds,
+        n_of_trajs_used=n_of_trajs_used)
 
     # error model for novel variant surveillance
     err_novel_incd = ErrorModel(survey_size=survey_size_novel_inf)
@@ -206,7 +210,7 @@ def build_dataset(week_of_prediction_in_fall,
 
 def build_and_combine_datasets(
         name_of_dataset, time_of_fall, weeks_in_fall,
-        weeks_to_predict, hosp_occu_thresholds, survey_size_novel_inf):
+        weeks_to_predict, hosp_occu_thresholds, survey_size_novel_inf, n_of_trajs_used=None):
     """
     :param name_of_dataset: (string) 'training dataset' or 'validation'
     :param time_of_fall: (float) year of simulation that marks the begining of fall
@@ -214,6 +218,8 @@ def build_and_combine_datasets(
     :param weeks_to_predict: (int) number of weeks in future when outcomes should be predicted
     :param hosp_occu_thresholds: (list) of thresholds for hospital occupancy
     :param survey_size_novel_inf: (int) survey size of novel infection surveillance
+    :param n_of_trajs_used: (None or int) number of trajectories used to build the dataset
+        (if None, all trajectories are used)
     """
 
     # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
@@ -227,7 +233,8 @@ def build_and_combine_datasets(
                       pred_period=(time_of_prediction, time_of_prediction + weeks_to_predict / 52),
                       hosp_thresholds=hosp_occu_thresholds,
                       survey_size_novel_inf=survey_size_novel_inf,
-                      report_corr=False)
+                      report_corr=False,
+                      n_of_trajs_used=n_of_trajs_used)
 
     # merge the data collected at different weeks to from a
     # single dataset for training the model

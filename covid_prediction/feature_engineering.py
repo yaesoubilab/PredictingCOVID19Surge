@@ -52,19 +52,24 @@ class ErrorModel:
 
 
 class FeatureEngineering:
-    def __init__(self, dir_of_trajs, week_of_prediction_in_fall, pred_period, hosp_thresholds):
+    def __init__(self, dir_of_trajs, week_of_prediction_in_fall, pred_period, hosp_thresholds, n_of_trajs_used=None):
         """ create the dataset needed to develop the predictive models
         :param dir_of_trajs: (string) the name of directory where trajectories are located
         :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
                                                  a negative int for number of weeks before the peak
         :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
         :param hosp_thresholds: (list) of thresholds for hospitalization capacity
+        :param n_of_trajs_used: (None or int) number of trajectories used to build the dataset
+            (if None, all trajectories are used)
         """
         self.directoryName = dir_of_trajs
         self.weekOfPredInFall = week_of_prediction_in_fall
         self.weeksOfPredictionPeriod = (round(pred_period[0] * 52, 0), round(pred_period[1] * 52, 0))
         self.hospThresholds = hosp_thresholds
-        self.namesOfTrajFiles = os.listdir(dir_of_trajs)
+        if n_of_trajs_used is None:
+            self.namesOfTrajFiles = os.listdir(dir_of_trajs)
+        else:
+            self.namesOfTrajFiles = os.listdir(dir_of_trajs)[:n_of_trajs_used]
 
     def pre_process(self, info_of_incd_fs, info_of_prev_fs, info_of_parameter_fs, output_file, report_corr=True):
         """

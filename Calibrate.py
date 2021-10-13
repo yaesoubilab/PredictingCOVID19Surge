@@ -34,7 +34,7 @@ if __name__ == "__main__":
                       'for training and validating the predictive models ({}).'
                       '\nIncrease the number of trajectories '
                       'used for calibration from {}.'
-                      .format(calibration.nTrajsWithNonZeroProb,n_trajs_needed, N_SIM_CALIBRATION))
+                      .format(calibration.nTrajsWithNonZeroProb, n_trajs_needed, N_SIM_CALIBRATION))
 
     # save calibration results
     calibration.save_results(filename='outputs/summary/calibration_summary.csv')

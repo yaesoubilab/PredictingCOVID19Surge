@@ -12,14 +12,18 @@ A.Y_LABEL_COORD_X = -0.15
 A.SUBPLOT_W_SPACE = 0.0
 
 
-def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_trajs_to_display=None):
+def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
+         n_random_trajs_to_display=None, save_plots_dir=None):
     """
     :param prev_multiplier: (int) to multiply the simulation time to convert it to year, week, or day.
     :param incd_multiplier: (int) to multiply the simulation period to covert it to year, week, or day.
     :param obs_incd_multiplier: (int) to multiply the observation period to conver it to year, week, or day.
     :param n_random_trajs_to_display: (int) number of trajectories to display
+    :param save_plots_dir: (string) directory to save
     :return:
     """
+    if save_plots_dir is None:
+        save_plots_dir = ROOT_DIR + '/outputs/figures/'
 
     directory = ROOT_DIR + '/outputs/trajectories'
     sim_outcomes = A.SimOutcomeTrajectories(csv_directory=directory)
@@ -133,7 +137,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
                                   list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
                                                   obs_hosp_occ_rate, obs_cum_vacc_rate],
-                                  file_name=ROOT_DIR+'/outputs/figures/summary3.png',
+                                  file_name=save_plots_dir+'summary3.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
                                   figure_size=(2.3*2, 2.4*2)
@@ -141,7 +145,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
                                   list_plot_info=[obs_hosp_occ_rate, obs_hosp_rate, obs_prev_immune_from_inf,
                                                   obs_cum_hosp_rate, obs_cum_vacc_rate, obs_incd_novel],
-                                  file_name=ROOT_DIR+'/outputs/figures/summary.png',
+                                  file_name=save_plots_dir+'summary.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
                                   figure_size=(2.3*3, 2.4*2)
@@ -193,7 +197,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
                                   list_plot_info=[obs_incd_novel, obs_incd_novel_unvacc, obs_incd_novl_vacc,
                                                   obs_new_hosp_novel, obs_new_hosp_novel_unvacc, obs_new_hosp_novel_vacc],
-                                  file_name=ROOT_DIR+'/outputs/figures/novel_variant.png',
+                                  file_name=save_plots_dir+'novel_variant.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
                                   figure_size=(2.3*3, 2.4*2)
@@ -239,7 +243,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
                                                          if_connect_obss=True)
         ))
 
-    filename_validation = ROOT_DIR+'/outputs/figures/calibration.png'
+    filename_validation = save_plots_dir+'calibration.png'
     list_plot_info = hosp_rate_by_age
     list_plot_info.extend(cum_hosp_rate_by_age)
     list_plot_info.extend(age_dist_cum_hosp)
@@ -281,7 +285,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1, n_random_
             title=str_a, y_label='Age-distribution of\n cumulative deaths (%)' if a == 0 else None,
             y_range=(0, 100), y_multiplier=100, x_multiplier=prev_multiplier))
 
-    filename_validation = ROOT_DIR+'/outputs/figures/incidence.png'
+    filename_validation = save_plots_dir+'incidence.png'
     list_plot_info = incd_rate_by_age
     list_plot_info.extend(age_dist_cum_incd)
     #list_plot_info.extend(age_dist_cum_death)
@@ -301,5 +305,4 @@ if __name__ == "__main__":
     plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
          incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
          obs_incd_multiplier=sets.observationPeriod * 52,
-         n_random_trajs_to_display=200,
-         )
+         n_random_trajs_to_display=200)
