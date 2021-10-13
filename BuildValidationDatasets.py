@@ -1,3 +1,4 @@
+import sys
 import warnings
 
 import apace.Calibration as calib
@@ -10,6 +11,8 @@ from definitions import ROOT_DIR, FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TR
 def build_validation_datasets():
 
     warnings.filterwarnings("ignore")
+    sys.stdout = open(
+        ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/summary_validating_set.txt', 'w')
 
     # ---- build the dataset for the base scenario ----
     # get the seeds and probability weights
@@ -22,7 +25,7 @@ def build_validation_datasets():
              seeds=seeds[-N_SIM_VALIDATION:],
              n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
-             print_summary_state=False,
+             print_summary_stats=False,
              folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/base')
 
     # ---- build the dataset for the base scenario ----
@@ -51,7 +54,7 @@ def build_validation_datasets():
              n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
              novel_variant_will_emerge=False,
-             print_summary_state=False,
+             print_summary_stats=False,
              folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/no_novel_variant')
     # build the dataset
     build_and_combine_datasets(
@@ -69,7 +72,7 @@ def build_validation_datasets():
              n_to_display=N_SIM_VALIDATION,
              sample_seeds_by_weights=False,
              mitigating_strategies_on=False,
-             print_summary_state=False,
+             print_summary_stats=False,
              folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/no_mitigation')
     # build the dataset
     build_and_combine_datasets(
@@ -80,6 +83,8 @@ def build_validation_datasets():
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
     )
+
+    sys.stdout.close()
 
 
 if __name__ == '__main__':

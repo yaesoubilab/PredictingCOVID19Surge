@@ -3,9 +3,10 @@ from apace.MultiEpidemics import MultiEpidemics
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot
+from definitions import N_SIM_TRAINING
 
-N = 50   # number of trajectories to simulate
-N_TO_DISPLAY = 50  # number of trajectories to display
+
+N = N_SIM_TRAINING  # number of simulation
 IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 
@@ -13,11 +14,11 @@ IF_PARALLEL = True
 USE_CALIBRATED_MODEL = True
 
 
-def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
-             sample_seeds_by_weights=False,
-             novel_variant_will_emerge=True,
-             mitigating_strategies_on=True,
-             print_summary_state=True,
+def simulate(n=25,
+             n_to_display=None,
+             calibrated=True, seeds=None, weights=None, sample_seeds_by_weights=False,
+             novel_variant_will_emerge=True, mitigating_strategies_on=True,
+             print_summary_stats=True,
              folder_to_save_plots=None):
 
     # get model settings
@@ -40,10 +41,11 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
                          if_run_in_parallel=IF_PARALLEL)
 
     # save ids, seeds, runtime,
-    multi_model.save_summary()
+    if print_summary_stats:
+        multi_model.save_summary()
 
     # get summary statistics of runtime,
-    if print_summary_state:
+    if print_summary_stats:
         multi_model.print_summary_stats()
 
     # plot trajectories
@@ -59,7 +61,7 @@ def simulate(n=25, n_to_display=None, calibrated=True, seeds=None, weights=None,
 if __name__ == "__main__":
 
     simulate(n=N,
-             n_to_display=N_TO_DISPLAY,
+             n_to_display=min(200, N),
              calibrated=USE_CALIBRATED_MODEL,
              novel_variant_will_emerge=IF_NOVEL_VARIANT,
              mitigating_strategies_on=IF_MITIGATION)

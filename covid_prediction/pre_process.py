@@ -239,11 +239,11 @@ def build_and_combine_datasets(
     # merge the data collected at different weeks to from a
     # single dataset for training the model
     dataframes = []
-    prefix = '/outputs/prediction_datasets/week_into_fall/'
+    prefix = '/outputs/prediction_datasets/week_into_fall'
     for w in weeks_in_fall:
         # file name
         label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)
-        file_name = ROOT_DIR + prefix + 'data-{}.csv'.format(label)
+        file_name = ROOT_DIR + prefix + '/data-{}.csv'.format(label)
         # read and store
         dataframes.append(pd.read_csv(file_name))
         # delete file

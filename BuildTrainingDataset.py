@@ -7,7 +7,7 @@ from definitions import FEASIBILITY_PERIOD, N_NOVEL_INCD, WEEKS_IN_FALL, HOSP_OC
 if __name__ == "__main__":
 
     sys.stdout = open(
-        ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/summary_training.txt', 'w')
+        ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/summary_training_set.txt', 'w')
 
     # the report the summary of training trajectories
     report_traj_summary(hosp_occ_thresholds=HOSP_OCCU_THRESHOLDS,
