@@ -1,0 +1,20 @@
+---- summary of 'data-validating base' dataset ----
+# of records: 350
+% observations where threshold 7.5 is passed: 16.0
+% observations where threshold 10 is passed: 13.1
+% observations where threshold 15 is passed: 10.0
+---- summary of 'data-validating smaller survey' dataset ----
+# of records: 350
+% observations where threshold 7.5 is passed: 16.0
+% observations where threshold 10 is passed: 13.1
+% observations where threshold 15 is passed: 10.0
+---- summary of 'data-validating no novel variant' dataset ----
+# of records: 350
+% observations where threshold 7.5 is passed: 12.3
+% observations where threshold 10 is passed: 10.0
+% observations where threshold 15 is passed: 5.7
+---- summary of 'data-validating no control measure' dataset ----
+# of records: 350
+% observations where threshold 7.5 is passed: 24.9
+% observations where threshold 10 is passed: 20.9
+% observations where threshold 15 is passed: 17.7

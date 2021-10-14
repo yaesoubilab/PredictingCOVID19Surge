@@ -31,7 +31,10 @@ def simulate(n=25,
 
     if calibrated and seeds is None:
         # get the seeds and probability weights
-        seeds, weights = calib.get_seeds_and_probs('outputs/summary/calibration_summary.csv')
+        seeds = calib.get_seeds_with_non_zero_prob(
+            filename='outputs/summary/calibration_summary.csv',
+            random_state=0)
+        # seeds, weights = calib.get_seeds_and_probs('outputs/summary/calibration_summary.csv')
 
     multi_model.simulate(function_to_populate_model=M.build_covid_model,
                          n=n,
@@ -61,7 +64,7 @@ def simulate(n=25,
 if __name__ == "__main__":
 
     simulate(n=N,
-             n_to_display=min(200, N),
+             n_to_display=min(100, N),
              calibrated=USE_CALIBRATED_MODEL,
              novel_variant_will_emerge=IF_NOVEL_VARIANT,
              mitigating_strategies_on=IF_MITIGATION)

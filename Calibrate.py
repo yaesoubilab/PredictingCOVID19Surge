@@ -1,15 +1,19 @@
+import sys
 import warnings
 
 import apace.Calibration as calib
 from SimulateMany import simulate
 from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
-from definitions import N_SIM_CALIBRATION, N_SIM_TRAINING, N_SIM_VALIDATION, CALIB_PERIOD
+from definitions import N_SIM_CALIBRATION, N_SIM_TRAINING, N_SIM_VALIDATION, CALIB_PERIOD, ROOT_DIR
 
 RUN_IN_PARALLEL = True
 
 
 if __name__ == "__main__":
+
+    sys.stdout = open(
+        ROOT_DIR + '/outputs/summary/calibration.txt', 'w')
 
     # get model settings
     sets = COVIDSettings(if_calibrating=True)
@@ -25,7 +29,8 @@ if __name__ == "__main__":
         num_of_iterations=N_SIM_CALIBRATION,
         if_run_in_parallel=RUN_IN_PARALLEL)
 
-    print('Calibration duration (seconds): {}.'.format(round(calibration.runTime, 1)))
+    print('Number of simulation runs: {}'.format(N_SIM_CALIBRATION))
+    print('Calibration duration (seconds): {}'.format(round(calibration.runTime, 1)))
     print('Number of trajectories with non-zero probability: {}'.format(calibration.nTrajsWithNonZeroProb))
     n_trajs_needed = N_SIM_TRAINING+N_SIM_VALIDATION
     if calibration.nTrajsWithNonZeroProb < n_trajs_needed:
@@ -41,6 +46,8 @@ if __name__ == "__main__":
 
     # simulate the calibrated model
     simulate(n=N_SIM_TRAINING,
-             n_to_display=min(200, N_SIM_TRAINING),
+             n_to_display=min(100, N_SIM_TRAINING),
              calibrated=True,
              sample_seeds_by_weights=False)
+
+    sys.stdout.close()

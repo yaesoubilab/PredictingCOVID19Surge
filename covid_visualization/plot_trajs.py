@@ -305,4 +305,4 @@ if __name__ == "__main__":
     plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
          incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
          obs_incd_multiplier=sets.observationPeriod * 52,
-         n_random_trajs_to_display=200)
+         n_random_trajs_to_display=100)

@@ -414,7 +414,10 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         summary = [['# features', 'max depth', 'ccp alpha', 'Score', 'Score and PI']]
 
         for s in self.crossValidationSummaries:
-            summary.append([s.nFeatures, s.maxDepth, s.ccpAlpha, s.meanScore,
+            summary.append([s.nFeatures,
+                            s.maxDepth,
+                            s.ccpAlpha,
+                            round(s.meanScore, 3),
                             s.get_formatted_mean_and_interval(deci=3)])
             if s.meanScore > max_score:
                 best_spec = s
