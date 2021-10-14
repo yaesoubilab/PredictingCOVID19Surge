@@ -22,14 +22,14 @@ CV_FOLD = 20         # num of splits for cross validation
 
 SCENARIOS = {
     'base': 'base',
-    'smaller survey': 'smaller survey',
+    'no control measure': 'no control measure',
     'no novel variant': 'no novel variant',
-    'no control measure': 'no control measure'
+    'smaller survey': 'smaller survey'
 }
 
 # survey sizes
 N_NOVEL_INCD = 1521
-SMALLER_N_NOVEL_INCD = 500
+SMALLER_N_NOVEL_INCD = 250
 
 # columns in datasets
 HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
