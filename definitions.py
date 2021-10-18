@@ -14,9 +14,9 @@ WEEKS_IN_FALL = (8, 12, 16, 20, 24, 28, 32)
 HOSP_OCCU_THRESHOLDS = (7.5, 10, 15)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
-N_SIM_CALIBRATION = 10000
-N_SIM_TRAINING = 250
-N_SIM_VALIDATION = 50
+N_SIM_CALIBRATION = 1000
+N_SIM_TRAINING = 25
+N_SIM_VALIDATION = 5
 CV_FOLD = 20         # num of splits for cross validation
 
 

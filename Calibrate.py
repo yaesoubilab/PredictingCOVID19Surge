@@ -38,7 +38,7 @@ if __name__ == "__main__":
                       'the number of trajectories needed '
                       'for training and validating the predictive models ({}).'
                       '\nIncrease the number of trajectories '
-                      'used for calibration from {}.'
+                      'used for calibration which is currently {}.'
                       .format(calibration.nTrajsWithNonZeroProb, n_trajs_needed, N_SIM_CALIBRATION))
 
     # save calibration results

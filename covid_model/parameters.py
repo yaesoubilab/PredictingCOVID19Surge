@@ -45,9 +45,9 @@ class COVIDParameters(EpiParameters):
 
         # seasonality
         self.seasonalityParams = [
-            Uniform(0.15, 0.35),    # phase
+            Uniform(-0.25, 0.25),    # phase
             Uniform(0.75, 1.25),    # a0
-            Uniform(0, 1)          # a1
+            Uniform(0, 0.5)           # a1
         ]
 
         # parameters related to duration of E, hospitalizations, and R

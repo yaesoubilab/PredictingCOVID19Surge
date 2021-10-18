@@ -279,9 +279,9 @@ plot_alpha_h(h_max=15, alpha_max=0.7,
 # seasonality
 Y_RANGE = (0, 3)
 X_RANGE = (-0.1, 2.35)
-plot_cos_functions(phase=0.25, phases=[0.15, 0.25, 0.35],
+plot_cos_functions(phase=0, phases=[-0.25, 0.0, 0.25],
                    a_0=1, a_0s=[0.75, 1, 1.25],
-                   a_1=0.5, a_1s=[0, 0.5, 1],
+                   a_1=0.25, a_1s=[0, 0.25, 0.5],
                    y_label=r'$\sigma(t)$',
                    # x_range=[T0, SIM_DURATION],
                    x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
