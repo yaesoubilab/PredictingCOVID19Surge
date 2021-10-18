@@ -23,24 +23,24 @@ def sigmoid(t, b, f_min, f_max, t_mid, t_min=0):
     return val if val > 0 else None
 
 
-def cos(t, phase, scale, f_min, f_max):
+def cos(t, a_0, a_1, phase, scale):
     # cosine function
     par = TimeDependentCosine(
         par_phase=Constant(phase),
         par_scale=Constant(scale),
-        par_min=Constant(f_min),
-        par_max=Constant(f_max)
+        par_a0=Constant(a_0),
+        par_a1=Constant(a_1),
     )
     return par.sample(time=t)
 
 
 def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
                            bs, f_mins, f_maxs, t_mids, t_mins,
-                           x_range, y_label, x_label,
+                           x_min_max, y_label, x_label,
                            vertical_line=None, fig_size=(7.5, 3.2), round_b=None):
 
     # ------------------
-    ts = np.linspace(start=x_range[0], stop=x_range[1])
+    ts = np.linspace(start=x_min_max[0], stop=x_min_max[1])
     fs = []
     legends = []
     titles = []
@@ -125,11 +125,11 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
 
 def plot_alpha_h(h_max, alpha_max,
                  h_maxs, alpha_maxs,
-                 x_range, y_label, x_label,
+                 x_min_max, y_label, x_label,
                  vertical_line=None, fig_size=(7.5, 3.2)):
 
     # ------------------
-    hs = np.linspace(start=x_range[0], stop=x_range[1])
+    hs = np.linspace(start=x_min_max[0], stop=x_min_max[1])
     fs = []
     legends = []
     titles = []
@@ -176,8 +176,9 @@ def plot_alpha_h(h_max, alpha_max,
     plt.show()
 
 
-def plot_cos_functions(phase, f_min, f_max,
-                       phases, f_mins, f_maxes,
+def plot_cos_functions(phase, a_0, a_1,
+                       phases, a_0s, a_1s,
+                       x_label,
                        y_label, fig_size=(7.5, 3.2)):
 
     # ------------------
@@ -193,29 +194,29 @@ def plot_cos_functions(phase, f_min, f_max,
         ys = []
         for v in phases:
             legs.append(r'$\phi=$'+str(v))
-            ys.append([cos(t, phase=v, scale=1, f_min=f_min, f_max=f_max) for t in ts])
+            ys.append([cos(t, phase=v, scale=1, a_1=a_1, a_0=a_0) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
-    # varying min
-    if f_mins is not None:
-        titles.append('Varying '+r'$\sigma_{min}$')
+    # varying a_0
+    if a_0s is not None:
+        titles.append('Varying '+r'$a_{0}$')
         legs = [] # legends
         ys = []
-        for v in f_mins:
-            legs.append(r'$\sigma_{min}=$'+str(v))
-            ys.append([cos(t, phase=phase, scale=1, f_min=v, f_max=f_max) for t in ts])
+        for v in a_0s:
+            legs.append(r'$a_{0}=$'+str(v))
+            ys.append([cos(t, phase=phase, scale=1, a_1=a_1, a_0=v) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
-    # varying max
-    if f_maxes is not None:
-        titles.append('Varying '+r'$\sigma_{max}$')
+    # varying a_1
+    if a_1s is not None:
+        titles.append('Varying '+r'$a_{1}$')
         legs = [] # legends
         ys = []
-        for v in f_maxes:
-            legs.append(r'$\sigma_{max}=$'+str(v))
-            ys.append([cos(t, phase=phase, scale=1, f_min=f_min, f_max=v) for t in ts])
+        for v in a_1s:
+            legs.append(r'$a_{1}=$'+str(v))
+            ys.append([cos(t, phase=phase, scale=1, a_1=v, a_0=a_0) for t in ts])
         legends.append(legs)
         fs.append(ys)
 
@@ -230,14 +231,13 @@ def plot_cos_functions(phase, f_min, f_max,
         ax.set_ylim(Y_RANGE)
         ax.set_xlim(X_RANGE)
         ax.axvline(x=SEPTEMBER_FIRST, c='k', linestyle='--', linewidth=0.5)
-        ax.set_xlabel('Simulation Year ' + r'$(t)$')
+        ax.set_xlabel(x_label)
         ax.legend(fontsize='x-small') # loc=2
 
     axarr[0].set_ylabel(y_label)
     plt.tight_layout()
     plt.show()
 
-# ---- settings ----
 
 # probability of novel strain over time
 plot_sigmoid_functions(b=7, bs=[5, 7, 9],
@@ -246,10 +246,10 @@ plot_sigmoid_functions(b=7, bs=[5, 7, 9],
                        t_mid=1.75, t_mids=[1.5, 1.75, 2.0],
                        t_min=0, t_mins=None,
                        y_label=r'$\gamma(t)$',
-                       x_range=[T0, SIM_DURATION],
-                       x_label='Simulation Year ' + r'$(t)$',
+                       x_min_max=[T0, SIM_DURATION],
+                       x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
                        vertical_line=SEPTEMBER_FIRST,
-                       fig_size=(5.5, 3))
+                       fig_size=(6, 2.8))
 
 # rate of vaccination
 Y_RANGE = (0, 3)
@@ -260,29 +260,30 @@ plot_sigmoid_functions(b=-7.5, bs=[-10, -7.5, -5],
                        t_min=1, t_mins=[0.8, 1, 1.2],
                        # t_min=0, t_mins=None,
                        y_label=r'$v(t)$',
-                       x_range=[T0, SIM_DURATION],
-                       x_label='Simulation Year ' + r'$(t)$',
+                       x_min_max=[T0, SIM_DURATION],
+                       x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
                        vertical_line=SEPTEMBER_FIRST,
-                       fig_size=(9, 3))
+                       fig_size=(9, 2.8))
 
 # effectiveness of control strategies
-X_RANGE = (-0.1, 30)
+X_RANGE = (-1, 31)
 Y_RANGE = (0, 1)
 MAX_OCC = (10, 15, 20)
 plot_alpha_h(h_max=15, alpha_max=0.7,
              h_maxs=[10, 15, 20], alpha_maxs=[0.5, 0.7, 0.9],
              y_label=r'$\alpha(h)$',
-             x_range=[0, 40],
+             x_min_max=[0, 30],
              x_label='Hospital occupancy ' + r'$(h)$',
-             fig_size=(4.5, 3))
+             fig_size=(4.5, 2.8))
 
-# # seasonality
-# Y_RANGE = (0, 3)
-# plot_cos_functions(phase=0, phases=[-0.1, 0, 0.1],
-#                    f_min=1, f_mins=None,
-#                    f_max=2, f_maxes=[1.5, 2, 2.5],
-#                    y_label=r'$\sigma(t)$',
-#                    x_range=[T0, SIM_DURATION],
-#                    x_label='Simulation Year ' + r'$(t)$',
-#                    vertical_line = SEPTEMBER_FIRST,
-#                    fig_size=(5.3, 3))
+# seasonality
+Y_RANGE = (0, 3)
+X_RANGE = (-0.1, 2.35)
+plot_cos_functions(phase=0.25, phases=[0.15, 0.25, 0.35],
+                   a_0=1, a_0s=[0.75, 1, 1.25],
+                   a_1=0.5, a_1s=[0, 0.5, 1],
+                   y_label=r'$\sigma(t)$',
+                   # x_range=[T0, SIM_DURATION],
+                   x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
+                   # vertical_line = SEPTEMBER_FIRST,
+                   fig_size=(6, 2.8))
