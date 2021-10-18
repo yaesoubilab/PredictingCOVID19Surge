@@ -1,7 +1,7 @@
 from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Logit, Product, \
     OneMinus, MatrixOfParams, TimeDependentSigmoid, \
     Beta, Uniform, UniformDiscrete, Gamma, Equal, OneMinusTimes, \
-    SigmoidOnModelOutput
+    SigmoidOnModelOutput, TimeDependentCosine
 from apace.Inputs import EpiParameters
 from apace.Inputs import InfectivityFromR0
 from definitions import AgeGroups, Profiles
@@ -43,6 +43,13 @@ class COVIDParameters(EpiParameters):
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
         self.probHosp18To29 = Uniform(0.001, 0.005)  # age group 18-29 as the reference
 
+        # seasonality
+        self.seasonalityParams = [
+            Uniform(0.15, 0.35),    # phase
+            Uniform(0.75, 1.25),    # a0
+            Uniform(0, 1)          # a1
+        ]
+
         # parameters related to duration of E, hospitalizations, and R
         self.durEByProfile = [Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
                               Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d),
@@ -52,9 +59,6 @@ class COVIDParameters(EpiParameters):
                                  Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d),
                                  Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d),
                                  Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d)]
-        # self.durRByProfile = [Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
-        #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5),
-        #                       Beta(mean=1, st_dev=0.2, minimum=0.5, maximum=1.5)]
 
         self.ratioDurImmunityFromInfAndVaccToInf = Uniform(1.0, 1.5)
         self.durRByProfile = [Uniform(0.25, 1.5), Uniform(0.25, 1.5), None, None]
@@ -118,7 +122,9 @@ class COVIDParameters(EpiParameters):
         self.distS0ToSs = None
         self.distI0ToIs = None
 
+        self.seasonality = None
         self.infectivityDominant = None
+        self.infectivityDominantWithSeasonality = None
         self.infectivityByProfile = [None] * self.nProfiles
         self.suspVaccinated = None
         self.ratioTransmByProfile = None
@@ -197,10 +203,24 @@ class COVIDParameters(EpiParameters):
             list_par_pop_sizes=self.sizeSByAge,
             par_inf_duration=self.durI)
 
+        # seasonality
+        self.seasonality = TimeDependentCosine(
+            par_phase=self.seasonalityParams[0],
+            par_scale=Constant(1),
+            par_a0=self.seasonalityParams[1],
+            par_a1=self.seasonalityParams[2]
+        )
+
+        # infectivity of dominant strain with seasonality
+        self.infectivityDominantWithSeasonality = Product(
+            parameters=[self.infectivityDominant, self.seasonality]
+        )
+
         # infectivity by profile
         for p in range(self.nProfiles):
             self.infectivityByProfile[p] = Product(
-                parameters=[self.infectivityDominant, self.ratioTransmByProfile[p]])
+                parameters=[self.infectivityDominantWithSeasonality,
+                            self.ratioTransmByProfile[p]])
 
         # relative probability of hospitalization to age 18-29
         for a in range(self.nAgeGroups):
@@ -299,6 +319,8 @@ class COVIDParameters(EpiParameters):
 
              'R0': self.R0,
              'Duration of infectiousness-dominant': self.durI,
+             'Seasonality parameters': self.seasonalityParams,
+             'Seasonality': self.seasonality,
              'Importation rate': self.importRateByAge,
              'Prob novel strain params': self.probNovelStrainParams,
              'Prob novel strain': self.probNovelStrain,
@@ -318,6 +340,7 @@ class COVIDParameters(EpiParameters):
 
              # transmission parameter
              'Infectivity-dominant': self.infectivityDominant,
+             'Infectivity-dominant with seasonality': self.infectivityDominantWithSeasonality,
              'Infectivity by profile': self.infectivityByProfile,
 
              'Ratio prob of hospitalization of novel to dominant': self.ratioProbHospNovel,
