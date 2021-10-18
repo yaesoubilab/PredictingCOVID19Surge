@@ -1,3 +1,5 @@
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pydotplus
@@ -36,9 +38,15 @@ class ClassifierPerformance:
         self.yTest = y_test
         self.yTestHatProb = y_test_hat_prob
 
-        tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
-        self.sen = tp / (tp + fn)
-        self.spe = tn / (tn + fp)
+        try:
+            tn, fp, fn, tp = confusion_matrix(y_true=y_test, y_pred=y_test_hat).ravel()
+            self.sen = tp / (tp + fn)
+            self.spe = tn / (tn + fp)
+        except ValueError:
+            warnings.warn('\nSensitivity and specificity cannot be calculated.')
+            self.sen = None
+            self.spe = None
+
         self.accuracy = accuracy_score(y_test, y_test_hat)
 
         self.roc_auc = None

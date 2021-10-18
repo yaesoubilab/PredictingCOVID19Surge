@@ -61,7 +61,12 @@ class COVIDParameters(EpiParameters):
                                  Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d)]
 
         self.ratioDurImmunityFromInfAndVaccToInf = Uniform(1.0, 1.5)
-        self.durRByProfile = [Uniform(0.25, 1.5), Uniform(0.25, 1.5), None, None]
+        # self.durRByProfile = [Beta(mean=1, st_dev=0.25, minimum=0.25, maximum=1.5),
+        #                       Beta(mean=1, st_dev=0.25, minimum=0.25, maximum=1.5),
+        #                       None, None]
+        self.durRByProfile = [Uniform(0.25, 1.5),
+                              Uniform(0.25, 1.5),
+                              None, None]
 
         # probability that an imported case is infected with the novel strain
         self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
@@ -70,8 +75,8 @@ class COVIDParameters(EpiParameters):
 
         # parameters related to novel strain
         self.ratioTransmNovel = Uniform(1, 2)
-        self.ratioDurInfNovel = Uniform(0.75, 1.25)
-        self.ratioProbHospNovel = Uniform(0.5, 1.5)
+        self.ratioDurInfNovel = Uniform(0.5, 2)
+        self.ratioProbHospNovel = Uniform(0.5, 3)
 
         # parameters related to vaccine effectiveness [dominant, novel]
         self.durVacImmunity = Uniform(0.5, 1.5)

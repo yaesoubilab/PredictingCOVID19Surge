@@ -17,7 +17,7 @@ HOSP_OCCU_THRESHOLDS = (7.5, 10, 15)  # per 100,000 population
 N_SIM_CALIBRATION = 1000*5
 N_SIM_TRAINING = 25*5
 N_SIM_VALIDATION = 5*5
-CV_FOLD = 20         # num of splits for cross validation
+CV_FOLD = 10         # num of splits for cross validation
 
 
 SCENARIOS = {

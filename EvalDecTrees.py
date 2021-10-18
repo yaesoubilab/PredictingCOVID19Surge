@@ -8,7 +8,7 @@ from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, SCENARIOS, DIGITS, CV_FO
 MODELS = (A, B3)
 
 ALPHAS = np.arange(0, 0.1, 0.005) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
-IF_PARALLEL = True
+IF_PARALLEL = False
 
 
 def evaluate():
@@ -44,9 +44,9 @@ def evaluate():
             for p in performance:
                 result.extend([
                     round(p.accuracy, DIGITS),
-                    round(p.sen, DIGITS),
-                    round(p.spe, DIGITS)]
-                )
+                    None if p.sen is None else round(p.sen, DIGITS),
+                    None if p.spe is None else round(p.spe, DIGITS)
+                ])
 
             rows.append(result)
 
