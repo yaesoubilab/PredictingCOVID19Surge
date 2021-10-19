@@ -75,8 +75,8 @@ class COVIDParameters(EpiParameters):
 
         # parameters related to novel strain
         self.ratioTransmNovel = Uniform(1, 2)
-        self.ratioDurInfNovel = Uniform(0.5, 2)
-        self.ratioProbHospNovel = Uniform(0.5, 3)
+        self.ratioDurInfNovel = Uniform(0.5, 1.5)
+        self.ratioProbHospNovel = Uniform(0.5, 2)
 
         # parameters related to vaccine effectiveness [dominant, novel]
         self.durVacImmunity = Uniform(0.5, 1.5)
@@ -110,9 +110,9 @@ class COVIDParameters(EpiParameters):
         self.y1PercChangeInContact = Product(parameters=[Constant(-1), self.y1EffOfControlMeasures])
 
         # year 2 physical distancing properties
-        self.y2Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        self.y2MaxHospOcc = Uniform(4 * 10 / 100000, 4 * 20 / 100000)
-        self.y2MaxEff = Uniform(0.5, 0.75)
+        self.y2Thresholds = [Equal(par=self.y1Thresholds[0]), Equal(par=self.y1Thresholds[1])]  # [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
+        self.y2MaxHospOcc = Equal(par=self.y1MaxHospOcc)  # Uniform(4 * 10 / 100000, 4 * 20 / 100000)
+        self.y2MaxEff = Equal(par=self.y1MaxEff)  # Uniform(0.5, 0.75)
         self.y2EffOfControlMeasures = SigmoidOnModelOutput(
             par_b=self.y2MaxHospOcc,
             par_max=self.y2MaxEff)
