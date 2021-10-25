@@ -77,7 +77,8 @@ def build_covid_model(model):
             Hs[i] = Compartment(name='Hospitalized-'+str_a_p,
                                 num_of_pathogens=2, if_empty_to_eradicate=True, row_index_contact_matrix=a)
             Rs[i] = Compartment(name='Recovered-'+str_a_p,
-                                susceptibility_params=params.suspInRByProfile[p],
+                                susceptibility_params=[Constant(0),
+                                                       params.suspInRAgainstNovelByProfile[p]],
                                 row_index_contact_matrix=a)
             Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 
@@ -199,25 +200,20 @@ def build_covid_model(model):
             Is[i].add_event(event=leaving_Is[i])
             Hs[i].add_events(events=[leaving_Hs[i], deaths_in_hosp[i]])
 
-            if p == Profiles.DOM_UNVAC:
+            if p == Profiles.DOM_UNVAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i],
                                          vaccination_in_R_dom[a],
-                                         infection_in_R[a]])
-            elif p == Profiles.NOV_UNVAC:
+                                         infection_in_R[i]])
+            elif p == Profiles.NOV_UNVAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i],
                                          vaccination_in_R_nov[a]])
-            elif p == Profiles.DOM_VAC:
+            elif p == Profiles.DOM_VAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i],
-                                         infection_in_R[a]])
-            elif p == Profiles.NOV_VAC:
+                                         infection_in_R[i]])
+            elif p == Profiles.NOV_VAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i]])
-            #
-            # if p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
-            #     Rs[i].add_events(events=[leaving_Rs[i],
-            #                              vaccination_in_R_dom[a],
-            #                              vaccination_in_R_nov[a]])
-            # else:
-            #     Rs[i].add_event(event=leaving_Rs[i])
+            else:
+                raise ValueError()
 
     # --------- sum time-series ------
     # population size

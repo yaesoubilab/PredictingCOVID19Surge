@@ -136,7 +136,7 @@ class COVIDParameters(EpiParameters):
         self.infectivityDominantWithSeasonality = None
         self.infectivityByProfile = [None] * self.nProfiles
         self.suspVaccinated = None
-        self.suspInRByProfile = [None] * self.nProfiles
+        self.suspInRAgainstNovelByProfile = [None] * self.nProfiles
         self.ratioTransmByProfile = None
         self.ratioProbHospByProfile = None
         self.ratioDurInfByProfile = None
@@ -236,16 +236,14 @@ class COVIDParameters(EpiParameters):
             # full immunity against infection with novel variant
             # for R after infection with novel variant
             if p in (Profiles.NOV_UNVAC.value, Profiles.NOV_VAC.value):
-                self.suspInRByProfile[p] = [Constant(0), Constant(0)]
+                self.suspInRAgainstNovelByProfile[p] = Constant(0)
             # partial immunity against infection with the novel variant
             # for R after infection with dominant strain
             elif p == Profiles.DOM_UNVAC.value:
-                self.suspInRByProfile[p] = [Constant(0),
-                                            Equal(self.ratioToReduceSuscInUnvacR)]
+                self.suspInRAgainstNovelByProfile[p] = Equal(self.ratioToReduceSuscInUnvacR)
             elif p == Profiles.DOM_VAC.value:
-                self.suspInRByProfile[p] = [Constant(0),
-                                            Product(self.ratioToReduceSuscInUnvacR,
-                                                    self.suspVaccinated[1])]
+                self.suspInRAgainstNovelByProfile[p] = Product([self.ratioToReduceSuscInUnvacR,
+                                                                self.suspVaccinated[1]])
 
         # relative probability of hospitalization to age 18-29
         for a in range(self.nAgeGroups):
@@ -368,7 +366,7 @@ class COVIDParameters(EpiParameters):
              'Infectivity-dominant': self.infectivityDominant,
              'Infectivity-dominant with seasonality': self.infectivityDominantWithSeasonality,
              'Infectivity by profile': self.infectivityByProfile,
-             'Susceptibility in R by profile': self.suspInRByProfile,
+             'Susceptibility in R by profile': self.suspInRAgainstNovelByProfile,
 
              'Ratio prob of hospitalization of novel to dominant': self.ratioProbHospNovel,
              'Vaccine effectiveness against hospitalization': self.vacEffAgainstHosp,
