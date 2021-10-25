@@ -36,6 +36,7 @@ def build_covid_model(model):
     # events
     importation = [None] * age_groups_profiles.nAgeGroups
     infection_in_S = [None] * age_groups_profiles.length
+    infection_in_R = [None] * age_groups_profiles.length
     infection_in_V = [None] * age_groups_profiles.length
     leaving_Es = [None] * age_groups_profiles.length
     leaving_Is = [None] * age_groups_profiles.length
@@ -74,9 +75,10 @@ def build_covid_model(model):
                                 infectivity_params=infectivity_params, if_empty_to_eradicate=True,
                                 row_index_contact_matrix=a)
             Hs[i] = Compartment(name='Hospitalized-'+str_a_p,
-                                num_of_pathogens=2, if_empty_to_eradicate=True,row_index_contact_matrix=a)
+                                num_of_pathogens=2, if_empty_to_eradicate=True, row_index_contact_matrix=a)
             Rs[i] = Compartment(name='Recovered-'+str_a_p,
-                                num_of_pathogens=2, row_index_contact_matrix=a)
+                                susceptibility_params=params.suspInRByProfile[p],
+                                row_index_contact_matrix=a)
             Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 
             # --------- chance nodes ---------
@@ -136,9 +138,22 @@ def build_covid_model(model):
             if p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
                 infection_in_S[i] = EpiDepEvent(
                     name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=pathogen)
+
+                if p == Profiles.DOM_UNVAC.value:
+                    i_prime = age_groups_profiles.get_row_index(
+                        age_group=a, profile=Profiles.NOV_UNVAC.value)
+                    infection_in_R[i] = EpiDepEvent(
+                        name='Infection in R-'+str_a_p, destination=Es[i_prime], generating_pathogen=pathogen+1)
             else:
                 infection_in_V[i] = EpiDepEvent(
                     name='Infection in V-'+str_a_p, destination=Es[i], generating_pathogen=pathogen)
+
+                if p == Profiles.DOM_VAC.value:
+                    i_prime = age_groups_profiles.get_row_index(
+                        age_group=a, profile=Profiles.NOV_VAC.value)
+                    infection_in_R[i] = EpiDepEvent(
+                        name='Infection in R-'+str_a_p, destination=Es[i_prime], generating_pathogen=pathogen+1)
+
             leaving_Es[i] = EpiIndepEvent(
                 name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[p], destination=Is[i])
             leaving_Is[i] = EpiIndepEvent(
@@ -183,10 +198,26 @@ def build_covid_model(model):
             Es[i].add_event(event=leaving_Es[i])
             Is[i].add_event(event=leaving_Is[i])
             Hs[i].add_events(events=[leaving_Hs[i], deaths_in_hosp[i]])
-            if p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
-                Rs[i].add_events(events=[leaving_Rs[i], vaccination_in_R_dom[a], vaccination_in_R_nov[a]])
-            else:
-                Rs[i].add_event(event=leaving_Rs[i])
+
+            if p == Profiles.DOM_UNVAC:
+                Rs[i].add_events(events=[leaving_Rs[i],
+                                         vaccination_in_R_dom[a],
+                                         infection_in_R[a]])
+            elif p == Profiles.NOV_UNVAC:
+                Rs[i].add_events(events=[leaving_Rs[i],
+                                         vaccination_in_R_nov[a]])
+            elif p == Profiles.DOM_VAC:
+                Rs[i].add_events(events=[leaving_Rs[i],
+                                         infection_in_R[a]])
+            elif p == Profiles.NOV_VAC:
+                Rs[i].add_events(events=[leaving_Rs[i]])
+            #
+            # if p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
+            #     Rs[i].add_events(events=[leaving_Rs[i],
+            #                              vaccination_in_R_dom[a],
+            #                              vaccination_in_R_nov[a]])
+            # else:
+            #     Rs[i].add_event(event=leaving_Rs[i])
 
     # --------- sum time-series ------
     # population size
