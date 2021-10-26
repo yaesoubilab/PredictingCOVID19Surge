@@ -2,7 +2,8 @@ import sys
 
 from covid_prediction.pre_process import build_and_combine_datasets
 from covid_prediction.summary_of_trajs import report_traj_summary
-from definitions import FEASIBILITY_PERIOD, N_NOVEL_INCD, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS, ROOT_DIR
+from definitions import FEASIBILITY_PERIOD, N_NOVEL_INCD, WEEKS_IN_FALL, \
+    HOSP_OCCU_THRESHOLDS, ROOT_DIR, WEEKS_TO_PREDICT
 
 if __name__ == "__main__":
 
@@ -19,7 +20,7 @@ if __name__ == "__main__":
         name_of_dataset='data-training',
         time_of_fall=FEASIBILITY_PERIOD,
         weeks_in_fall=WEEKS_IN_FALL,
-        weeks_to_predict=4,
+        weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD)
 
