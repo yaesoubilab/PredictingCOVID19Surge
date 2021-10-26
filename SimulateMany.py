@@ -4,7 +4,7 @@ from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot
 
-N = 16 # N_SIM_TRAINING  # number of simulation
+N = 50 # N_SIM_TRAINING  # number of simulation
 IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 

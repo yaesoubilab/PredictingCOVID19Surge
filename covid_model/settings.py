@@ -89,8 +89,8 @@ class COVIDSettings(ModelSettings):
                             0.25 * (CUM_HOSP_RATE_BY_AGE[a][0][3] - CUM_HOSP_RATE_BY_AGE[a][0][2]) * 0.00001
                         )
                         self.cumHospRateByAgeN[a].append(get_survey_size(mean=CUM_HOSP_RATE_BY_AGE[a][0][1],
-                                                                         l=CUM_HOSP_RATE_BY_AGE[a][0][1]*0.5,
-                                                                         u=CUM_HOSP_RATE_BY_AGE[a][0][1]*1.5,
+                                                                         l=CUM_HOSP_RATE_BY_AGE[a][0][2],
+                                                                         u=CUM_HOSP_RATE_BY_AGE[a][0][3],
                                                                          multiplier=0.00001,
                                                                          interval_type='p'))
                     else:

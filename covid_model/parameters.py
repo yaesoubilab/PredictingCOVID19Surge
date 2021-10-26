@@ -20,7 +20,7 @@ class COVIDParameters(EpiParameters):
         # -------- model main parameters -------------
         # age groups: ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
         us_age_dist = [0.060, 0.100, 0.064, 0.163, 0.256, 0.192, 0.096, 0.069]
-        hosp_relative_risk = [0.5, 0.5, 0.25, 1, 2, 4, 15, 40]
+        hosp_relative_risk = [0.5, 0.5, 0.25, 1, 2, 4, 18, 40]
         prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
         importation_rate = 52 * 5
         contact_matrix = [
@@ -41,7 +41,7 @@ class COVIDParameters(EpiParameters):
         # dominant strain
         self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
-        self.probHosp18To29 = Uniform(0.001, 0.005)  # age group 18-29 as the reference
+        self.probHosp18To29 = Uniform(0.001, 0.0075)  # age group 18-29 as the reference
 
         # seasonality
         self.seasonalityParams = [
