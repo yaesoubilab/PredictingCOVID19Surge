@@ -26,9 +26,8 @@ class _CrossValidSummary:
         self.selectedFeatures = None  # features uses in the model evaluated in cross validation
         self.meanScore = None   # mean of scores
         self.PI = None
-        # self.formattedMeanPI = None  # formatted mean and percentile interval for the score
 
-    def add_cv_performance(self, scores, deci=4, selected_features=None):
+    def add_cv_performance(self, scores, selected_features=None):
         """
         gets the list of scores to calculate summary statistics (mean, percentile intervals, and error length)
         :param scores: (list) of scores from cross validation
@@ -41,7 +40,6 @@ class _CrossValidSummary:
         self.selectedFeatures = selected_features
         self.meanScore = self.summaryStat.get_mean()
         self.PI = self.summaryStat.get_PI(alpha=0.05)
-        # self.formattedMeanPI = self.summaryStat.get_formatted_mean_and_interval(deci=deci, interval_type='c')
 
     def get_formatted_mean_and_interval(self, deci):
 
@@ -235,13 +233,15 @@ def run_this_cross_validator(cross_validator, i):
 class _ParameterOptimizer:
     """ class to find the optimal parameters for a model using cross validation """
 
-    def __init__(self, df, feature_names, outcome_name, if_outcome_binary, if_standardize=True):
+    def __init__(self, df, feature_names, outcome_name, if_outcome_binary,
+                 if_standardize=True, balance_binary_outcome=False):
         """
         :param df: (panda DataFrame)
         :param feature_names: (list) of feature names to be included in the analysis
         :param outcome_name: (string) name of the outcome
         :param if_outcome_binary: (bool) if outcome is binary
         :param if_standardize: (bool) if inputs should be standardized
+        :param balance_binary_outcome: (bool) set True to balance the binary outcome
         """
 
         self.crossValidators = []
@@ -249,7 +249,9 @@ class _ParameterOptimizer:
 
         # preprocess
         self.preprocessedData = PreProcessor(df=df, feature_names=feature_names, y_name=outcome_name)
-        self.preprocessedData.preprocess(y_is_binary=if_outcome_binary, if_standardize=if_standardize)
+        self.preprocessedData.preprocess(y_is_binary=if_outcome_binary,
+                                         if_standardize=if_standardize,
+                                         balance_binary_outcome=balance_binary_outcome)
 
     def _run(self, run_in_parallel):
         """ runs cross validation over all combinations of parameters """
@@ -380,7 +382,8 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                                      feature_names=feature_names,
                                      outcome_name=outcome_name,
                                      if_outcome_binary=True,
-                                     if_standardize=False)
+                                     if_standardize=False,
+                                     balance_binary_outcome=True)
 
         if list_of_n_features_wanted is None:
             list_of_n_features_wanted = [None]

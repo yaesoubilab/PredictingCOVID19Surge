@@ -1,3 +1,4 @@
+from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 
 from SimPy.InOutFunctions import delete_file
@@ -36,17 +37,23 @@ class PreProcessor:
         self.selectedFeatureNames = None
         self.selectedX = None
 
-    def preprocess(self, y_is_binary=False, if_standardize=False, degree_of_polynomial=None):
+    def preprocess(self, y_is_binary=False, if_standardize=False, degree_of_polynomial=None,
+                   balance_binary_outcome=False):
         """
         :param y_is_binary: (bool) set True if outcome is a binary variable
         :param if_standardize: (bool) set True to standardize features and outcome
         :param degree_of_polynomial: (int >=1 ) to add polynomial terms
+        :param balance_binary_outcome: (bool) set True to balance the binary outcome
         """
 
         if if_standardize:
             self.X = standardize(self._X)
             if not y_is_binary:
                 self.y = standardize(self._y.reshape(-1, 1)).ravel()
+
+        if y_is_binary and balance_binary_outcome:
+            sm = SMOTE(random_state=0)
+            self.X, self.y = sm.fit_resample(self.X, self.y)
 
         if degree_of_polynomial is not None:
             poly = PolynomialFeatures(degree_of_polynomial)
