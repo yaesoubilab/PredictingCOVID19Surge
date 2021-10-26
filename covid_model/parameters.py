@@ -79,7 +79,7 @@ class COVIDParameters(EpiParameters):
 
         # parameters related to novel strain
         self.ratioTransmNovel = Uniform(1, 2)
-        self.ratioDurInfNovel = Uniform(0.5, 1.5)
+        self.ratioDurInfNovel = Uniform(0.5, 2)
         self.ratioProbHospNovel = Uniform(0.5, 2)
 
         # parameters related to vaccine effectiveness [dominant, novel]
