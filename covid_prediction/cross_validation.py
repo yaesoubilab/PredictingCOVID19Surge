@@ -218,7 +218,6 @@ class DecTreeCrossValidator(_CrossValidator):
 
         # store the performance of this specification
         self.performanceSummary.add_cv_performance(scores=cv_scores,
-                                                   deci=2,
                                                    selected_features=self.preProcessedData.selectedFeatureNames)
 
 
