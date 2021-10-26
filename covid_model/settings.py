@@ -85,7 +85,7 @@ class COVIDSettings(ModelSettings):
                 for a in range(len(AgeGroups)):
                     if week == CUM_HOSP_RATE_BY_AGE[a][0][0]:
                         self.cumHospRateByAgeMean[a].append(CUM_HOSP_RATE_BY_AGE[a][0][1] * 0.00001)
-                        self.cumHospRateVar.append(
+                        self.cumHospRateByAgeVar.append(
                             0.25 * (CUM_HOSP_RATE_BY_AGE[a][0][3] - CUM_HOSP_RATE_BY_AGE[a][0][2]) * 0.00001
                         )
                         self.cumHospRateByAgeN[a].append(get_survey_size(mean=CUM_HOSP_RATE_BY_AGE[a][0][1],
@@ -111,7 +111,7 @@ class COVIDSettings(ModelSettings):
                 # vaccination rate
                 if week == VACCINE_COVERAGE_OVER_TIME[-1][0]:
                     self.cumVaccRateMean.append(VACCINE_COVERAGE_OVER_TIME[-1][1] * 0.01)
-                    self.cumHospRateVar.append(
+                    self.cumVaccRateVar.append(
                         0.25 * (VACCINE_COVERAGE_OVER_TIME[-1][3] - VACCINE_COVERAGE_OVER_TIME[-1][2]) * 0.01
                     )
                     self.cumVaccRateN.append(get_survey_size(mean=VACCINE_COVERAGE_OVER_TIME[-1][1],
@@ -128,7 +128,7 @@ class COVIDSettings(ModelSettings):
                 if week in weeks_with_data_prec_inf:
                     index = weeks_with_data_prec_inf.index(week) # + 4
                     self.percInfWithNovelMean.append(PERC_INF_WITH_NOVEL[index][1]*0.01)
-                    self.cumHospRateVar.append(
+                    self.percInfWithNovelVar.append(
                         0.25 * (PERC_INF_WITH_NOVEL[index][3] - PERC_INF_WITH_NOVEL[index][2]) * 0.01
                     )
                     self.percInfWithNovelN.append((get_survey_size(mean=PERC_INF_WITH_NOVEL[index][1],
