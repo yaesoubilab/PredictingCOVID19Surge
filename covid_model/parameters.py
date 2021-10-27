@@ -92,7 +92,7 @@ class COVIDParameters(EpiParameters):
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
                                Uniform(minimum=0.25, maximum=0.75),       # t_middle
                                Uniform(minimum=0.0, maximum=0.0),  # min
-                               Uniform(minimum=2, maximum=3)]       # max
+                               Uniform(minimum=1, maximum=3)]       # max
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
             Uniform(minimum=1.75, maximum=2.25),    # 5-12
@@ -120,7 +120,7 @@ class COVIDParameters(EpiParameters):
         self.y2EffOfControlMeasures = SigmoidOnModelOutput(
             par_b=self.y2MaxHospOcc,
             par_max=self.y2MaxEff)
-        self.y2PercChangeInContactY1Plus = Product(parameters=[Constant(-1), self.y2EffOfControlMeasures])
+        self.y2PercChangeInContact = Product(parameters=[Constant(-1), self.y2EffOfControlMeasures])
 
         # ------------------------------
         # calculate dependent parameters
@@ -297,11 +297,11 @@ class COVIDParameters(EpiParameters):
 
         # change in contact matrices
         matrix_of_params_y1 = [[self.y1PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
-        matrix_of_params_y1_plus = [[self.y1PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
+        matrix_of_params_y2 = [[self.y2PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
         self.matrixOfPercChangeInContactsY1 = MatrixOfParams(
             matrix_of_params_or_values=matrix_of_params_y1)
         self.matrixOfPercChangeInContactsY2 = MatrixOfParams(
-            matrix_of_params_or_values=matrix_of_params_y1_plus)
+            matrix_of_params_or_values=matrix_of_params_y2)
 
         # rates of leaving compartments
         # duration of immunity for vaccinated and recovered
@@ -402,7 +402,7 @@ class COVIDParameters(EpiParameters):
              'Y1+ Effectiveness of control measures': self.y2EffOfControlMeasures,
 
              'Change in contacts - PD Y1': self.y1PercChangeInContact,
-             'Change in contacts - PD Y1+': self.y2PercChangeInContactY1Plus,
+             'Change in contacts - PD Y1+': self.y2PercChangeInContact,
              'Matrix of change in contacts - PD Y1': self.matrixOfPercChangeInContactsY1,
              'Matrix of change in contacts - PD Y1+': self.matrixOfPercChangeInContactsY2
              })

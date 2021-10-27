@@ -3,8 +3,10 @@ from apace.MultiEpidemics import MultiEpidemics
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot
+from definitions import N_SIM_TRAINING
 
-N = 50 # N_SIM_TRAINING  # number of simulation
+
+N = 50 + 0*N_SIM_TRAINING  # number of simulation
 IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 
