@@ -13,10 +13,14 @@ from definitions import HOSP_OCCUPANCY_IN_TRAJ_FILE, OUTCOME_NAME_IN_DATASET, ge
 
 class ErrorModel:
 
-    def __init__(self, survey_size=None, bias_delay=None):
+    def __init__(self, survey_size=None, weeks_delay=0):
+        """
+        :param survey_size: (int) sample size 
+        :param weeks_delay: (int) weeks of delay
+        """
 
         self.surveySize = survey_size
-        self.biasDelay = bias_delay
+        self.weeksDelay = weeks_delay
         self.rnd = RandomState(1)
 
     def get_obs(self, true_values):
@@ -25,22 +29,21 @@ class ErrorModel:
         :return: observed value (with noise and bias added)
         """
 
-        bias = 0
-        noise = 0
-
-        # bias
-        if self.biasDelay is not None:
-            # if enough observations are accumulated
-            if len(true_values) >= self.biasDelay:
-                bias = true_values[-self.biasDelay] - true_values[-1]
-                noise = self.get_noise(true_value=true_values[-self.biasDelay], n=self.surveySize)
-            else:
-                bias = 0
-
+        # which true value to use
+        y = None
+        if self.weeksDelay > 0:
+            # the value with delay
+            if len(true_values) > self.weeksDelay:
+                y = true_values[-self.weeksDelay-1]
         else:
-            noise = self.get_noise(true_value=true_values[-1], n=self.surveySize)
+            # last true value
+            y = true_values[-1]
 
-        return min(max(true_values[-1] + bias + noise, 0), 1)
+        if y is not None:
+            noise = self.get_noise(true_value=y, n=self.surveySize)
+            return min(max(y + noise, 0), 1)
+        else:
+            return None
 
     def get_noise(self, true_value, n):
 
