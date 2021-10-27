@@ -64,8 +64,8 @@ class COVIDParameters(EpiParameters):
         # self.durRByProfile = [Beta(mean=1, st_dev=0.25, minimum=0.25, maximum=1.5),
         #                       Beta(mean=1, st_dev=0.25, minimum=0.25, maximum=1.5),
         #                       None, None]
-        self.durRByProfile = [Uniform(0.25, 1.5),
-                              Uniform(0.25, 1.5),
+        self.durRByProfile = [Uniform(0.25, 1.25),
+                              Uniform(0.25, 1.25),
                               None, None]
 
         # probability that an imported case is infected with the novel strain
@@ -83,7 +83,7 @@ class COVIDParameters(EpiParameters):
         self.ratioProbHospNovel = Uniform(0.5, 2)
 
         # parameters related to vaccine effectiveness [dominant, novel]
-        self.durVacImmunity = Uniform(0.5, 1.5)
+        self.durVacImmunity = Uniform(0.5, 2.5)
         self.vacEffAgainstInf = [Uniform(0, 1), Uniform(0, 1)]
         self.vacEffReducingInfectiousness = [Uniform(0.9, 1), Uniform(0, 0.5)]
         self.vacEffAgainstHosp = [Uniform(0.9, 1), Uniform(0, 1)]
