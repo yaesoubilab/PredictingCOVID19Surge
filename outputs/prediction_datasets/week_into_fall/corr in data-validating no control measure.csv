@@ -1,10 +1,10 @@
 feature,If threshold passed (0:Yes) 5 | corr,If threshold passed (0:Yes) 5 | p-value,If threshold passed (0:Yes) 7.5 | corr,If threshold passed (0:Yes) 7.5 | p-value,If threshold passed (0:Yes) 10 | corr,If threshold passed (0:Yes) 10 | p-value,If threshold passed (0:Yes) 15 | corr,If threshold passed (0:Yes) 15 | p-value,If threshold passed (0:Yes) 20 | corr,If threshold passed (0:Yes) 20 | p-value
-Obs: New hospitalization rate,-0.456,0.0,-0.488,0.0,-0.514,0.0,-0.555,0.0,-0.581,0.0
-Obs: New hospitalization rate-ave-2wk,-0.449,0.0,-0.481,0.0,-0.506,0.0,-0.546,0.0,-0.571,0.0
-Obs: New hospitalization rate-slope-4wk,-0.154,0.0,-0.166,0.0,-0.179,0.0,-0.195,0.0,-0.21,0.0
-Obs: % of incidence due to novel variant,-0.54,0.0,-0.514,0.0,-0.514,0.0,-0.52,0.0,-0.524,0.0
-Obs: % of incidence due to novel variant-ave-2wk,-0.544,0.0,-0.518,0.0,-0.517,0.0,-0.524,0.0,-0.528,0.0
-Obs: % of incidence due to novel variant-slope-4wk,-0.028,0.459,-0.032,0.398,-0.045,0.232,-0.04,0.29,-0.025,0.505
-Obs: Hospital occupancy rate,-0.463,0.0,-0.496,0.0,-0.522,0.0,-0.564,0.0,-0.59,0.0
-Obs: Cumulative vaccination rate,0.207,0.0,0.215,0.0,0.227,0.0,0.217,0.0,0.224,0.0
-Max Obs: Hospital occupancy rate,-0.564,0.0,-0.604,0.0,-0.635,0.0,-0.684,0.0,-0.716,0.0
+Obs: New hospitalization rate,-0.494,0.0,-0.537,0.0,-0.574,0.0,-0.619,0.0,-0.652,0.0
+Obs: New hospitalization rate-ave-2wk,-0.487,0.0,-0.529,0.0,-0.566,0.0,-0.61,0.0,-0.643,0.0
+Obs: New hospitalization rate-slope-4wk,-0.167,0.0,-0.182,0.0,-0.197,0.0,-0.213,0.0,-0.229,0.0
+Obs: % of incidence due to novel variant,-0.516,0.0,-0.482,0.0,-0.496,0.0,-0.48,0.0,-0.497,0.0
+Obs: % of incidence due to novel variant-ave-2wk,-0.527,0.0,-0.494,0.0,-0.508,0.0,-0.49,0.0,-0.507,0.0
+Obs: % of incidence due to novel variant-slope-4wk,-0.006,0.876,0.027,0.468,0.038,0.312,0.019,0.612,-0.003,0.929
+Obs: Hospital occupancy rate,-0.502,0.0,-0.545,0.0,-0.583,0.0,-0.629,0.0,-0.663,0.0
+Obs: Cumulative vaccination rate,0.226,0.0,0.219,0.0,0.211,0.0,0.221,0.0,0.214,0.0
+Max Obs: Hospital occupancy rate,-0.562,0.0,-0.608,0.0,-0.65,0.0,-0.698,0.0,-0.736,0.0

@@ -1,21 +1,21 @@
 ---- summary of simulated trajectories ----
-% trajectories passing the hospital occupancy threshold 5:  100.0
-% trajectories passing the hospital occupancy threshold 7.5:  100.0
-% trajectories passing the hospital occupancy threshold 10:  100.0
-% trajectories passing the hospital occupancy threshold 15:  100.0
-% trajectories passing the hospital occupancy threshold 20:  100.0
-% trajectories passing the novel variant threshold 0.05:  100.0
-% trajectories passing the novel variant threshold 0.95:  100.0
-Max rate of hospital occupancy (mean, PI):  29.4 (29.4, 29.4)
-Max rate of new hospitalizations (mean, PI):  25.6 (25.6, 25.6)
-Cumulative hospitalizations (mean, PI):  596.1 (596.1, 596.1)
-Cumulative vaccinations (mean, PI):  58.9 (58.9, 58.9)
-Range of immunity from infection: [9.1%, 29.2%]
+% trajectories passing the hospital occupancy threshold 5:  63.0
+% trajectories passing the hospital occupancy threshold 7.5:  60.0
+% trajectories passing the hospital occupancy threshold 10:  55.0
+% trajectories passing the hospital occupancy threshold 15:  52.0
+% trajectories passing the hospital occupancy threshold 20:  47.0
+% trajectories passing the novel variant threshold 0.05:  87.0
+% trajectories passing the novel variant threshold 0.95:  55.0
+Max rate of hospital occupancy (mean, PI):  69.1 (0.3, 337.4)
+Max rate of new hospitalizations (mean, PI):  55.7 (0.2, 273.3)
+Cumulative hospitalizations (mean, PI):  1032.0 (183.4, 2938.2)
+Cumulative vaccinations (mean, PI):  69.8 (43.5, 94.6)
+Range of immunity from infection: [1.9%, 77.9%]
 
 ---- summary of 'data-training' dataset ----
-# of records: 175
-% observations where threshold 5 is passed: 28.6
-% observations where threshold 7.5 is passed: 28.6
-% observations where threshold 10 is passed: 28.6
-% observations where threshold 15 is passed: 28.6
-% observations where threshold 20 is passed: 14.3
+# of records: 700
+% observations where threshold 5 is passed: 28.0
+% observations where threshold 7.5 is passed: 24.4
+% observations where threshold 10 is passed: 21.6
+% observations where threshold 15 is passed: 18.6
+% observations where threshold 20 is passed: 16.4

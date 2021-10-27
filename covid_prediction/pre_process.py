@@ -126,7 +126,7 @@ def build_dataset(week_of_prediction_in_fall,
         n_of_trajs_used=n_of_trajs_used)
 
     # error model for novel variant surveillance
-    err_novel_incd = ErrorModel(survey_size=survey_size_novel_inf, weeks_delay=0)
+    err_novel_incd = ErrorModel(survey_size=survey_size_novel_inf, weeks_delay=1)
 
     # find output file name
     label = get_dataset_labels(week=week_of_prediction_in_fall, survey_size=survey_size_novel_inf)
