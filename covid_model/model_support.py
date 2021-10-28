@@ -175,9 +175,9 @@ def add_calibration_info(settings,
 
     # by age
     for a in range(age_groups_profiles.nAgeGroups):
-        if a > 0:  # no age 0-4
+        if a > 1:  # no age 0-4 and 5-12
             cum_vaccine_rate_by_age[a + 1].add_calibration_targets(
-                ratios=settings.cumVaccRateByAgeMean[a], variances=settings.cumVaccRateVar[a])
+                ratios=settings.cumVaccRateByAgeMean[a], variances=settings.cumVaccRateByAgeVar[a])
 
     # # calibration information for the percentage of infection associated with the novel variant
     # perc_incd_novel.add_calibration_targets(

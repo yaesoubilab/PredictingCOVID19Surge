@@ -111,8 +111,8 @@ class COVIDParameters(EpiParameters):
             Uniform(minimum=1, maximum=3),  # 18-29
             Uniform(minimum=1, maximum=3),  # 30-49
             Uniform(minimum=2, maximum=4),  # 50-64
-            Uniform(minimum=3, maximum=4),  # 65-75
-            Uniform(minimum=3, maximum=4)   # 75+
+            Uniform(minimum=2, maximum=4),  # 65-75
+            Uniform(minimum=2, maximum=4)   # 75+
         ]
 
         # year 1 physical distancing properties

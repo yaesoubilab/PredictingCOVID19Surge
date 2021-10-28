@@ -58,7 +58,6 @@ class COVIDSettings(ModelSettings):
 
             self.cumVaccRateByAgeMean = [[] for i in range(len(AgeGroups))]
             self.cumVaccRateByAgeVar = [[] for i in range(len(AgeGroups))]
-            self.cumVaccRateByAgeN = [[] for i in range(len(AgeGroups))]
 
             self.percInfWithNovelMean = []
             self.percInfWithNovelVar = []
@@ -130,11 +129,11 @@ class COVIDSettings(ModelSettings):
 
                 # cumulative vaccination rate by age
                 for a in range(len(AgeGroups)):
-                    if a > 0:  # no age 0-4
-                        if week == VACCINE_COVERAGE_BY_AGE[a][-1][0]:
-                            self.cumVaccRateByAgeMean[a].append(VACCINE_COVERAGE_BY_AGE[a][-1][1] * 0.01)
-                            self.cumVaccRateByAgeVar.append(
-                                0.25 * 0.4 * VACCINE_COVERAGE_BY_AGE[a][-1][1] * 0.01
+                    if a > 1:  # no age 0-4 and 5-12
+                        if week == VACCINE_COVERAGE_BY_AGE[a][-2][0]:
+                            self.cumVaccRateByAgeMean[a].append(VACCINE_COVERAGE_BY_AGE[a][-2][1] * 0.01)
+                            self.cumVaccRateByAgeVar[a].append(
+                                0.25 * 0.4 * VACCINE_COVERAGE_BY_AGE[a][-2][1] * 0.01
                             )
                         else:
                             self.cumVaccRateByAgeMean[a].append(None)
