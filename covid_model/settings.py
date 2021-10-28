@@ -56,6 +56,10 @@ class COVIDSettings(ModelSettings):
             self.cumVaccRateVar = []
             self.cumVaccRateN = []
 
+            self.cumVaccRateByAgeMean = [[] for i in range(len(AgeGroups))]
+            self.cumVaccRateByAgeVar = [[] for i in range(len(AgeGroups))]
+            self.cumVaccRateByAgeN = [[] for i in range(len(AgeGroups))]
+
             self.percInfWithNovelMean = []
             self.percInfWithNovelVar = []
             self.percInfWithNovelN = []
@@ -123,6 +127,18 @@ class COVIDSettings(ModelSettings):
                     self.cumVaccRateMean.append(None)
                     self.cumVaccRateVar.append(None)
                     self.cumVaccRateN.append(None)
+
+                # cumulative vaccination rate by age
+                for a in range(len(AgeGroups)):
+                    if a > 0:  # no age 0-4
+                        if week == VACCINE_COVERAGE_BY_AGE[a][-1][0]:
+                            self.cumVaccRateByAgeMean[a].append(VACCINE_COVERAGE_BY_AGE[a][-1][1] * 0.01)
+                            self.cumVaccRateByAgeVar.append(
+                                0.25 * 0.4 * VACCINE_COVERAGE_BY_AGE[a][-1][1] * 0.01
+                            )
+                        else:
+                            self.cumVaccRateByAgeMean[a].append(None)
+                            self.cumVaccRateByAgeVar[a].append(None)
 
                 # % infected with novel variant
                 if week in weeks_with_data_prec_inf:

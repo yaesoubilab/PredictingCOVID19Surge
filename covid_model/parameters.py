@@ -91,8 +91,9 @@ class COVIDParameters(EpiParameters):
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
                                Uniform(minimum=0.25, maximum=0.75),       # t_middle
-                               Uniform(minimum=0.0, maximum=0.0),  # min
-                               Uniform(minimum=1, maximum=3)]       # max
+                               Uniform(minimum=0.0, maximum=0.0)  # min
+                               # Uniform(minimum=1, maximum=3) # max
+                               ]
         self.vaccRateTMinByAge = [
             Constant(100),                      # 0-4
             Uniform(minimum=1.75, maximum=2.25),    # 5-12
@@ -103,22 +104,33 @@ class COVIDParameters(EpiParameters):
             Uniform(minimum=0.8, maximum=1.2),  # 65-75
             Uniform(minimum=0.7, maximum=1.1)   # 75+
         ]
+        self.vaccRateMaxByAge = [
+            Constant(0),                      # 0-4
+            Uniform(minimum=1, maximum=3),    # 5-12
+            Uniform(minimum=1, maximum=3),  # 13-17
+            Uniform(minimum=1, maximum=3),  # 18-29
+            Uniform(minimum=1, maximum=3),  # 30-49
+            Uniform(minimum=2, maximum=4),  # 50-64
+            Uniform(minimum=3, maximum=4),  # 65-75
+            Uniform(minimum=3, maximum=4)   # 75+
+        ]
 
         # year 1 physical distancing properties
         self.y1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        self.y1MaxHospOcc = Uniform(4 * 10 / 100000, 4 * 20 / 100000)
+        self.y1MaxHospOcc = Uniform(5 / 100000 / 4, 20 / 100000 / 4)
+        self.bEffOfControlMeasure = Inverse(par=self.y1MaxHospOcc)
         self.y1MaxEff = Uniform(0.5, 0.75)
         self.y1EffOfControlMeasures = SigmoidOnModelOutput(
-            par_b=self.y1MaxHospOcc,
+            par_b=self.bEffOfControlMeasure,
             par_max=self.y1MaxEff)
         self.y1PercChangeInContact = Product(parameters=[Constant(-1), self.y1EffOfControlMeasures])
 
         # year 2 physical distancing properties
         self.y2Thresholds = [Equal(par=self.y1Thresholds[0]), Equal(par=self.y1Thresholds[1])]  # [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        self.y2MaxHospOcc = Equal(par=self.y1MaxHospOcc)  # Uniform(4 * 10 / 100000, 4 * 20 / 100000)
+        # self.y2MaxHospOcc = Equal(par=self.y1MaxHospOcc)  # Uniform(4 * 10 / 100000, 4 * 20 / 100000)
         self.y2MaxEff = Equal(par=self.y1MaxEff)  # Uniform(0.5, 0.75)
         self.y2EffOfControlMeasures = SigmoidOnModelOutput(
-            par_b=self.y2MaxHospOcc,
+            par_b=self.bEffOfControlMeasure,
             par_max=self.y2MaxEff)
         self.y2PercChangeInContact = Product(parameters=[Constant(-1), self.y2EffOfControlMeasures])
 
@@ -293,7 +305,7 @@ class COVIDParameters(EpiParameters):
                     par_t_min=self.vaccRateTMinByAge[a],
                     par_t_middle=self.vaccRateParams[1],
                     par_min=self.vaccRateParams[2],
-                    par_max=self.vaccRateParams[3])
+                    par_max=self.vaccRateMaxByAge[a])
 
         # change in contact matrices
         matrix_of_params_y1 = [[self.y1PercChangeInContact] * self.nAgeGroups] * self.nAgeGroups
@@ -389,15 +401,17 @@ class COVIDParameters(EpiParameters):
 
              'Vaccination rate params': self.vaccRateParams,
              'Vaccination rate t_min by age': self.vaccRateTMinByAge,
+             'Vaccination rate max by age': self.vaccRateMaxByAge,
              'Vaccination rate': self.vaccRateByAge,
              'Rate of losing vaccine immunity': self.rateOfLosingVacImmunity,
 
              'Y1 thresholds': self.y1Thresholds,
              'Y1 Maximum hosp occupancy': self.y1MaxHospOcc,
+             'Y1 effectiveness-b': self.bEffOfControlMeasure,
              'Y1 Max effectiveness of control measures': self.y1MaxEff,
              'Y1 Effectiveness of control measures': self.y1EffOfControlMeasures,
              'Y1+ thresholds': self.y2Thresholds,
-             'Y1+ Maximum hosp occupancy': self.y2MaxHospOcc,
+             # 'Y1+ Maximum hosp occupancy': self.y2MaxHospOcc,
              'Y1+ Max effectiveness of control measures': self.y2MaxEff,
              'Y1+ Effectiveness of control measures': self.y2EffOfControlMeasures,
 
