@@ -2,7 +2,7 @@ import pandas as pd
 
 from covid_prediction.model_specs import A, B3, SHORT_FEATURE_NAMES
 from covid_prediction.prediction_models import DecisionTree
-from definitions import ROOT_DIR
+from definitions import ROOT_DIR, FILL_TREE
 
 
 def build_a_decision_tree(feature_names, outcome_name, max_depth=None, ccp_alpha=0.0, fig_filename='tree.png'):
@@ -25,7 +25,7 @@ def build_a_decision_tree(feature_names, outcome_name, max_depth=None, ccp_alpha
     # plot the decision path
     dt.plot_decision_path(file_name=fig_filename, simple=True, class_names=['Yes', 'No'],
                           impurity=True, proportion=True, label='all', precision=2,
-                          shorten_feature_names=SHORT_FEATURE_NAMES)
+                          shorten_feature_names=SHORT_FEATURE_NAMES, filled=FILL_TREE)
 
 
 if __name__ == '__main__':

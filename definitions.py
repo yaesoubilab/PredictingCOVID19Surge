@@ -19,7 +19,7 @@ N_SIM_CALIBRATION = 50*100
 N_SIM_TRAINING = 4*100
 N_SIM_VALIDATION = 1*100
 CV_FOLD = 20         # num of splits for cross validation
-
+FILL_TREE = True
 
 SCENARIOS = {
     'base': 'base',

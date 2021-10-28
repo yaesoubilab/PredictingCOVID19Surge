@@ -2,7 +2,7 @@ import pandas as pd
 
 import covid_prediction.cross_validation as CV
 from covid_prediction.prediction_models import DecisionTree
-from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome, get_outcome_label, SCENARIOS
+from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome, get_outcome_label, SCENARIOS, FILL_TREE
 
 
 def get_neural_net_best_spec(outcome_name, week, model_spec, noise_coeff, bias_delay,
@@ -140,6 +140,6 @@ def optimize_and_eval_dec_tree(
         model.plot_decision_path(
             file_name=ROOT_DIR + '/outputs/figures/trees/model-{}-{}.png'.format(model_spec.name, t),
             simple=True, class_names=['Yes', 'No'],
-            precision=2, shorten_feature_names=shorten_feature_names)
+            precision=2, shorten_feature_names=shorten_feature_names, filled=FILL_TREE)
 
     return validation_performance

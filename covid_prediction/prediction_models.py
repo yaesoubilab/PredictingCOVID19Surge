@@ -135,7 +135,8 @@ class DecisionTree(Classifier):
                 ClassifierPerformance(y_test=y_test, y_test_hat=y_test_hat))
 
     def plot_decision_path(self, file_name, simple=True, class_names=None, proportion=True,
-                           impurity=False, label=None, precision=3, shorten_feature_names=None):
+                           impurity=False, label=None, precision=3, shorten_feature_names=None,
+                           filled=True):
         """
         plot the decision path
         :param file_name: (string) filename to save the tree as
@@ -152,6 +153,7 @@ class DecisionTree(Classifier):
             in the values of impurity, threshold and value attributes of each node.
         :param shorten_feature_names: (dictionary) with keys as features names in the dataset and
             values as alternative names to replace the original names with
+        :param filled: (bool) if fill the leaves
         """
 
         # turn of labels and impurity if simple decision tree should be shown
@@ -163,7 +165,7 @@ class DecisionTree(Classifier):
         dot_data = export_graphviz(self.model,
                                    out_file=None, feature_names=self.features, class_names=class_names,
                                    proportion=proportion, impurity=impurity, label=label,
-                                   filled=True, rounded=True, special_characters=True, precision=precision)
+                                   filled=filled, rounded=True, special_characters=True, precision=precision)
         graph = pydotplus.graph_from_dot_data(dot_data)
 
         # replace the feature names with the alternative names provided
