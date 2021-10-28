@@ -117,7 +117,7 @@ class COVIDParameters(EpiParameters):
 
         # year 1 physical distancing properties
         self.y1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
-        self.y1MaxHospOcc = Uniform(5 / 100000 / 4, 20 / 100000 / 4)
+        self.y1MaxHospOcc = Uniform(5 / 100000 / 4, 15 / 100000 / 4)
         self.bEffOfControlMeasure = Inverse(par=self.y1MaxHospOcc)
         self.y1MaxEff = Uniform(0.5, 0.75)
         self.y1EffOfControlMeasures = SigmoidOnModelOutput(

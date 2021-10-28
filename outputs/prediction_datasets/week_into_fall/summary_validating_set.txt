@@ -1,28 +1,28 @@
 ---- summary of 'data-validating base' dataset ----
 # of records: 700
-% observations where threshold 5 is passed: 49.7
-% observations where threshold 7.5 is passed: 43.3
-% observations where threshold 10 is passed: 38.6
-% observations where threshold 15 is passed: 30.4
-% observations where threshold 20 is passed: 25.0
+% observations where threshold 5 is passed: 47.9
+% observations where threshold 7.5 is passed: 39.4
+% observations where threshold 10 is passed: 32.3
+% observations where threshold 15 is passed: 21.7
+% observations where threshold 20 is passed: 15.3
 ---- summary of 'data-validating smaller survey' dataset ----
 # of records: 700
-% observations where threshold 5 is passed: 49.7
-% observations where threshold 7.5 is passed: 43.3
-% observations where threshold 10 is passed: 38.6
-% observations where threshold 15 is passed: 30.4
-% observations where threshold 20 is passed: 25.0
+% observations where threshold 5 is passed: 47.9
+% observations where threshold 7.5 is passed: 39.4
+% observations where threshold 10 is passed: 32.3
+% observations where threshold 15 is passed: 21.7
+% observations where threshold 20 is passed: 15.3
 ---- summary of 'data-validating no novel variant' dataset ----
 # of records: 700
-% observations where threshold 5 is passed: 39.3
-% observations where threshold 7.5 is passed: 32.6
-% observations where threshold 10 is passed: 23.3
-% observations where threshold 15 is passed: 11.0
-% observations where threshold 20 is passed: 6.1
+% observations where threshold 5 is passed: 33.4
+% observations where threshold 7.5 is passed: 24.3
+% observations where threshold 10 is passed: 19.0
+% observations where threshold 15 is passed: 10.3
+% observations where threshold 20 is passed: 5.3
 ---- summary of 'data-validating no control measure' dataset ----
 # of records: 700
-% observations where threshold 5 is passed: 53.1
-% observations where threshold 7.5 is passed: 49.0
-% observations where threshold 10 is passed: 44.4
-% observations where threshold 15 is passed: 39.6
-% observations where threshold 20 is passed: 34.6
+% observations where threshold 5 is passed: 47.9
+% observations where threshold 7.5 is passed: 42.7
+% observations where threshold 10 is passed: 39.4
+% observations where threshold 15 is passed: 36.1
+% observations where threshold 20 is passed: 32.3
