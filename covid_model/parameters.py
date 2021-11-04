@@ -85,7 +85,7 @@ class COVIDParameters(EpiParameters):
         # parameters related to vaccine effectiveness [dominant, novel]
         self.durVacImmunity = Uniform(0.5, 2.5)
         self.vacEffAgainstInf = [Uniform(0, 1), Uniform(0, 1)]
-        self.vacEffReducingInfectiousness = [Uniform(0.9, 1), Uniform(0, 0.5)]
+        self.vacEffReducingInfectiousness = [Uniform(0.25, 0.75), Uniform(0.25, 0.75)]
         self.vacEffAgainstHosp = [Uniform(0.9, 1), Uniform(0, 1)]
 
         # vaccination rate is age-dependent
