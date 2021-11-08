@@ -182,4 +182,6 @@ def add_calibration_info(settings,
 
     # calibration information for the percentage of infection associated with the novel variant
     perc_incd_novel.add_calibration_targets(
-        ratios=settings.percInfWithNovelMean, variances=settings.percInfWithNovelVar)
+        ratios=settings.percInfWithNovelMean, survey_sizes=settings.percInfWithNovelN,
+        # variances=settings.percInfWithNovelVar
+    )

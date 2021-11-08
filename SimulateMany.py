@@ -6,7 +6,7 @@ from covid_visualization.plot_trajs import plot
 from definitions import N_SIM_TRAINING
 
 
-N = 16 + 0*N_SIM_TRAINING  # number of simulation
+N = 32 + 0*N_SIM_TRAINING  # number of simulation
 IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 
