@@ -6,11 +6,11 @@ from covid_visualization.plot_trajs import plot
 from definitions import N_SIM_TRAINING
 
 
-N = 32 + 0*N_SIM_TRAINING  # number of simulation
+N = 8 + 0*N_SIM_TRAINING  # number of simulation
 IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 
-IF_PARALLEL = True
+IF_PARALLEL = False
 USE_CALIBRATED_MODEL = True
 
 
@@ -64,7 +64,7 @@ def simulate(n=25,
 if __name__ == "__main__":
 
     simulate(n=N,
-             n_to_display=min(100, N),
+             n_to_display=None, # min(100, N),
              calibrated=USE_CALIBRATED_MODEL,
              novel_variant_will_emerge=IF_NOVEL_VARIANT,
              mitigating_strategies_on=IF_MITIGATION)
