@@ -61,14 +61,18 @@ class Variants(Enum):
 class ProfileDefiner:
     """ to convert (age group index, variant index, vaccination status index) to an index and vice versa """
 
-    def __init__(self, n_age_groups, n_variants, n_vaccinations_status):
+    def __init__(self, n_age_groups, n_variants, n_vaccination_status):
         self.nAgeGroups = n_age_groups
         self.nVariants = n_variants
-        self.nVaccStatus = n_vaccinations_status
-        self.length = n_age_groups * n_variants * n_vaccinations_status
+        self.nVaccStatus = n_vaccination_status
+        self.nProfiles = self.nVariants * self.nVaccStatus
+        self.length = n_age_groups * n_variants * n_vaccination_status
 
     def get_row_index(self, age_group, variant, vacc_status):
         return self.nVariants * self.nVaccStatus * age_group + self.nVaccStatus * variant + vacc_status
+
+    def get_index(self, variant, vacc_status):
+        return self.nVaccStatus * variant + vacc_status
 
     @staticmethod
     def get_str_profile(age_group, variant, vacc_status):
