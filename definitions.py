@@ -37,15 +37,8 @@ HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
 OUTCOME_NAME_IN_DATASET = 'If threshold passed (0:Yes)'
 
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
-PROFILES = ['Dominant-UV', 'Novel-UV',
-            'Dominant-V', 'Novel-V']
-
-
-class Profiles(Enum):
-    DOM_UNVAC = 0   # infected with dominant strain
-    NOV_UNVAC = 1   # infected with novel strain
-    DOM_VAC = 2  # vaccinated and infected with dominant strain
-    NOV_VAC = 3   # vaccinated and infected with novel strain
+VARIANTS = ['Dominant', 'Delta', 'Novel']
+VACC_STATUS = ['UnVacc', 'Vacc']
 
 
 class AgeGroups(Enum):
@@ -59,28 +52,39 @@ class AgeGroups(Enum):
     Age_75_ = 7
 
 
-class AgeGroupsProfiles:
-    # to convert (age group index, profile index) to an index and vice versa
+class Variants(Enum):
+    ORIGINAL = 0
+    DELTA = 1
+    NOVEL = 2
 
-    def __init__(self, n_age_groups, n_profiles):
+
+class ProfileDefiner:
+    """ to convert (age group index, variant index, vaccination status index) to an index and vice versa """
+
+    def __init__(self, n_age_groups, n_variants, n_vaccinations_status):
         self.nAgeGroups = n_age_groups
-        self.nProfiles = n_profiles
-        self.length = n_age_groups * n_profiles
+        self.nVariants = n_variants
+        self.nVaccStatus = n_vaccinations_status
+        self.length = n_age_groups * n_variants * n_vaccinations_status
 
-    def get_row_index(self, age_group, profile):
-        return self.nProfiles * age_group + profile
+    def get_row_index(self, age_group, variant, vacc_status):
+        return self.nVariants * self.nVaccStatus * age_group + self.nVaccStatus * variant + vacc_status
 
-    def get_age_group_and_profile(self, i):
-        return int(i/self.nProfiles), i % self.nAgeGroups
+    @staticmethod
+    def get_str_profile(age_group, variant, vacc_status):
+        return AGES[age_group] + '-' + VARIANTS[variant] + '-' + VACC_STATUS[vacc_status]
 
-    def get_str_age_profile(self, age_group, profile):
-        return AGES[age_group] + '-' + PROFILES[profile]
-
-    def get_str_age(self, age_group):
+    @staticmethod
+    def get_str_age(age_group):
         return AGES[age_group]
 
-    def get_str_profile(self, profile):
-        return PROFILES[profile]
+    @staticmethod
+    def get_str_variant(variant):
+        return VARIANTS[variant]
+
+    @staticmethod
+    def get_str_vacc_status(vacc_status):
+        return VACC_STATUS[vacc_status]
 
 
 def get_dataset_labels(week, survey_size=None, bias_delay=None):

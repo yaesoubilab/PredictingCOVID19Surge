@@ -34,7 +34,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     A.X_TICKS = (0, 52/2)      # x-axis ticks (min at 0 with interval of 5)
     A.X_LABEL = 'Weeks since March 1, 2010'     # x-axis label
 
-    indexer = Def.AgeGroupsProfiles(n_age_groups=len(AgeGroups), n_profiles=len(Profiles))
+    indexer = Def.ProfileDefiner(n_age_groups=len(AgeGroups), n_variants=len(Profiles))
 
     # -----------------------------------------------------------------
     # ------ plot information for the validation plot (by age) --------
@@ -53,8 +53,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
             Hs = []
             Rs = []
             Ds = []
-            for p in range(indexer.nProfiles):
-                str_a_p = indexer.get_str_age_profile(age_group=a, profile=p)
+            for p in range(indexer.nVariants):
+                str_a_p = indexer.get_str_profile(age_group=a, profile=p)
                 Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
                                          y_range=(0, 22000), x_multiplier=prev_multiplier))
                 Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,
