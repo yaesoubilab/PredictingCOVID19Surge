@@ -131,7 +131,8 @@ def add_calibration_info(settings,
                          new_hosp_rate_by_age,
                          prev_immune_from_inf,
                          cum_hosp_rate_by_age,
-                         cum_vaccine_rate_by_age):
+                         cum_vaccine_rate_by_age,
+                         perc_incd_novel):
 
     # feasible ranges of hospital occupancy rate
     hosp_occupancy_rate.add_feasible_conditions(
@@ -179,6 +180,6 @@ def add_calibration_info(settings,
             cum_vaccine_rate_by_age[a + 1].add_calibration_targets(
                 ratios=settings.cumVaccRateByAgeMean[a], variances=settings.cumVaccRateByAgeVar[a])
 
-    # # calibration information for the percentage of infection associated with the novel variant
-    # perc_incd_novel.add_calibration_targets(
-    #     ratios=sets.percInfWithNovelMean, survey_sizes=sets.percInfWithNovelN)
+    # calibration information for the percentage of infection associated with the novel variant
+    perc_incd_novel.add_calibration_targets(
+        ratios=settings.percInfWithNovelMean, variances=settings.percInfWithNovelVar)

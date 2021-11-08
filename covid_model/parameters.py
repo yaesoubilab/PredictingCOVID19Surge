@@ -69,8 +69,11 @@ class COVIDParameters(EpiParameters):
                               None, None]
 
         # probability that an imported case is infected with the novel strain
-        self.probNovelStrainParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                      Beta(mean=2, st_dev=0.1, minimum=1.75, maximum=2.25),  # t_middle
+        self.probNovelStrainParams = [Constant(value=7),  # b
+                                      Constant(value=1.25),
+                                      Constant(value=0.0075)]  # max
+        self.probNovelStrainParams2 = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
+                                      Beta(mean=1.25, st_dev=0.001, minimum=1.24, maximum=1.35),  # t_middle
                                       Uniform(minimum=0.0, maximum=0.75)]  # max
 
         # infection-induced immunity against novel variant
