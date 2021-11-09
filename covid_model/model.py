@@ -55,7 +55,7 @@ def build_covid_model(model):
                             susceptibility_params=[Constant(1), Constant(1), Constant(1)],
                             row_index_contact_matrix=a)
         Vs[a] = Compartment(name='Vaccinated-'+str_a,
-                            susceptibility_params=params.suspVaccinated,
+                            susceptibility_params=params.suspVaccByVariant,
                             row_index_contact_matrix=a)
 
         for p in range(pd.nVariants):
@@ -65,7 +65,7 @@ def build_covid_model(model):
 
             # infectivity
             infectivity_params = [Constant(0), Constant(0)]
-            infectivity_params[p % 2] = params.infectivityByProfile[p]
+            infectivity_params[p % 2] = params.infectivityByVaccByVariant[p]
 
             # -------- compartments ----------
             Es[i] = Compartment(name='Exposed-'+str_a_p,
@@ -78,7 +78,7 @@ def build_covid_model(model):
                                 num_of_pathogens=2, if_empty_to_eradicate=True, row_index_contact_matrix=a)
             Rs[i] = Compartment(name='Recovered-'+str_a_p,
                                 susceptibility_params=[Constant(0),
-                                                       params.suspInRAgainstNovelByProfile[p]],
+                                                       params.suspInRByProfileByVariant[p]],
                                 row_index_contact_matrix=a)
             Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 

@@ -71,7 +71,7 @@ class ProfileDefiner:
     def get_row_index(self, age_group, variant, vacc_status):
         return self.nVariants * self.nVaccStatus * age_group + self.nVaccStatus * variant + vacc_status
 
-    def get_index(self, variant, vacc_status):
+    def get_profile_index(self, variant, vacc_status):
         return self.nVaccStatus * variant + vacc_status
 
     @staticmethod
