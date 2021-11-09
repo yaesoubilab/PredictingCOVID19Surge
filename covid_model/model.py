@@ -4,7 +4,7 @@ from apace.ModelObjects import Compartment, ChanceNode, Counter, \
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.model_support import get_interventions_features_conditions, add_calibration_info
 from covid_model.parameters import COVIDParameters
-from definitions import ProfileDefiner
+from definitions import ProfileDefiner, Variants
 
 
 def build_covid_model(model):
@@ -62,7 +62,7 @@ def build_covid_model(model):
 
         for v in range(pd.nVariants):
             for vs in range(pd.nVaccStatus):
-                str_a_p = pd.get_str_profile(age_group=a, variant=v, vacc_status=vs)
+                str_a_p = pd.get_str_age_and_profile(age_group=a, variant=v, vacc_status=vs)
                 i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
                 p = pd.get_profile_index(variant=v, vacc_status=vs)
 
@@ -89,22 +89,23 @@ def build_covid_model(model):
                 # chance node to decide if an infected individual would get hospitalized
                 ifs_hosp[i] = ChanceNode(name='If hospitalized-'+str_a_p,
                                          destination_compartments=[Hs[i], Rs[i]],
-                                         probability_params=params.probHospByAgeAndProfile[a][v])
+                                         probability_params=params.probHospByAgeAndProfile[a][p])
 
         # count vaccinations among recovered after infection with dominant or novel variants
-        for v in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
-            str_a_p = pd.get_str_profile(age_group=a, profile=v)
+        for v in range(pd.nVariants):
+            str_a_p = pd.get_str_age_and_profile(age_group=a, variant=v, vacc_status=0)
+            dest_after_vacc_in_recovered = pd.get_row_index(
+                age_group=a, variant=v, vacc_status=1)
 
-            if v == Profiles.DOM_UNVAC.value:
-                dest_after_vacc_in_recovered = pd.get_row_index(age_group=a,
-                                                                                 variant=Profiles.DOM_VAC.value)
+            if v == Variants.ORIGINAL.value:
                 counting_vacc_in_R_org[a] = Counter(name='Vaccination in R-' + str_a_p,
                                                     destination_compartment=Rs[dest_after_vacc_in_recovered])
-            elif v == Profiles.NOV_UNVAC.value:
-                dest_after_vacc_in_recovered = pd.get_row_index(age_group=a,
-                                                                                 variant=Profiles.NOV_VAC.value)
+            elif v == Variants.DELTA.value:
                 counting_vacc_in_R_delta[a] = Counter(name='Vaccination in R-' + str_a_p,
-                                                    destination_compartment=Rs[dest_after_vacc_in_recovered])
+                                                      destination_compartment=Rs[dest_after_vacc_in_recovered])
+            elif v == Variants.NOVEL.value:
+                counting_vacc_in_R_novel[a] = Counter(name='Vaccination in R-' + str_a_p,
+                                                      destination_compartment=Rs[dest_after_vacc_in_recovered])
 
         # if an imported cases is infected with the novel strain
         dest_if_novel = pd.get_row_index(age_group=a, variant=Profiles.NOV_UNVAC.value)
@@ -135,7 +136,7 @@ def build_covid_model(model):
         # --------- model events ---------
         for v in range(pd.nProfiles):
 
-            str_a_p = pd.get_str_profile(age_group=a, profile=v)
+            str_a_p = pd.get_str_age_and_profile(age_group=a, profile=v)
             i = pd.get_row_index(age_group=a, variant=v)
 
             pathogen = v % 2
@@ -314,7 +315,7 @@ def build_covid_model(model):
             Is_this_profile.append(Is[i])
             Hs_this_profile.append(Hs[i])
 
-        str_profile = pd.get_str_profile(v)
+        str_profile = pd.get_str_age_and_profile(v)
         # incidence and hospitalization by profile
         incd_by_profile.append(SumIncidence(
             name='Incidence-'+str_profile, compartments=Is_this_profile))

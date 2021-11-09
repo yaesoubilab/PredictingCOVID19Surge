@@ -54,7 +54,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
             Rs = []
             Ds = []
             for p in range(indexer.nVariants):
-                str_a_p = indexer.get_str_profile(age_group=a, profile=p)
+                str_a_p = indexer.get_str_age_and_profile(age_group=a, profile=p)
                 Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
                                          y_range=(0, 22000), x_multiplier=prev_multiplier))
                 Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,

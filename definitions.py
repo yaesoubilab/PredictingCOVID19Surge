@@ -75,7 +75,7 @@ class ProfileDefiner:
         return self.nVaccStatus * variant + vacc_status
 
     @staticmethod
-    def get_str_profile(age_group, variant, vacc_status):
+    def get_str_age_and_profile(age_group, variant, vacc_status):
         return AGES[age_group] + '-' + VARIANTS[variant] + '-' + VACC_STATUS[vacc_status]
 
     @staticmethod
