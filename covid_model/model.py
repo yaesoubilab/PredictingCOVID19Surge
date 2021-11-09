@@ -35,7 +35,8 @@ def build_covid_model(model):
     counting_vacc_in_R_novel = [None] * pd.nAgeGroups
 
     # events
-    importation = [None] * pd.nAgeGroups
+    importation_by_age_variant = [[None]*pd.nVariants] * pd.nAgeGroups
+
     infection_in_S = [None] * pd.nAgeGroups * pd.nVariants
     infection_in_R = [None] * pd.nAgeGroups * pd.nVariants
     infection_in_V = [None] * pd.nAgeGroups * pd.nVariants
@@ -107,13 +108,6 @@ def build_covid_model(model):
                 counting_vacc_in_R_novel[a] = Counter(name='Vaccination in R-' + str_a_p,
                                                       destination_compartment=Rs[dest_after_vacc_in_recovered])
 
-        # if an imported cases is infected with the novel strain
-        dest_if_novel = pd.get_row_index(age_group=a, variant=Profiles.NOV_UNVAC.value)
-        dest_if_dominant = pd.get_row_index(age_group=a, variant=Profiles.DOM_UNVAC.value)
-        ifs_novel_strain[a] = ChanceNode(name='If infected with the novel strain-'+str_a,
-                                         destination_compartments=[Es[dest_if_novel], Es[dest_if_dominant]],
-                                         probability_params=params.probNovelStrain)
-
         # count vaccinations among susceptibles
         counting_vacc_in_S[a] = Counter(name='Vaccination in S-' + str_a,
                                         destination_compartment=Vs[a])
@@ -170,8 +164,13 @@ def build_covid_model(model):
             deaths_in_hosp[i] = EpiIndepEvent(
                 name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][v], destination=Ds[i])
 
-        importation[a] = PoissonEvent(
-            name='Importation-'+str_a, destination=ifs_novel_strain[a], rate_param=params.importRateByAge[a])
+        for v in range(pd.nVariants):
+            dest_if_novel = pd.get_row_index(age_group=a, variant=v, vacc_status=0)
+            importation_by_age_variant[a][v] = PoissonEvent(
+                name='Importation-'+str_a,
+                destination=Es[dest_if_novel],
+                rate_param=params.importRateByVariant[v])
+
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=counting_vacc_in_S[a])
         vaccination_in_R_org[a] = EpiIndepEvent(
@@ -190,7 +189,7 @@ def build_covid_model(model):
         Ss[a].add_events(events=[infection_in_S[i_inf_with_dominant_event],  # infection with dominant
                                  infection_in_S[i_inf_with_novel_event],  # infection with novel
                                  vaccination_in_S[a],
-                                 importation[a]])
+                                 importation_by_age_variant[a]])
         i_inf_with_dominant_event = pd.get_row_index(age_group=a, variant=Profiles.DOM_VAC.value)
         i_inf_with_novel_event = pd.get_row_index(age_group=a, variant=Profiles.NOV_VAC.value)
         Vs[a].add_events(events=[infection_in_V[i_inf_with_dominant_event],  # infection with dominant

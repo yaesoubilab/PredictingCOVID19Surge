@@ -27,7 +27,7 @@ class COVIDParameters(EpiParameters):
         us_age_dist = [0.060, 0.100, 0.064, 0.163, 0.256, 0.192, 0.096, 0.069]
         hosp_relative_risk = [0.5, 0.5, 0.25, 1, 2, 4, 18, 40]
         prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
-        importation_rate = 52 * 5
+        importation_rate = 52 * 5 / 8 # distributed uniformly over age groups
         contact_matrix = [
             [2.598, 1.312, 0.316, 2.551, 1.08, 1.146, 0.258, 0.141],
             [0.786, 6.398, 2.266, 3.28, 1.306, 1.069, 0.365, 0.207],
@@ -70,12 +70,12 @@ class COVIDParameters(EpiParameters):
         self.suscToNovelInUnvacR = Uniform(0, 0.5)
 
         # probability that an imported case is infected with the novel strain
-        self.probDeltaVariantParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                       Uniform(1.25, 1.5),  # t-middle
-                                       Constant(value=0.75)]  # max
-        self.probNovelVariantParams = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                       Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
-                                       Uniform(minimum=0.0, maximum=0.75)]  # max
+        self.paramsForRateDeltaVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
+                                          Uniform(1.25, 1.5),  # t-middle
+                                          Constant(importation_rate)]  # max
+        self.paramsForRateNovelVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
+                                          Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
+                                          Uniform(0.0, importation_rate)]  # max
 
         # parameters related to novel variants
         for v in range(self.nVariants):
@@ -146,7 +146,6 @@ class COVIDParameters(EpiParameters):
         self.baseContactMatrix = None
         self.sizeSByAge = []
         self.sizeIProfile0ByAge = []
-        self.importRateByAge = []
         self.distS0ToSs = None
         self.distI0ToIs = None
 
@@ -160,7 +159,8 @@ class COVIDParameters(EpiParameters):
         self.ratioTransmByVaccByVariant = [[None]*self.nVariants] * self.profileDefiner.nVaccStatus
         self.ratioProbHospByProfile = [None] * self.profileDefiner.nProfiles
 
-        self.probNovelStrain = None
+        self.importRateByVariant = [None]*self.nVariants
+
         self.relativeProbHospByAge = [None] * self.nAgeGroups
         self.probHospByAgeAndProfile = [[None]*self.nProfiles] * self.nAgeGroups
         self.probDeathIfHospByAgeAndProfile = [None] * self.nAgeGroups
@@ -203,7 +203,6 @@ class COVIDParameters(EpiParameters):
         for a in range(self.nAgeGroups):
             self.sizeSByAge.append(AMultinomialOutcome(par_multinomial=self.distS0ToSs, outcome_index=a))
             self.sizeIProfile0ByAge.append(AMultinomialOutcome(par_multinomial=self.distI0ToIs, outcome_index=a))
-            self.importRateByAge.append(Constant(value=importation_rate * us_age_dist[a]))
 
         # susceptibility of the vaccinated against different variants
         for v in range(self.nVariants):
@@ -311,14 +310,19 @@ class COVIDParameters(EpiParameters):
                 else:
                     self.durRByProfile[p] = Product(self.durR, self.ratioToIncreaseDurRAfterVacc)
 
-        # probability of novel strain
+        # importation of variants
+        self.importRateByVariant[0] = Uniform(0, importation_rate)
+        self.importRateByVariant[1] = TimeDependentSigmoid(
+            par_b=self.paramsForRateDeltaVariant[0],
+            par_t_middle=self.paramsForRateDeltaVariant[1],
+            par_max=self.paramsForRateDeltaVariant[2])
         if novel_variant_will_emerge:
-            self.probNovelStrain = TimeDependentSigmoid(
-                par_b=self.probNovelVariantParams[0],
-                par_t_middle=self.probNovelVariantParams[1],
-                par_max=self.probNovelVariantParams[2])
+            self.importRateByVariant[2] = TimeDependentSigmoid(
+                par_b=self.paramsForRateNovelVariant[0],
+                par_t_middle=self.paramsForRateNovelVariant[1],
+                par_max=self.paramsForRateNovelVariant[2])
         else:
-            self.probNovelStrain = Constant(0)
+            self.importRateByVariant[2] = Constant(0)
 
         # vaccination rate
         for a in range(self.nAgeGroups):
@@ -374,9 +378,8 @@ class COVIDParameters(EpiParameters):
              'Duration of infectiousness-dominant': self.durI,
              'Seasonality parameters': self.seasonalityParams,
              'Seasonality': self.seasonality,
-             'Importation rate': self.importRateByAge,
-             'Prob novel strain params': self.probDeltaVariantParams,
-             'Prob novel strain': self.probNovelStrain,
+             'Prob novel strain params': self.paramsForRateDeltaVariant,
+             'Prob novel strain': self.importRateDeltaStrain,
 
              'Ratio infectiousness duration of novel to dominant': self.ratioDurInfByVariant,
              'Ratio of infectiousness duration by profile': self.ratioDurInfByVariant,
