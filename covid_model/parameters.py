@@ -153,11 +153,11 @@ class COVIDParameters(EpiParameters):
         self.seasonality = None
         self.infectivityOrg = None  # infectivity of the original strain
         self.infectivityOrgWithSeasonality = None   # adjusted for seasonality
-        self.infectivityByVaccByVariant = [None] * self.nVaccStatus
+        self.infectivityByVaccByVariant = [[None]*self.nVariants] * self.nVaccStatus
 
         self.suspVaccByVariant = [None] * self.nVariants
-        self.suspInRByProfileByVariant = [None] * self.profileDefiner.nProfiles
-        self.ratioTransmByVaccByVariant = [None] * self.profileDefiner.nVaccStatus
+        self.suspInRByProfileByVariant = [[None]*self.nVariants] * self.profileDefiner.nProfiles
+        self.ratioTransmByVaccByVariant = [[None]*self.nVariants] * self.profileDefiner.nVaccStatus
         self.ratioProbHospByProfile = [None] * self.profileDefiner.nProfiles
 
         self.probNovelStrain = None
@@ -209,31 +209,33 @@ class COVIDParameters(EpiParameters):
         for v in range(self.nVariants):
             self.suspVaccByVariant[v] = OneMinus(par=self.vacEffAgainstInfByVariant[v])
 
-        # find ratio of transmissibility and probability of hospitalization by profile
+        # find ratio of transmissibility by profile
+        for v in range(self.nVariants):
+            # for unvaccinated
+            self.ratioTransmByVaccByVariant[0][v] = Equal(self.ratioTransmByVariant[v])
+            # for vaccinated
+            self.ratioTransmByVaccByVariant[1][v] = OneMinusTimes(
+                par1=self.vacEffReducingInfectiousByVariant[v],
+                par2=self.ratioTransmByVaccByVariant[0][v])
+
+        # find ratio of hospitalization by profile
         # for original variant + unvaccinated
-        self.ratioTransmByVaccByVariant[0][0] = Constant(1)
         self.ratioProbHospByProfile[0] = Constant(1)
 
         # for novel variants + unvaccinated
         for v in (Variants.DELTA.value, Variants.NOVEL.value):
             idx = self.profileDefiner.get_profile_index(variant=v, vacc_status=0)
-            self.ratioTransmByVaccByVariant[0][v] = Equal(self.ratioTransmByVariant[v - 1])
             self.ratioProbHospByProfile[idx] = Equal(self.ratioProbHospByVariant[v-1])
 
         # add vaccination effect on the original variant
         v = Variants.ORIGINAL.value
         idx = self.profileDefiner.get_profile_index(variant=v, vacc_status=1)
-        self.ratioTransmByVaccByVariant[1][v] = OneMinus(self.vacEffReducingInfectiousByVariant[v])
         self.ratioProbHospByProfile[idx] = OneMinus(self.vacEffAgainstHospByVariant[v])
 
         # add vaccination effect on delta and the novel variants
         for v in (Variants.DELTA.value, Variants.NOVEL.value):
             idx = self.profileDefiner.get_profile_index(variant=v, vacc_status=1)
             idx_unvacc = self.profileDefiner.get_profile_index(variant=v, vacc_status=0)
-
-            self.ratioTransmByVaccByVariant[1][v] = OneMinusTimes(
-                par1=self.vacEffReducingInfectiousByVariant[v],
-                par2=self.ratioTransmByVaccByVariant[idx_unvacc])
 
             self.ratioProbHospByProfile[idx] = OneMinusTimes(
                 par1=self.vacEffAgainstHospByVariant[v],
@@ -265,7 +267,7 @@ class COVIDParameters(EpiParameters):
                     parameters=[self.infectivityOrgWithSeasonality,
                                 self.ratioTransmByVaccByVariant[vs][v]])
 
-        # susceptibility in R by profile
+        # susceptibility in R by profile by variant
         for v in range(self.nVariants):
             for vs in range(self.nVaccStatus):
                 for against_v in range(self.nVariants):

@@ -4,7 +4,7 @@ from apace.ModelObjects import Compartment, ChanceNode, Counter, \
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.model_support import get_interventions_features_conditions, add_calibration_info
 from covid_model.parameters import COVIDParameters
-from definitions import ProfileDefiner, Profiles
+from definitions import ProfileDefiner
 
 
 def build_covid_model(model):
@@ -30,22 +30,24 @@ def build_covid_model(model):
     ifs_hosp = [None] * pd.length
     ifs_novel_strain = [None] * pd.nAgeGroups
     counting_vacc_in_S = [None] * pd.nAgeGroups
-    counting_vacc_in_R_dom = [None] * pd.nAgeGroups
-    counting_vacc_in_R_nov = [None] * pd.nAgeGroups
+    counting_vacc_in_R_org = [None] * pd.nAgeGroups
+    counting_vacc_in_R_delta = [None] * pd.nAgeGroups
+    counting_vacc_in_R_novel = [None] * pd.nAgeGroups
 
     # events
     importation = [None] * pd.nAgeGroups
-    infection_in_S = [None] * pd.length
-    infection_in_R = [None] * pd.length
-    infection_in_V = [None] * pd.length
+    infection_in_S = [None] * pd.nAgeGroups * pd.nVariants
+    infection_in_R = [None] * pd.nAgeGroups * pd.nVariants
+    infection_in_V = [None] * pd.nAgeGroups * pd.nVariants
     leaving_Es = [None] * pd.length
     leaving_Is = [None] * pd.length
     leaving_Hs = [None] * pd.length
     leaving_Rs = [None] * pd.length
     deaths_in_hosp = [None] * pd.length
     vaccination_in_S = [None] * pd.nAgeGroups
-    vaccination_in_R_dom = [None] * pd.nAgeGroups
-    vaccination_in_R_nov = [None] * pd.nAgeGroups
+    vaccination_in_R_org = [None] * pd.nAgeGroups
+    vaccination_in_R_delta = [None] * pd.nAgeGroups
+    vaccination_in_R_novel = [None] * pd.nAgeGroups
     losing_vaccine_immunity = [None] * pd.length
 
     # --------- model compartments ---------
@@ -58,49 +60,50 @@ def build_covid_model(model):
                             susceptibility_params=params.suspVaccByVariant,
                             row_index_contact_matrix=a)
 
-        for p in range(pd.nVariants):
+        for v in range(pd.nVariants):
+            for vs in range(pd.nVaccStatus):
+                str_a_p = pd.get_str_profile(age_group=a, variant=v, vacc_status=vs)
+                i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
+                p = pd.get_profile_index(variant=v, vacc_status=vs)
 
-            str_a_p = pd.get_str_profile(age_group=a, profile=p)
-            i = pd.get_row_index(age_group=a, variant=p)
+                # infectivity and susceptibility
+                inf_params = [Constant(0), Constant(0), Constant(0)]
+                inf_params[v] = params.infectivityByVaccByVariant[vs][v]
 
-            # infectivity
-            infectivity_params = [Constant(0), Constant(0)]
-            infectivity_params[p % 2] = params.infectivityByVaccByVariant[p]
+                # -------- compartments ----------
+                Es[i] = Compartment(name='Exposed-'+str_a_p,
+                                    num_of_pathogens=pd.nVariants, row_index_contact_matrix=a)
+                Is[i] = Compartment(name='Infectious-'+str_a_p,
+                                    size_par=params.sizeIProfile0ByAge[a] if v == 0 else Constant(value=0),
+                                    infectivity_params=inf_params, if_empty_to_eradicate=True,
+                                    row_index_contact_matrix=a)
+                Hs[i] = Compartment(name='Hospitalized-'+str_a_p,
+                                    num_of_pathogens=pd.nVariants, if_empty_to_eradicate=True,
+                                    row_index_contact_matrix=a)
+                Rs[i] = Compartment(name='Recovered-'+str_a_p,
+                                    susceptibility_params=params.suspInRByProfileByVariant[p],
+                                    row_index_contact_matrix=a)
+                Ds[i] = DeathCompartment(name='Death-'+str_a_p)
 
-            # -------- compartments ----------
-            Es[i] = Compartment(name='Exposed-'+str_a_p,
-                                num_of_pathogens=2, row_index_contact_matrix=a)
-            Is[i] = Compartment(name='Infectious-'+str_a_p,
-                                size_par=params.sizeIProfile0ByAge[a] if p == 0 else Constant(value=0),
-                                infectivity_params=infectivity_params, if_empty_to_eradicate=True,
-                                row_index_contact_matrix=a)
-            Hs[i] = Compartment(name='Hospitalized-'+str_a_p,
-                                num_of_pathogens=2, if_empty_to_eradicate=True, row_index_contact_matrix=a)
-            Rs[i] = Compartment(name='Recovered-'+str_a_p,
-                                susceptibility_params=[Constant(0),
-                                                       params.suspInRByProfileByVariant[p]],
-                                row_index_contact_matrix=a)
-            Ds[i] = DeathCompartment(name='Death-'+str_a_p)
-
-            # --------- chance nodes ---------
-            # chance node to decide if an infected individual would get hospitalized
-            ifs_hosp[i] = ChanceNode(name='If hospitalized-'+str_a_p,
-                                     destination_compartments=[Hs[i], Rs[i]],
-                                     probability_params=params.probHospByAgeAndProfile[a][p])
+                # --------- chance nodes ---------
+                # chance node to decide if an infected individual would get hospitalized
+                ifs_hosp[i] = ChanceNode(name='If hospitalized-'+str_a_p,
+                                         destination_compartments=[Hs[i], Rs[i]],
+                                         probability_params=params.probHospByAgeAndProfile[a][v])
 
         # count vaccinations among recovered after infection with dominant or novel variants
-        for p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
-            str_a_p = pd.get_str_profile(age_group=a, profile=p)
+        for v in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
+            str_a_p = pd.get_str_profile(age_group=a, profile=v)
 
-            if p == Profiles.DOM_UNVAC.value:
+            if v == Profiles.DOM_UNVAC.value:
                 dest_after_vacc_in_recovered = pd.get_row_index(age_group=a,
                                                                                  variant=Profiles.DOM_VAC.value)
-                counting_vacc_in_R_dom[a] = Counter(name='Vaccination in R-' + str_a_p,
+                counting_vacc_in_R_org[a] = Counter(name='Vaccination in R-' + str_a_p,
                                                     destination_compartment=Rs[dest_after_vacc_in_recovered])
-            elif p == Profiles.NOV_UNVAC.value:
+            elif v == Profiles.NOV_UNVAC.value:
                 dest_after_vacc_in_recovered = pd.get_row_index(age_group=a,
                                                                                  variant=Profiles.NOV_VAC.value)
-                counting_vacc_in_R_nov[a] = Counter(name='Vaccination in R-' + str_a_p,
+                counting_vacc_in_R_delta[a] = Counter(name='Vaccination in R-' + str_a_p,
                                                     destination_compartment=Rs[dest_after_vacc_in_recovered])
 
         # if an imported cases is infected with the novel strain
@@ -121,8 +124,8 @@ def build_covid_model(model):
             Ss[a].setup_history(collect_prev=True)
             Vs[a].setup_history(collect_prev=True)
 
-            for p in range(pd.nVariants):
-                i = pd.get_row_index(age_group=a, variant=p)
+            for v in range(pd.nVariants):
+                i = pd.get_row_index(age_group=a, variant=v)
                 Es[i].setup_history(collect_prev=True)
                 Is[i].setup_history(collect_prev=True)
                 Hs[i].setup_history(collect_prev=True)
@@ -130,17 +133,17 @@ def build_covid_model(model):
                 Ds[i].setup_history(collect_cum_incd=True)
 
         # --------- model events ---------
-        for p in range(pd.nProfiles):
+        for v in range(pd.nProfiles):
 
-            str_a_p = pd.get_str_profile(age_group=a, profile=p)
-            i = pd.get_row_index(age_group=a, variant=p)
+            str_a_p = pd.get_str_profile(age_group=a, profile=v)
+            i = pd.get_row_index(age_group=a, variant=v)
 
-            pathogen = p % 2
-            if p in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
+            pathogen = v % 2
+            if v in (Profiles.DOM_UNVAC.value, Profiles.NOV_UNVAC.value):
                 infection_in_S[i] = EpiDepEvent(
                     name='Infection in S-'+str_a_p, destination=Es[i], generating_pathogen=pathogen)
 
-                if p == Profiles.DOM_UNVAC.value:
+                if v == Profiles.DOM_UNVAC.value:
                     i_prime = pd.get_row_index(
                         age_group=a, variant=Profiles.NOV_UNVAC.value)
                     infection_in_R[i] = EpiDepEvent(
@@ -149,33 +152,33 @@ def build_covid_model(model):
                 infection_in_V[i] = EpiDepEvent(
                     name='Infection in V-'+str_a_p, destination=Es[i], generating_pathogen=pathogen)
 
-                if p == Profiles.DOM_VAC.value:
+                if v == Profiles.DOM_VAC.value:
                     i_prime = pd.get_row_index(
                         age_group=a, variant=Profiles.NOV_VAC.value)
                     infection_in_R[i] = EpiDepEvent(
                         name='Infection in R-'+str_a_p, destination=Es[i_prime], generating_pathogen=pathogen+1)
 
             leaving_Es[i] = EpiIndepEvent(
-                name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[p], destination=Is[i])
+                name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[v], destination=Is[i])
             leaving_Is[i] = EpiIndepEvent(
-                name='Leaving I-'+str_a_p, rate_param=params.ratesOfLeavingI[p], destination=ifs_hosp[i])
+                name='Leaving I-'+str_a_p, rate_param=params.ratesOfLeavingI[v], destination=ifs_hosp[i])
             leaving_Hs[i] = EpiIndepEvent(
-                name='Leaving H-'+str_a_p, rate_param=params.ratesOfLeavingHosp[p], destination=Rs[i])
+                name='Leaving H-'+str_a_p, rate_param=params.ratesOfLeavingHosp[v], destination=Rs[i])
             leaving_Rs[i] = EpiIndepEvent(
-                name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[p], destination=Ss[a])
+                name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[v], destination=Ss[a])
             deaths_in_hosp[i] = EpiIndepEvent(
-                name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][p], destination=Ds[i])
+                name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][v], destination=Ds[i])
 
         importation[a] = PoissonEvent(
             name='Importation-'+str_a, destination=ifs_novel_strain[a], rate_param=params.importRateByAge[a])
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=counting_vacc_in_S[a])
-        vaccination_in_R_dom[a] = EpiIndepEvent(
+        vaccination_in_R_org[a] = EpiIndepEvent(
             name='Vaccinating R-dominant-' + str_a, rate_param=params.vaccRateByAge[a],
-            destination=counting_vacc_in_R_dom[a])
-        vaccination_in_R_nov[a] = EpiIndepEvent(
+            destination=counting_vacc_in_R_org[a])
+        vaccination_in_R_delta[a] = EpiIndepEvent(
             name='Vaccinating R-novel-' + str_a, rate_param=params.vaccRateByAge[a],
-            destination=counting_vacc_in_R_nov[a])
+            destination=counting_vacc_in_R_delta[a])
         losing_vaccine_immunity[a] = EpiIndepEvent(
             name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
 
@@ -194,23 +197,23 @@ def build_covid_model(model):
                                  losing_vaccine_immunity[a],
                                  ])
 
-        for p in range(pd.nVariants):
-            i = pd.get_row_index(age_group=a, variant=p)
+        for v in range(pd.nVariants):
+            i = pd.get_row_index(age_group=a, variant=v)
             Es[i].add_event(event=leaving_Es[i])
             Is[i].add_event(event=leaving_Is[i])
             Hs[i].add_events(events=[leaving_Hs[i], deaths_in_hosp[i]])
 
-            if p == Profiles.DOM_UNVAC.value:
+            if v == Profiles.DOM_UNVAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i],
-                                         vaccination_in_R_dom[a],
+                                         vaccination_in_R_org[a],
                                          infection_in_R[i]])
-            elif p == Profiles.NOV_UNVAC.value:
+            elif v == Profiles.NOV_UNVAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i],
-                                         vaccination_in_R_nov[a]])
-            elif p == Profiles.DOM_VAC.value:
+                                         vaccination_in_R_delta[a]])
+            elif v == Profiles.DOM_VAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i],
                                          infection_in_R[i]])
-            elif p == Profiles.NOV_VAC.value:
+            elif v == Profiles.NOV_VAC.value:
                 Rs[i].add_events(events=[leaving_Rs[i]])
             else:
                 raise ValueError()
@@ -221,7 +224,7 @@ def build_covid_model(model):
 
     # lists to contain summation statistics
     # counts
-    all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_dom + counting_vacc_in_R_nov
+    all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_org + counting_vacc_in_R_delta
     pop_size_by_age = []
     incd_by_age = []
     new_hosp_by_age = []
@@ -302,16 +305,16 @@ def build_covid_model(model):
     new_hosp_by_profile = []
     profile_dist_incd = []
     profile_dist_new_hosp = []
-    for p in range(pd.nVariants):
+    for v in range(pd.nVariants):
         # find Is and Hs in this profile
         Is_this_profile = []
         Hs_this_profile = []
         for a in range(pd.nAgeGroups):
-            i = pd.get_row_index(age_group=a, variant=p)
+            i = pd.get_row_index(age_group=a, variant=v)
             Is_this_profile.append(Is[i])
             Hs_this_profile.append(Hs[i])
 
-        str_profile = pd.get_str_profile(p)
+        str_profile = pd.get_str_profile(v)
         # incidence and hospitalization by profile
         incd_by_profile.append(SumIncidence(
             name='Incidence-'+str_profile, compartments=Is_this_profile))
@@ -334,17 +337,17 @@ def build_covid_model(model):
     Hs_vacc = []
     Is_novel = []
     Hs_novel = []
-    for p in range(pd.nVariants):
+    for v in range(pd.nVariants):
         # find Is and Hs that are vaccinated
-        if p in (Profiles.DOM_VAC.value, Profiles.NOV_VAC.value):
+        if v in (Profiles.DOM_VAC.value, Profiles.NOV_VAC.value):
             for a in range(pd.nAgeGroups):
-                i = pd.get_row_index(age_group=a, variant=p)
+                i = pd.get_row_index(age_group=a, variant=v)
                 Is_vacc.append(Is[i])
                 Hs_vacc.append(Hs[i])
         # find Is and Hs that are due to novel variant
-        if p in (Profiles.NOV_UNVAC.value, Profiles.NOV_VAC.value):
+        if v in (Profiles.NOV_UNVAC.value, Profiles.NOV_VAC.value):
             for a in range(pd.nAgeGroups):
-                i = pd.get_row_index(age_group=a, variant=p)
+                i = pd.get_row_index(age_group=a, variant=v)
                 Is_novel.append(Is[i])
                 Hs_novel.append(Hs[i])
 
@@ -383,10 +386,10 @@ def build_covid_model(model):
         Ds_this_age = []
 
         # number vaccinated
-        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R_dom[a], counting_vacc_in_R_nov[a]]
+        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R_org[a], counting_vacc_in_R_delta[a]]
 
-        for p in range(pd.nVariants):
-            i = pd.get_row_index(age_group=a, variant=p)
+        for v in range(pd.nVariants):
+            i = pd.get_row_index(age_group=a, variant=v)
             comparts_this_age.extend([Es[i], Is[i], Hs[i], Rs[i]])
             Is_this_age.append(Is[i])
             Hs_this_age.append(Hs[i])
@@ -487,8 +490,8 @@ def build_covid_model(model):
     chance_nodes.extend(ifs_hosp)
     chance_nodes.extend(ifs_novel_strain)
     chance_nodes.extend(counting_vacc_in_S)
-    chance_nodes.extend(counting_vacc_in_R_dom)
-    chance_nodes.extend(counting_vacc_in_R_nov)
+    chance_nodes.extend(counting_vacc_in_R_org)
+    chance_nodes.extend(counting_vacc_in_R_delta)
 
     # summation-time series
     list_of_sum_time_series = []
