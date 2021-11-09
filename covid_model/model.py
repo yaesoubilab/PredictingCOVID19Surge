@@ -4,7 +4,7 @@ from apace.ModelObjects import Compartment, ChanceNode, Counter, \
 from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.model_support import get_interventions_features_conditions, add_calibration_info
 from covid_model.parameters import COVIDParameters
-from definitions import ProfileDefiner, Variants
+from definitions import ProfileDefiner
 
 
 def build_covid_model(model):
@@ -30,9 +30,7 @@ def build_covid_model(model):
     ifs_hosp = [None] * pd.length
     ifs_novel_strain = [None] * pd.nAgeGroups
     counting_vacc_in_S = [None] * pd.nAgeGroups
-    counting_vacc_in_R_org = [None] * pd.nAgeGroups
-    counting_vacc_in_R_delta = [None] * pd.nAgeGroups
-    counting_vacc_in_R_novel = [None] * pd.nAgeGroups
+    counting_vacc_in_R_by_age_variant = [[None]*pd.nVariants] * pd.nAgeGroups
 
     # events
     importation_by_age_variant = [[None]*pd.nVariants] * pd.nAgeGroups
@@ -97,16 +95,9 @@ def build_covid_model(model):
             str_a_p = pd.get_str_age_and_profile(age_group=a, variant=v, vacc_status=0)
             dest_after_vacc_in_recovered = pd.get_row_index(
                 age_group=a, variant=v, vacc_status=1)
-
-            if v == Variants.ORIGINAL.value:
-                counting_vacc_in_R_org[a] = Counter(name='Vaccination in R-' + str_a_p,
-                                                    destination_compartment=Rs[dest_after_vacc_in_recovered])
-            elif v == Variants.DELTA.value:
-                counting_vacc_in_R_delta[a] = Counter(name='Vaccination in R-' + str_a_p,
-                                                      destination_compartment=Rs[dest_after_vacc_in_recovered])
-            elif v == Variants.NOVEL.value:
-                counting_vacc_in_R_novel[a] = Counter(name='Vaccination in R-' + str_a_p,
-                                                      destination_compartment=Rs[dest_after_vacc_in_recovered])
+            counting_vacc_in_R_by_age_variant[a][v] = Counter(
+                name='Vaccination in R-' + str_a_p,
+                destination_compartment=Rs[dest_after_vacc_in_recovered])
 
         # count vaccinations among susceptibles
         counting_vacc_in_S[a] = Counter(name='Vaccination in S-' + str_a,
@@ -175,7 +166,7 @@ def build_covid_model(model):
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=counting_vacc_in_S[a])
         vaccination_in_R_org[a] = EpiIndepEvent(
             name='Vaccinating R-dominant-' + str_a, rate_param=params.vaccRateByAge[a],
-            destination=counting_vacc_in_R_org[a])
+            destination=counting_vacc_in_R_by_age_variant[a])
         vaccination_in_R_delta[a] = EpiIndepEvent(
             name='Vaccinating R-novel-' + str_a, rate_param=params.vaccRateByAge[a],
             destination=counting_vacc_in_R_delta[a])
@@ -224,7 +215,7 @@ def build_covid_model(model):
 
     # lists to contain summation statistics
     # counts
-    all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_org + counting_vacc_in_R_delta
+    all_vaccinations = counting_vacc_in_S + counting_vacc_in_R_by_age_variant + counting_vacc_in_R_delta
     pop_size_by_age = []
     incd_by_age = []
     new_hosp_by_age = []
@@ -386,7 +377,7 @@ def build_covid_model(model):
         Ds_this_age = []
 
         # number vaccinated
-        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R_org[a], counting_vacc_in_R_delta[a]]
+        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R_by_age_variant[a], counting_vacc_in_R_delta[a]]
 
         for v in range(pd.nVariants):
             i = pd.get_row_index(age_group=a, variant=v)
@@ -490,7 +481,7 @@ def build_covid_model(model):
     chance_nodes.extend(ifs_hosp)
     chance_nodes.extend(ifs_novel_strain)
     chance_nodes.extend(counting_vacc_in_S)
-    chance_nodes.extend(counting_vacc_in_R_org)
+    chance_nodes.extend(counting_vacc_in_R_by_age_variant)
     chance_nodes.extend(counting_vacc_in_R_delta)
 
     # summation-time series
