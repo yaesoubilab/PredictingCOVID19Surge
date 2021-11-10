@@ -156,6 +156,11 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     # -----------------------------------------------------
     # ------ plot information for the novel variant plot --------
     # -----------------------------------------------------
+    # % incidence due to delta
+    # % hospitalizations due to delta
+    # % incidence that are unvaccinated and due to delta
+    # % hospitalizations that are unvaccinated and due to delta
+
     obs_incd_delta = A.TrajPlotInfo(
         outcome_name='Obs: % of incidence due to Delta',
         title='Incidence associated with\n'
