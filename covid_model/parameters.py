@@ -45,8 +45,8 @@ class COVIDParameters(EpiParameters):
 
         # dominant strain
         self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
-        self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
         self.durE = Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)
+        self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
         self.durR = Uniform(0.25, 1.25)
         self.probHosp18To29 = Uniform(0.001, 0.0075)  # age group 18-29 as the reference
 
@@ -174,8 +174,8 @@ class COVIDParameters(EpiParameters):
         self.ratesOfLeavingR = [None] * self.pd.nProfiles
 
         self.vaccRateByAge = [None] * self.nAgeGroups
-        self.logitProbDeathInHospByAge = [None] * self.nAgeGroups
-        self.ratesOfDeathInHospByAge = [None] * self.nAgeGroups
+        self.logitProbDeathInHospByAge = [[None]*self.nProfiles] * self.nAgeGroups
+        self.ratesOfDeathInHospByAge = [[None]*self.nProfiles] * self.nAgeGroups
         self.rateOfLosingVacImmunity = None
 
         self.matrixOfPercChangeInContactsY1 = None
@@ -274,7 +274,6 @@ class COVIDParameters(EpiParameters):
             else:
                 self.relativeProbHospByAge[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a] * 0.2)
 
-        # TODO: starts from here
         # probability of hospitalization by age and profile
         for a in range(self.nAgeGroups):
             for v in range(self.nVariants):
@@ -284,16 +283,15 @@ class COVIDParameters(EpiParameters):
                         self.probHospByAgeAndProfile[a][p] = Product(
                             parameters=[self.probHosp18To29, self.relativeProbHospByAge[a]])
                     else:
-                        p_org = self.pd.get_profile_index(
-                            variant=Variants.ORIGINAL.value, vacc_status=vs)
+                        # adjust with respect to the profile of original variant and unvaccinated
                         self.probHospByAgeAndProfile[a][p] = Product(
-                            parameters=[self.probHospByAgeAndProfile[a][p_org],
+                            parameters=[self.probHospByAgeAndProfile[a][0],
                                         self.ratioProbHospByProfile[p]])
 
         # probability of death by age
         for a in range(self.nAgeGroups):
             self.probDeathIfHospByAgeAndProfile[a] = \
-                [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25) for i in self.pd.nProfiles]
+                [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25) for i in range(self.pd.nProfiles)]
 
         # duration of infectiousness and exposed by variant
         for v in range(self.nVariants):
@@ -309,7 +307,7 @@ class COVIDParameters(EpiParameters):
                 if vs == 0:
                     self.durRByProfile[p] = Equal(self.durR)
                 else:
-                    self.durRByProfile[p] = Product(self.durR, self.ratioToIncreaseDurRAfterVacc)
+                    self.durRByProfile[p] = Product([self.durR, self.ratioToIncreaseDurRAfterVacc])
 
         # importation of variants
         self.importRateByVariant[0] = Uniform(0, importation_rate)
@@ -354,8 +352,6 @@ class COVIDParameters(EpiParameters):
             self.ratesOfLeavingR[i] = Inverse(par=self.durRByProfile[i])
 
         for a in range(self.nAgeGroups):
-            self.logitProbDeathInHospByAge[a] = [None] * self.pd.nProfiles
-            self.ratesOfDeathInHospByAge[a] = [None] * self.pd.nProfiles
             for v in range(self.nVariants):
                 for vs in range(self.nVaccStatus):
                     # Pr{Death in Hosp} = p
@@ -376,13 +372,15 @@ class COVIDParameters(EpiParameters):
              'Base contact matrix': self.baseContactMatrix,
 
              'R0': self.R0,
-             'Duration of infectiousness-dominant': self.durI,
+             'Duration of exposed-original': self.durE,
+             'Duration of infectiousness-original': self.durI,
+             'Duration of recovered-original': self.durR,
+
              'Seasonality parameters': self.seasonalityParams,
              'Seasonality': self.seasonality,
              'Prob novel strain params': self.paramsForRateDeltaVariant,
              'Prob novel strain': self.importRateDeltaStrain,
 
-             'Ratio infectiousness duration of novel to dominant': self.ratioDurInfByVariant,
              'Ratio of infectiousness duration by profile': self.ratioDurInfByVariant,
              'Ratio of susceptibility of R against novel strain': self.suscToNovelInUnvacR,
 
