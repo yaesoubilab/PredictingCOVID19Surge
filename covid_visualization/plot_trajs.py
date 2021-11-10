@@ -3,7 +3,7 @@ import covid_model.data as D
 import definitions as Def
 from covid_model.data import *
 from covid_model.settings import COVIDSettings
-from definitions import AgeGroups, FEASIBILITY_PERIOD, ROOT_DIR
+from definitions import AgeGroups, Variants, FEASIBILITY_PERIOD, ROOT_DIR
 
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
@@ -34,15 +34,16 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     A.X_TICKS = (0, 52/2)      # x-axis ticks (min at 0 with interval of 5)
     A.X_LABEL = 'Weeks since March 1, 2010'     # x-axis label
 
-    indexer = Def.ProfileDefiner(n_age_groups=len(AgeGroups), n_variants=len(Profiles))
+    pd = Def.ProfileDefiner(
+        n_age_groups=len(AgeGroups), n_variants=len(Variants), n_vacc_status=2)
 
     # -----------------------------------------------------------------
     # ------ plot information for the validation plot (by age) --------
     # -----------------------------------------------------------------
     if IF_MAKE_VALIDATION_PLOTS:
-        for a in range(indexer.nAgeGroups):
+        for a in range(pd.nAgeGroups):
 
-            str_a = indexer.get_str_age(age_group=a)
+            str_a = pd.get_str_age(age_group=a)
             S = A.TrajPlotInfo(outcome_name='In: Susceptible-'+str_a, title='Susceptible-'+str_a,
                                y_range=(0, 55000), x_multiplier=prev_multiplier)
             V = A.TrajPlotInfo(outcome_name='In: Vaccinated-'+str_a, title='Vaccinated-'+str_a,
@@ -53,8 +54,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
             Hs = []
             Rs = []
             Ds = []
-            for p in range(indexer.nVariants):
-                str_a_p = indexer.get_str_age_and_profile(age_group=a, profile=p)
+            for p in range(pd.nVariants):
+                str_a_p = pd.get_str_age_and_profile(age_group=a, profile=p)
                 Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
                                          y_range=(0, 22000), x_multiplier=prev_multiplier))
                 Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,
@@ -211,8 +212,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     age_dist_cum_hosp = []
     cum_vaccine_rate_by_age = []
 
-    for a in range(indexer.nAgeGroups):
-        str_a = indexer.get_str_age(age_group=a)
+    for a in range(pd.nAgeGroups):
+        str_a = pd.get_str_age(age_group=a)
 
         hosp_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='New hospitalization rate-{}'.format(str_a),
@@ -263,9 +264,9 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     cum_death_rate_by_age = []
     age_dist_cum_death = []
 
-    for a in range(indexer.nAgeGroups):
+    for a in range(pd.nAgeGroups):
 
-        str_a = indexer.get_str_age(age_group=a)
+        str_a = pd.get_str_age(age_group=a)
 
         incd_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Incidence rate-{}'.format(str_a),

@@ -412,10 +412,6 @@ class COVIDParameters(EpiParameters):
              'Relative prob hosp by age': self.relativeProbHospByAge,
              'Prob hosp': self.probHospByAgeAndProfile,
 
-             'Prob death|hosp': self.probDeathIfHospByAgeAndProfile,
-             'Logit of prob death in hosp': self.logitProbDeathInHospByAge,
-             'Rate of death in hosp': self.ratesOfDeathInHospByAge,
-
              # time in compartments
              'Duration of E': self.durEByProfile,
              'Duration of I': self.durIByProfile,
@@ -426,6 +422,10 @@ class COVIDParameters(EpiParameters):
              'Rates of leaving I': self.ratesOfLeavingI,
              'Rates of leaving Hosp': self.ratesOfLeavingHosp,
              'Rates of leaving R': self.ratesOfLeavingR,
+
+             'Prob death|hosp': self.probDeathIfHospByAgeAndProfile,
+             'Logit of prob death in hosp': self.logitProbDeathInHospByAge,
+             'Rate of death in hosp': self.ratesOfDeathInHospByAge,
 
              'Vaccination rate params': self.vaccRateParams,
              'Vaccination rate t_min by age': self.vaccRateTMinByAge,
