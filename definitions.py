@@ -68,31 +68,43 @@ class ProfileDefiner:
         self.nProfiles = self.nVariants * self.nVaccStatus
         self.length = n_age_groups * n_variants * n_vacc_status
 
+        self.strAge = [None] * self.nAgeGroups
+        self.strAgeVariant = [[None] * self.nVariants for a in range(self.nAgeGroups)]
+        self.strAgeProfile = [
+            [[None] * self.nVaccStatus for v in range(self.nVariants)] for a in range(self.nAgeGroups)]
+
+        for a in range(self.nAgeGroups):
+            self.strAge[a] = AGES[a]
+            for v in range(self.nVariants):
+                self.strAgeVariant[a][v] = AGES[a] + '-' + VARIANTS[v]
+                for vs in range(self.nVaccStatus):
+                    self.strAgeProfile[a][v][vs] = AGES[a] + '-' + VARIANTS[v] + '-' + VACC_STATUS[vs]
+
     def get_row_index(self, age_group, variant, vacc_status):
         return self.nVariants * self.nVaccStatus * age_group + self.nVaccStatus * variant + vacc_status
 
     def get_profile_index(self, variant, vacc_status):
         return self.nVaccStatus * variant + vacc_status
 
-    @staticmethod
-    def get_str_age_and_profile(age_group, variant, vacc_status):
-        return AGES[age_group] + '-' + VARIANTS[variant] + '-' + VACC_STATUS[vacc_status]
-
-    @staticmethod
-    def get_str_age_and_variant(age_group, variant):
-        return AGES[age_group] + '-' + VARIANTS[variant]
-
-    @staticmethod
-    def get_str_age(age_group):
-        return AGES[age_group]
-
-    @staticmethod
-    def get_str_variant(variant):
-        return VARIANTS[variant]
-
-    @staticmethod
-    def get_str_vacc_status(vacc_status):
-        return VACC_STATUS[vacc_status]
+    # @staticmethod
+    # def get_str_age_and_profile(age_group, variant, vacc_status):
+    #     return AGES[age_group] + '-' + VARIANTS[variant] + '-' + VACC_STATUS[vacc_status]
+    #
+    # @staticmethod
+    # def get_str_age_and_variant(age_group, variant):
+    #     return AGES[age_group] + '-' + VARIANTS[variant]
+    #
+    # @staticmethod
+    # def get_str_age(age_group):
+    #     return AGES[age_group]
+    #
+    # @staticmethod
+    # def get_str_variant(variant):
+    #     return VARIANTS[variant]
+    #
+    # @staticmethod
+    # def get_str_vacc_status(vacc_status):
+    #     return VACC_STATUS[vacc_status]
 
 
 def get_dataset_labels(week, survey_size=None, bias_delay=None):

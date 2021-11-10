@@ -152,17 +152,17 @@ class COVIDParameters(EpiParameters):
         self.seasonality = None
         self.infectivityOrg = None  # infectivity of the original strain
         self.infectivityOrgWithSeasonality = None   # adjusted for seasonality
-        self.infectivityByVaccByVariant = [[None]*self.nVariants] * self.nVaccStatus
+        self.infectivityByVaccByVariant = [[None]*self.nVariants for vs in range(self.nVaccStatus)]
 
         self.suspVaccByVariant = [None] * self.nVariants
-        self.suspInRByProfileByVariant = [[None]*self.nVariants] * self.pd.nProfiles
-        self.ratioTransmByVaccByVariant = [[None]*self.nVariants] * self.pd.nVaccStatus
+        self.suspInRByProfileByVariant = [[None]*self.nVariants for p in range(self.pd.nProfiles)]
+        self.ratioTransmByVaccByVariant = [[None]*self.nVariants for vs in range(self.pd.nVaccStatus)]
         self.ratioProbHospByProfile = [None] * self.pd.nProfiles
 
         self.importRateByVariant = [None]*self.nVariants
 
         self.relativeProbHospByAge = [None] * self.nAgeGroups
-        self.probHospByAgeAndProfile = [[None]*self.nProfiles] * self.nAgeGroups
+        self.probHospByAgeAndProfile = [[None]*self.nProfiles for a in range(self.nAgeGroups)]
         self.probDeathIfHospByAgeAndProfile = [None] * self.nAgeGroups
 
         self.durEByProfile = [None] * self.pd.nProfiles
@@ -174,8 +174,8 @@ class COVIDParameters(EpiParameters):
         self.ratesOfLeavingR = [None] * self.pd.nProfiles
 
         self.vaccRateByAge = [None] * self.nAgeGroups
-        self.logitProbDeathInHospByAge = [[None]*self.nProfiles] * self.nAgeGroups
-        self.ratesOfDeathInHospByAge = [[None]*self.nProfiles] * self.nAgeGroups
+        self.logitProbDeathInHospByAge = [[None]*self.nProfiles for a in range(self.nAgeGroups)]
+        self.ratesOfDeathInHospByAge = [[None]*self.nProfiles for a in range(self.nAgeGroups)]
         self.rateOfLosingVacImmunity = None
 
         self.matrixOfPercChangeInContactsY1 = None
@@ -257,15 +257,15 @@ class COVIDParameters(EpiParameters):
         # susceptibility in R by profile by variant
         for v in range(self.nVariants):
             for vs in range(self.nVaccStatus):
+                p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                 for against_v in range(self.nVariants):
-                    p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                     # full immunity against infection with the variant already infected with
                     if v == against_v:
-                        self.suspInRByProfileByVariant[p][v] = Constant(0)
+                        self.suspInRByProfileByVariant[p][against_v] = Constant(0)
                     # partial immunity against infection with the novel variant
                     # for R after infection with other variants
                     else:
-                        self.suspInRByProfileByVariant[p][v] = Equal(self.suscToNovelInUnvacR)
+                        self.suspInRByProfileByVariant[p][against_v] = Equal(self.suscToNovelInUnvacR)
 
         # relative probability of hospitalization to age 18-29
         for a in range(self.nAgeGroups):
@@ -395,6 +395,8 @@ class COVIDParameters(EpiParameters):
                  self.vacEffReducingInfectiousByVariant,
              'Ratio of transmissibility by profile': self.ratioTransmByVaccByVariant,
 
+             # importation
+             'Importation rates': self.importRateByVariant,
              # transmission parameter
              'Infectivity-dominant': self.infectivityOrg,
              'Infectivity-dominant with seasonality': self.infectivityOrgWithSeasonality,
