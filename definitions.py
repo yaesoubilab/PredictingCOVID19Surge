@@ -79,6 +79,10 @@ class ProfileDefiner:
         return AGES[age_group] + '-' + VARIANTS[variant] + '-' + VACC_STATUS[vacc_status]
 
     @staticmethod
+    def get_str_age_and_variant(age_group, variant):
+        return AGES[age_group] + '-' + VARIANTS[variant]
+
+    @staticmethod
     def get_str_age(age_group):
         return AGES[age_group]
 
