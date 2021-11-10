@@ -43,7 +43,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     if IF_MAKE_VALIDATION_PLOTS:
         for a in range(pd.nAgeGroups):
 
-            str_a = pd.get_str_age(age_group=a)
+            str_a = pd.strAge[a]
             S = A.TrajPlotInfo(outcome_name='In: Susceptible-'+str_a, title='Susceptible-'+str_a,
                                y_range=(0, 55000), x_multiplier=prev_multiplier)
             V = A.TrajPlotInfo(outcome_name='In: Vaccinated-'+str_a, title='Vaccinated-'+str_a,
@@ -54,18 +54,19 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
             Hs = []
             Rs = []
             Ds = []
-            for p in range(pd.nVariants):
-                str_a_p = pd.get_str_age_and_profile(age_group=a, profile=p)
-                Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
-                                         y_range=(0, 22000), x_multiplier=prev_multiplier))
-                Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,
-                                         y_range=(0, 17000), x_multiplier=prev_multiplier))
-                Hs.append(A.TrajPlotInfo(outcome_name='In: Hospitalized-'+str_a_p, title='Hospitalized-'+str_a_p,
-                                         y_range=(0, 5000), x_multiplier=prev_multiplier))
-                Rs.append(A.TrajPlotInfo(outcome_name='In: Recovered-'+str_a_p, title='Recovered-'+str_a_p,
-                                         y_range=(0, 105000), x_multiplier=prev_multiplier))
-                Ds.append(A.TrajPlotInfo(outcome_name='In: Death-'+str_a_p, title='Cumulative death-'+str_a_p,
-                                         y_range=(0, 500), x_multiplier=prev_multiplier))
+            for v in range(pd.nVariants):
+                for vs in range(pd.nVaccStatus):
+                    str_a_p = pd.strAgeProfile[a][v][vs]
+                    Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
+                                             y_range=(0, 22000), x_multiplier=prev_multiplier))
+                    Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,
+                                             y_range=(0, 17000), x_multiplier=prev_multiplier))
+                    Hs.append(A.TrajPlotInfo(outcome_name='In: Hospitalized-'+str_a_p, title='Hospitalized-'+str_a_p,
+                                             y_range=(0, 5000), x_multiplier=prev_multiplier))
+                    Rs.append(A.TrajPlotInfo(outcome_name='In: Recovered-'+str_a_p, title='Recovered-'+str_a_p,
+                                             y_range=(0, 105000), x_multiplier=prev_multiplier))
+                    Ds.append(A.TrajPlotInfo(outcome_name='In: Death-'+str_a_p, title='Cumulative death-'+str_a_p,
+                                             y_range=(0, 500), x_multiplier=prev_multiplier))
 
             # validation
             filename_validation = ROOT_DIR+'/outputs/figures/{}.png'.format(str_a)
@@ -124,10 +125,10 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
         calibration_info=A.CalibrationTargetPlotInfo(
             rows_of_data=D.VACCINE_COVERAGE_OVER_TIME,
             if_connect_obss=True))
-    obs_incd_novel = A.TrajPlotInfo(
-        outcome_name='Obs: % of incidence due to novel variant',
+    obs_incd_delta = A.TrajPlotInfo(
+        outcome_name='Obs: % of incidence due to Delta',
         title='Incidence associated with\n'
-              'novel strain (%)',
+              'the delta variant (%)',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier,
         calibration_info=A.CalibrationTargetPlotInfo(
@@ -145,7 +146,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
                                   )
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
                                   list_plot_info=[obs_hosp_occ_rate, obs_hosp_rate, obs_prev_immune_from_inf,
-                                                  obs_cum_hosp_rate, obs_cum_vacc_rate, obs_incd_novel],
+                                                  obs_cum_hosp_rate, obs_cum_vacc_rate, obs_incd_delta],
                                   file_name=save_plots_dir+'/summary.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
@@ -155,7 +156,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     # -----------------------------------------------------
     # ------ plot information for the novel variant plot --------
     # -----------------------------------------------------
-    obs_incd_novel = A.TrajPlotInfo(
+    obs_incd_delta = A.TrajPlotInfo(
         outcome_name='Obs: % of incidence due to novel variant',
         title='Incidence associated with\n'
               'novel strain (%)',
@@ -196,7 +197,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
         x_multiplier=obs_incd_multiplier)
 
     sim_outcomes.plot_multi_panel(n_rows=2, n_cols=3,
-                                  list_plot_info=[obs_incd_novel, obs_incd_novel_unvacc, obs_incd_novl_vacc,
+                                  list_plot_info=[obs_incd_delta, obs_incd_novel_unvacc, obs_incd_novl_vacc,
                                                   obs_new_hosp_novel, obs_new_hosp_novel_unvacc, obs_new_hosp_novel_vacc],
                                   file_name=save_plots_dir+'/novel_variant.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
@@ -213,7 +214,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     cum_vaccine_rate_by_age = []
 
     for a in range(pd.nAgeGroups):
-        str_a = pd.get_str_age(age_group=a)
+        str_a = pd.strAge[a]
 
         hosp_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='New hospitalization rate-{}'.format(str_a),
@@ -266,7 +267,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
 
     for a in range(pd.nAgeGroups):
 
-        str_a = pd.get_str_age(age_group=a)
+        str_a = pd.strAge[a]
 
         incd_rate_by_age.append(A.TrajPlotInfo(
             outcome_name='Incidence rate-{}'.format(str_a),
