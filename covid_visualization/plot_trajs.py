@@ -157,7 +157,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     # ------ plot information for the novel variant plot --------
     # -----------------------------------------------------
     obs_incd_delta = A.TrajPlotInfo(
-        outcome_name='Obs: % of incidence due to novel variant',
+        outcome_name='Obs: % of incidence due to Delta',
         title='Incidence associated with\n'
               'novel strain (%)',
         y_range=(0, 100), y_multiplier=100,
