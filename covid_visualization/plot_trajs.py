@@ -3,7 +3,7 @@ import covid_model.data as D
 import definitions as Def
 from covid_model.data import *
 from covid_model.settings import COVIDSettings
-from definitions import AgeGroups, Profiles, FEASIBILITY_PERIOD, ROOT_DIR
+from definitions import AgeGroups, FEASIBILITY_PERIOD, ROOT_DIR
 
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'

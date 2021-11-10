@@ -17,7 +17,7 @@ class COVIDParameters(EpiParameters):
         self.nVariants = len(Variants)
         self.nVaccStatus = 2
         self.nProfiles = self.nVariants * self.nVaccStatus
-        self.profileDefiner = ProfileDefiner(
+        self.pd = ProfileDefiner(
             n_age_groups=self.nAgeGroups, n_variants=self.nVariants, n_vaccination_status=self.nVaccStatus)
 
         d = 1 / 364  # one day (using year as the unit of time)
@@ -155,9 +155,9 @@ class COVIDParameters(EpiParameters):
         self.infectivityByVaccByVariant = [[None]*self.nVariants] * self.nVaccStatus
 
         self.suspVaccByVariant = [None] * self.nVariants
-        self.suspInRByProfileByVariant = [[None]*self.nVariants] * self.profileDefiner.nProfiles
-        self.ratioTransmByVaccByVariant = [[None]*self.nVariants] * self.profileDefiner.nVaccStatus
-        self.ratioProbHospByProfile = [None] * self.profileDefiner.nProfiles
+        self.suspInRByProfileByVariant = [[None]*self.nVariants] * self.pd.nProfiles
+        self.ratioTransmByVaccByVariant = [[None]*self.nVariants] * self.pd.nVaccStatus
+        self.ratioProbHospByProfile = [None] * self.pd.nProfiles
 
         self.importRateByVariant = [None]*self.nVariants
 
@@ -165,13 +165,13 @@ class COVIDParameters(EpiParameters):
         self.probHospByAgeAndProfile = [[None]*self.nProfiles] * self.nAgeGroups
         self.probDeathIfHospByAgeAndProfile = [None] * self.nAgeGroups
 
-        self.durEByProfile = [None] * self.profileDefiner.nProfiles
-        self.durIByProfile = [None] * self.profileDefiner.nProfiles
-        self.durRByProfile = [None] * self.profileDefiner.nProfiles
-        self.ratesOfLeavingE = [None] * self.profileDefiner.nProfiles
-        self.ratesOfLeavingI = [None] * self.profileDefiner.nProfiles
-        self.ratesOfLeavingHosp = [None] * self.profileDefiner.nProfiles
-        self.ratesOfLeavingR = [None] * self.profileDefiner.nProfiles
+        self.durEByProfile = [None] * self.pd.nProfiles
+        self.durIByProfile = [None] * self.pd.nProfiles
+        self.durRByProfile = [None] * self.pd.nProfiles
+        self.ratesOfLeavingE = [None] * self.pd.nProfiles
+        self.ratesOfLeavingI = [None] * self.pd.nProfiles
+        self.ratesOfLeavingHosp = [None] * self.pd.nProfiles
+        self.ratesOfLeavingR = [None] * self.pd.nProfiles
 
         self.vaccRateByAge = [None] * self.nAgeGroups
         self.logitProbDeathInHospByAge = [None] * self.nAgeGroups
@@ -220,10 +220,10 @@ class COVIDParameters(EpiParameters):
         # find ratio of hospitalization by profile
         for v in range(self.nVariants):
             # for unvaccinated
-            p_unvacc = self.profileDefiner.get_profile_index(variant=v, vacc_status=0)
+            p_unvacc = self.pd.get_profile_index(variant=v, vacc_status=0)
             self.ratioProbHospByProfile[p_unvacc] = Equal(self.ratioProbHospByVariant[v])
             # for vaccinated
-            p_vacc = self.profileDefiner.get_profile_index(variant=v, vacc_status=0)
+            p_vacc = self.pd.get_profile_index(variant=v, vacc_status=1)
             self.ratioProbHospByProfile[p_vacc] = OneMinusTimes(
                 par1=self.vacEffAgainstHospByVariant[v],
                 par2=self.ratioProbHospByProfile[p_unvacc])
@@ -258,7 +258,7 @@ class COVIDParameters(EpiParameters):
         for v in range(self.nVariants):
             for vs in range(self.nVaccStatus):
                 for against_v in range(self.nVariants):
-                    p = self.profileDefiner.get_profile_index(variant=v, vacc_status=vs)
+                    p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                     # full immunity against infection with the variant already infected with
                     if v == against_v:
                         self.suspInRByProfileByVariant[p][v] = Constant(0)
@@ -274,16 +274,17 @@ class COVIDParameters(EpiParameters):
             else:
                 self.relativeProbHospByAge[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a] * 0.2)
 
+        # TODO: starts from here
         # probability of hospitalization by age and profile
         for a in range(self.nAgeGroups):
             for v in range(self.nVariants):
                 for vs in range(self.nVaccStatus):
-                    p = self.profileDefiner.get_profile_index(variant=v, vacc_status=vs)
+                    p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                     if vs == 0 and v == Variants.ORIGINAL.value:
                         self.probHospByAgeAndProfile[a][p] = Product(
                             parameters=[self.probHosp18To29, self.relativeProbHospByAge[a]])
                     else:
-                        p_org = self.profileDefiner.get_profile_index(
+                        p_org = self.pd.get_profile_index(
                             variant=Variants.ORIGINAL.value, vacc_status=vs)
                         self.probHospByAgeAndProfile[a][p] = Product(
                             parameters=[self.probHospByAgeAndProfile[a][p_org],
@@ -292,19 +293,19 @@ class COVIDParameters(EpiParameters):
         # probability of death by age
         for a in range(self.nAgeGroups):
             self.probDeathIfHospByAgeAndProfile[a] = \
-                [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25) for i in self.profileDefiner.nProfiles]
+                [Beta(mean=prob_death[a], st_dev=prob_death[a]*0.25) for i in self.pd.nProfiles]
 
         # duration of infectiousness and exposed by variant
         for v in range(self.nVariants):
             for vs in range(self.nVaccStatus):
-                p = self.profileDefiner.get_profile_index(variant=v, vacc_status=vs)
+                p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                 self.durEByProfile[p] = Equal(self.durE)
                 self.durIByProfile[p] = Product(parameters=[self.durI, self.ratioDurInfByVariant[v]])
 
         # duration of R
         for v in range(self.nVariants):
             for vs in range(self.nVaccStatus):
-                p = self.profileDefiner.get_profile_index(variant=v, vacc_status=vs)
+                p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                 if vs == 0:
                     self.durRByProfile[p] = Equal(self.durR)
                 else:
@@ -346,20 +347,20 @@ class COVIDParameters(EpiParameters):
 
         self.rateOfLosingVacImmunity = Inverse(par=self.durVacImmunity)
 
-        for i in range(self.profileDefiner.nProfiles):
+        for i in range(self.pd.nProfiles):
             self.ratesOfLeavingE[i] = Inverse(par=self.durEByProfile[i])
             self.ratesOfLeavingI[i] = Inverse(par=self.durIByProfile[i])
             self.ratesOfLeavingHosp[i] = Inverse(par=self.durHospByProfile[i])
             self.ratesOfLeavingR[i] = Inverse(par=self.durRByProfile[i])
 
         for a in range(self.nAgeGroups):
-            self.logitProbDeathInHospByAge[a] = [None] * self.profileDefiner.nProfiles
-            self.ratesOfDeathInHospByAge[a] = [None] * self.profileDefiner.nProfiles
+            self.logitProbDeathInHospByAge[a] = [None] * self.pd.nProfiles
+            self.ratesOfDeathInHospByAge[a] = [None] * self.pd.nProfiles
             for v in range(self.nVariants):
                 for vs in range(self.nVaccStatus):
                     # Pr{Death in Hosp} = p
                     # Rate{Death in Hosp} = p/(1-p) * Rate{Leaving Hosp}
-                    p = self.profileDefiner.get_profile_index(variant=v, vacc_status=vs)
+                    p = self.pd.get_profile_index(variant=v, vacc_status=vs)
                     self.logitProbDeathInHospByAge[a][p] = Logit(par=self.probDeathIfHospByAgeAndProfile[a][p])
                     self.ratesOfDeathInHospByAge[a][p] = Product(
                         parameters=[self.logitProbDeathInHospByAge[a][p], self.ratesOfLeavingHosp[p]])
