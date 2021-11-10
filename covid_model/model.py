@@ -492,7 +492,7 @@ def build_covid_model(model):
                              prev_immune_from_inf=prev_immune_from_inf,
                              cum_hosp_rate_by_age=cum_hosp_rate_by_age,
                              cum_vaccine_rate_by_age=cum_vaccine_rate_by_age,
-                             perc_incd_novel=perc_incd_novel)
+                             perc_incd_novel=perc_incd_by_variant[Variants.DELTA.value])
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
@@ -521,7 +521,9 @@ def build_covid_model(model):
     list_of_sum_time_series.extend(cum_vaccine_by_age)
     list_of_sum_time_series.extend(incd_by_profile)
     list_of_sum_time_series.extend(new_hosp_by_profile)
-    list_of_sum_time_series.extend([incd_vacc, new_hosp_vacc, incd_by_variant, new_hosp_novel_by_variant])
+    list_of_sum_time_series.extend([incd_vacc, new_hosp_vacc])
+    list_of_sum_time_series.extend(incd_by_variant)
+    list_of_sum_time_series.extend(new_hosp_novel_by_variant)
 
     # ratio time-series
     list_of_ratio_time_series = []
@@ -537,8 +539,9 @@ def build_covid_model(model):
     list_of_ratio_time_series.extend(age_dist_cum_incd)
     list_of_ratio_time_series.extend(age_dist_new_hosp)
     list_of_ratio_time_series.extend(age_dist_cum_death)
-    list_of_ratio_time_series.extend([perc_incd_vacc, perc_new_hosp_vacc,
-                                      perc_incd_novel, perc_new_hosp_novel])
+    list_of_ratio_time_series.extend([perc_incd_vacc, perc_new_hosp_vacc])
+    list_of_ratio_time_series.extend(perc_incd_by_variant)
+    list_of_ratio_time_series.extend(perc_new_hosp_by_variant)
 
     model.populate(compartments=compartments,
                    parameters=params,
