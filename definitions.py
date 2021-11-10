@@ -69,9 +69,16 @@ class ProfileDefiner:
         self.length = n_age_groups * n_variants * n_vacc_status
 
         self.strAge = [None] * self.nAgeGroups
+        self.strVariant = [None] * self.nVariants
+        self.strProfile = [[None] * self.nVaccStatus for v in range(self.nVariants)]
         self.strAgeVariant = [[None] * self.nVariants for a in range(self.nAgeGroups)]
         self.strAgeProfile = [
             [[None] * self.nVaccStatus for v in range(self.nVariants)] for a in range(self.nAgeGroups)]
+
+        for v in range(self.nVariants):
+            self.strVariant[v] = VARIANTS[v]
+            for vs in range(self.nVaccStatus):
+                self.strProfile[v][vs] = VARIANTS[v] + '-' + VACC_STATUS[vs]
 
         for a in range(self.nAgeGroups):
             self.strAge[a] = AGES[a]

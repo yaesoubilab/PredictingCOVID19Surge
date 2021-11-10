@@ -308,59 +308,47 @@ def build_covid_model(model):
     profile_dist_incd = []
     profile_dist_new_hosp = []
     for v in range(pd.nVariants):
-        # find Is and Hs in this profile
-        Is_this_profile = []
-        Hs_this_profile = []
-        for a in range(pd.nAgeGroups):
-            i = pd.get_row_index(age_group=a, variant=v)
-            Is_this_profile.append(Is[i])
-            Hs_this_profile.append(Hs[i])
+        for vs in range(pd.nVaccStatus):
 
-        str_profile = pd.get_str_age_and_profile(v)
-        # incidence and hospitalization by profile
-        incd_by_profile.append(SumIncidence(
-            name='Incidence-'+str_profile, compartments=Is_this_profile))
-        new_hosp_by_profile.append(SumIncidence(
-            name='New hosp-'+str_profile, compartments=Hs_this_profile))
+            # find Is and Hs in this profile
+            Is_this_profile = []
+            Hs_this_profile = []
+            for a in range(pd.nAgeGroups):
+                i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
+                Is_this_profile.append(Is[i])
+                Hs_this_profile.append(Hs[i])
 
-        # profile-distribution of incidence
-        profile_dist_incd.append(RatioTimeSeries(name='% of incidence due to '+str_profile,
-                                                 numerator_sum_time_series=incd_by_profile[-1],
-                                                 denominator_sum_time_series=incd_by_age[0],
-                                                 if_surveyed=True))
-        # profile-distribution of new hospitalization
-        profile_dist_new_hosp.append(RatioTimeSeries(name='% of new hospitalizations due to '+str_profile,
-                                                     numerator_sum_time_series=new_hosp_by_profile[-1],
-                                                     denominator_sum_time_series=new_hosp_by_age[0],
+            str_profile = pd.strProfile[v][vs]
+
+            # incidence and hospitalization by profile
+            incd_by_profile.append(SumIncidence(
+                name='Incidence-'+str_profile, compartments=Is_this_profile))
+            new_hosp_by_profile.append(SumIncidence(
+                name='New hosp-'+str_profile, compartments=Hs_this_profile))
+
+            # profile-distribution of incidence
+            profile_dist_incd.append(RatioTimeSeries(name='% of incidence due to '+str_profile,
+                                                     numerator_sum_time_series=incd_by_profile[-1],
+                                                     denominator_sum_time_series=incd_by_age[0],
                                                      if_surveyed=True))
+            # profile-distribution of new hospitalization
+            profile_dist_new_hosp.append(RatioTimeSeries(name='% of new hospitalizations due to '+str_profile,
+                                                         numerator_sum_time_series=new_hosp_by_profile[-1],
+                                                         denominator_sum_time_series=new_hosp_by_age[0],
+                                                         if_surveyed=True))
 
     # incidence and new hospitalization among the vaccinated
     Is_vacc = []
     Hs_vacc = []
-    Is_novel = []
-    Hs_novel = []
-    for v in range(pd.nVariants):
-        # find Is and Hs that are vaccinated
-        if v in (Profiles.DOM_VAC.value, Profiles.NOV_VAC.value):
-            for a in range(pd.nAgeGroups):
-                i = pd.get_row_index(age_group=a, variant=v)
-                Is_vacc.append(Is[i])
-                Hs_vacc.append(Hs[i])
-        # find Is and Hs that are due to novel variant
-        if v in (Profiles.NOV_UNVAC.value, Profiles.NOV_VAC.value):
-            for a in range(pd.nAgeGroups):
-                i = pd.get_row_index(age_group=a, variant=v)
-                Is_novel.append(Is[i])
-                Hs_novel.append(Hs[i])
-
+    for a in range(pd.nAgeGroups):
+        for v in range(pd.nVariants):
+            i = pd.get_row_index(age_group=a, variant=v, vacc_status=1)
+            Is_vacc.append(Is[i])
+            Hs_vacc.append(Hs[i])
     incd_vacc = SumIncidence(
         name='Incidence-vaccinated', compartments=Is_vacc)
     new_hosp_vacc = SumIncidence(
         name='New hospitalizations and vaccinated', compartments=Hs_vacc)
-    incd_novel = SumIncidence(
-        name='Incidence-novel', compartments=Is_novel)
-    new_hosp_novel = SumIncidence(
-        name='New hospitalizations-novel', compartments=Hs_novel)
     perc_incd_vacc = RatioTimeSeries(name='% of incidence that are vaccinated',
                                      numerator_sum_time_series=incd_vacc,
                                      denominator_sum_time_series=incd_by_age[0],
@@ -369,18 +357,43 @@ def build_covid_model(model):
                                          numerator_sum_time_series=new_hosp_vacc,
                                          denominator_sum_time_series=new_hosp_by_age[0],
                                          if_surveyed=True)
-    perc_incd_novel = RatioTimeSeries(name='% of incidence due to novel variant',
-                                      numerator_sum_time_series=incd_novel,
-                                      denominator_sum_time_series=incd_by_age[0],
-                                      if_surveyed=True)
-    perc_new_hosp_novel = RatioTimeSeries(name='% of new hospitalizations due to novel variant',
-                                          numerator_sum_time_series=new_hosp_novel,
-                                          denominator_sum_time_series=new_hosp_by_age[0],
-                                          if_surveyed=True)
+
+    # incidence and new hospitalization due to delta and novel variant
+    Is_by_variant = [[] for v in range(pd.nVariants)]
+    Hs_by_variant = [[] for v in range(pd.nVariants)]
+    for v in range(pd.nVariants):
+        for a in range(pd.nAgeGroups):
+            for vs in range(pd.nVaccStatus):
+                i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
+                Is_by_variant[v].append(Is[i])
+                Hs_by_variant[v].append(Hs[i])
+
+    incd_by_variant = [None] * pd.nVariants
+    new_hosp_novel_by_variant = [None] * pd.nVariants
+    for v in range(pd.nVariants):
+        incd_by_variant[v] = SumIncidence(
+            name='Incidence-'+pd.strVariant[v], compartments=Is_by_variant[v])
+        new_hosp_novel_by_variant[v] = SumIncidence(
+            name='New hospitalizations-'+pd.strVariant[v], compartments=Hs_by_variant[v])
+
+    # percentage of incidence and new hospitalizations due to delta and novel variant
+    perc_incd_by_variant = [None] * pd.nVariants
+    perc_new_hosp_by_variant = [None] * pd.nVariants
+    for v in range(pd.nVariants):
+        perc_incd_by_variant[v] = RatioTimeSeries(
+            name='% of incidence due to '+pd.strVariant[v],
+            numerator_sum_time_series=incd_by_variant[v],
+            denominator_sum_time_series=incd_by_age[0],
+            if_surveyed=True)
+        perc_new_hosp_by_variant[v] = RatioTimeSeries(
+            name='% of new hospitalizations due to '+pd.strVariant[v],
+            numerator_sum_time_series=new_hosp_novel_by_variant[v],
+            denominator_sum_time_series=new_hosp_by_age[0],
+            if_surveyed=True)
 
     # list to contain summation statistics for age groups
     for a in range(pd.nAgeGroups):
-        str_a = pd.get_str_age(age_group=a)
+        str_a = pd.strAge[a]
 
         comparts_this_age = [Ss[a], Vs[a]]
         Is_this_age = []
@@ -388,14 +401,15 @@ def build_covid_model(model):
         Ds_this_age = []
 
         # number vaccinated
-        vaccinated_this_age = [counting_vacc_in_S[a], counting_vacc_in_R_by_variant[a], counting_vacc_in_R_delta[a]]
+        vaccinated_this_age = [counting_vacc_in_S[a]] + counting_vacc_in_R_by_variant[a]
 
         for v in range(pd.nVariants):
-            i = pd.get_row_index(age_group=a, variant=v)
-            comparts_this_age.extend([Es[i], Is[i], Hs[i], Rs[i]])
-            Is_this_age.append(Is[i])
-            Hs_this_age.append(Hs[i])
-            Ds_this_age.append(Ds[i])
+            for vs in range(pd.nVaccStatus):
+                i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
+                comparts_this_age.extend([Es[i], Is[i], Hs[i], Rs[i]])
+                Is_this_age.append(Is[i])
+                Hs_this_age.append(Hs[i])
+                Ds_this_age.append(Ds[i])
 
         # population size of this age group
         pop_size_by_age.append(SumPrevalence(
@@ -507,7 +521,7 @@ def build_covid_model(model):
     list_of_sum_time_series.extend(cum_vaccine_by_age)
     list_of_sum_time_series.extend(incd_by_profile)
     list_of_sum_time_series.extend(new_hosp_by_profile)
-    list_of_sum_time_series.extend([incd_vacc, new_hosp_vacc, incd_novel, new_hosp_novel])
+    list_of_sum_time_series.extend([incd_vacc, new_hosp_vacc, incd_by_variant, new_hosp_novel_by_variant])
 
     # ratio time-series
     list_of_ratio_time_series = []
