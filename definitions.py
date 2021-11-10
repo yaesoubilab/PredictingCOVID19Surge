@@ -37,7 +37,7 @@ HOSP_OCCUPANCY_IN_TRAJ_FILE = 'Obs: Hospital occupancy rate'
 OUTCOME_NAME_IN_DATASET = 'If threshold passed (0:Yes)'
 
 AGES = ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
-VARIANTS = ['Dominant', 'Delta', 'Novel']
+VARIANTS = ['Orig', 'Delta', 'Novel']
 VACC_STATUS = ['UnVacc', 'Vacc']
 
 
@@ -61,12 +61,12 @@ class Variants(Enum):
 class ProfileDefiner:
     """ to convert (age group index, variant index, vaccination status index) to an index and vice versa """
 
-    def __init__(self, n_age_groups, n_variants, n_vaccination_status):
+    def __init__(self, n_age_groups, n_variants, n_vacc_status):
         self.nAgeGroups = n_age_groups
         self.nVariants = n_variants
-        self.nVaccStatus = n_vaccination_status
+        self.nVaccStatus = n_vacc_status
         self.nProfiles = self.nVariants * self.nVaccStatus
-        self.length = n_age_groups * n_variants * n_vaccination_status
+        self.length = n_age_groups * n_variants * n_vacc_status
 
     def get_row_index(self, age_group, variant, vacc_status):
         return self.nVariants * self.nVaccStatus * age_group + self.nVaccStatus * variant + vacc_status

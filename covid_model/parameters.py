@@ -18,7 +18,7 @@ class COVIDParameters(EpiParameters):
         self.nVaccStatus = 2
         self.nProfiles = self.nVariants * self.nVaccStatus
         self.pd = ProfileDefiner(
-            n_age_groups=self.nAgeGroups, n_variants=self.nVariants, n_vaccination_status=self.nVaccStatus)
+            n_age_groups=self.nAgeGroups, n_variants=self.nVariants, n_vacc_status=self.nVaccStatus)
 
         d = 1 / 364  # one day (using year as the unit of time)
 
@@ -378,35 +378,41 @@ class COVIDParameters(EpiParameters):
 
              'Seasonality parameters': self.seasonalityParams,
              'Seasonality': self.seasonality,
-             'Prob novel strain params': self.paramsForRateDeltaVariant,
-             'Prob novel strain': self.importRateDeltaStrain,
+             'Params for rate of delta importation': self.paramsForRateDeltaVariant,
+             'Params for rate of novel ': self.paramsForRateNovelVariant,
 
-             'Ratio of infectiousness duration by profile': self.ratioDurInfByVariant,
+             'Ratio of infectiousness duration by variant': self.ratioDurInfByVariant,
              'Ratio of susceptibility of R against novel strain': self.suscToNovelInUnvacR,
 
              'Duration of vaccine immunity': self.durVacImmunity,
              'Ratio of duration of immunity from infection+vaccination to infection':
                  self.ratioToIncreaseDurRAfterVacc,
-             'Vaccine effectiveness against infection': self.vacEffAgainstInfByVariant,
+             'Vaccine effectiveness against infection by variant': self.vacEffAgainstInfByVariant,
              'Susceptibility of vaccinated': self.suspVaccByVariant,
 
-             'Ratio transmissibility of novel to dominant': self.ratioTransmByVariant,
-             'Vaccine effectiveness in reducing infectiousness': self.vacEffReducingInfectiousByVariant,
+             'Ratio transmissibility by variant': self.ratioTransmByVariant,
+             'Vaccine effectiveness in reducing infectiousness by variant':
+                 self.vacEffReducingInfectiousByVariant,
              'Ratio of transmissibility by profile': self.ratioTransmByVaccByVariant,
 
              # transmission parameter
              'Infectivity-dominant': self.infectivityOrg,
              'Infectivity-dominant with seasonality': self.infectivityOrgWithSeasonality,
              'Infectivity by profile': self.infectivityByVaccByVariant,
-             'Susceptibility in R by profile': self.suspInRByProfileByVariant,
+             'Susceptibility in R by profile by variant': self.suspInRByProfileByVariant,
 
-             'Ratio prob of hospitalization of novel to dominant': self.ratioProbHospByVariant,
-             'Vaccine effectiveness against hospitalization': self.vacEffAgainstHospByVariant,
+             'Ratio prob of hospitalization by variant': self.ratioProbHospByVariant,
+             'Vaccine effectiveness against hospitalization by variant': self.vacEffAgainstHospByVariant,
              'Ratio of hospitalization probability by profile': self.ratioProbHospByProfile,
 
              # prob hospitalization
-             'Prob Hosp for 18-29': self.probHosp18To29,
+             'Prob hosp for 18-29': self.probHosp18To29,
              'Relative prob hosp by age': self.relativeProbHospByAge,
+             'Prob hosp': self.probHospByAgeAndProfile,
+
+             'Prob death|hosp': self.probDeathIfHospByAgeAndProfile,
+             'Logit of prob death in hosp': self.logitProbDeathInHospByAge,
+             'Rate of death in hosp': self.ratesOfDeathInHospByAge,
 
              # time in compartments
              'Duration of E': self.durEByProfile,
@@ -440,15 +446,3 @@ class COVIDParameters(EpiParameters):
              'Matrix of change in contacts - PD Y1': self.matrixOfPercChangeInContactsY1,
              'Matrix of change in contacts - PD Y1+': self.matrixOfPercChangeInContactsY2
              })
-
-        for a in range(self.nAgeGroups):
-            self.dictOfParams['Prob Hosp-age '+str(a)] = self.probHospByAgeAndProfile[a]
-
-        for a in range(self.nAgeGroups):
-            self.dictOfParams['Prob Death|Hosp-age' + str(a)] = self.probDeathIfHospByAgeAndProfile[a]
-
-        for a in range(self.nAgeGroups):
-            self.dictOfParams['Logit of prob death in Hosp' + str(a)] = self.logitProbDeathInHospByAge[a]
-
-        for a in range(self.nAgeGroups):
-            self.dictOfParams['Rate of death in Hosp' + str(a)] = self.ratesOfDeathInHospByAge[a]

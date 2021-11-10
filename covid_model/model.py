@@ -18,7 +18,7 @@ def build_covid_model(model):
     # parameters of the COVID model
     params = COVIDParameters(novel_variant_will_emerge=sets.novelVariantWillEmerge)
 
-    pd = ProfileDefiner(n_age_groups=params.nAgeGroups, n_variants=params.nVariants, n_vaccination_status=2)
+    pd = ProfileDefiner(n_age_groups=params.nAgeGroups, n_variants=params.nVariants, n_vacc_status=2)
 
     Ss = [None] * pd.nAgeGroups
     Vs = [None] * pd.nAgeGroups
@@ -34,7 +34,7 @@ def build_covid_model(model):
     # events
     importation_by_variant = [[None]*pd.nVariants] * pd.nAgeGroups
     infection_in_S_or_V = [None] * pd.length
-    infection_in_R = [None] * pd.nAgeGroups * pd.length
+    infection_in_R = [None] * pd.length
     leaving_Es = [None] * pd.length
     leaving_Is = [None] * pd.length
     leaving_Hs = [None] * pd.length
