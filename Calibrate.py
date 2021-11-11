@@ -20,6 +20,7 @@ if __name__ == "__main__":
     sets.simulationDuration = CALIB_PERIOD
     sets.ifCollectTrajsOfCompartments = False
     sets.exportCalibrationTrajs = False
+    sets.storeParameterValues=False
 
     # calibrate the model
     calibration = calib.CalibrationWithRandomSampling(model_settings=sets)

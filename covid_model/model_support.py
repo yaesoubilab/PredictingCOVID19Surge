@@ -132,7 +132,7 @@ def add_calibration_info(settings,
                          prev_immune_from_inf,
                          cum_hosp_rate_by_age,
                          cum_vaccine_rate_by_age,
-                         perc_incd_delta):
+                         perc_incd_delta, perc_incd_novel):
 
     # feasible ranges of hospital occupancy rate
     hosp_occupancy_rate.add_feasible_conditions(
@@ -189,3 +189,8 @@ def add_calibration_info(settings,
         feasible_conditions=FeasibleConditions(
             min_threshold_to_hit=0.2,
             period=[1, FEASIBILITY_PERIOD+2/52]))
+
+    perc_incd_novel.add_feasible_conditions(
+        feasible_conditions=FeasibleConditions(
+            feasible_max=0.0,
+            period=[1, FEASIBILITY_PERIOD]))

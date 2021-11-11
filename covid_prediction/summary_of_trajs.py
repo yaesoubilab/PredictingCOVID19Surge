@@ -46,7 +46,7 @@ def report_traj_summary(hosp_occ_thresholds, perc_novel_thresholds):
         outcome_name='Obs: Cumulative vaccination rate')
     perc_novel_all_trajs = get_trajs_over_training_period(
         sim_trajs=sim_trajs,
-        outcome_name='Obs: % of incidence due to novel variant')
+        outcome_name='Obs: % of incidence due to Novel')
 
     # list of desired statistics
     list_n_with_hosp_occ_passing_threshold = [0] * len(hosp_occ_thresholds)

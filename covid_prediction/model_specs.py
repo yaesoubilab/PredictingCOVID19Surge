@@ -5,8 +5,8 @@ SHORT_FEATURE_NAMES = {
     'Obs: New hospitalization rate-ave-2wk': 'Hosp',
     'Obs: Cumulative hospitalization rate': 'sumHosp',
     'Obs: Cumulative vaccination rate': 'Vacc',
-    'Obs: % of incidence due to novel variant-ave-2wk': 'Novel',
-    'Obs: % of incidence due to novel variant-slope-4wk': 'dNovel'
+    'Obs: % of incidence due to Novel-ave-2wk': 'Novel',
+    'Obs: % of incidence due to Novel-slope-4wk': 'dNovel'
 }
 
 
@@ -157,8 +157,8 @@ B3 = ModelSpec(name='B3',
                    'Obs: New hospitalization rate-slope-4wk',
                    # 'Obs: Cumulative hospitalization rate',
                    'Obs: Cumulative vaccination rate',
-                   'Obs: % of incidence due to novel variant-ave-2wk',
-                   'Obs: % of incidence due to novel variant-slope-4wk'
+                   'Obs: % of incidence due to Novel-ave-2wk',
+                   'Obs: % of incidence due to Novel-slope-4wk'
                ],
                list_num_of_features_wanted=[5, 6],
                list_num_of_neurons=[7, 8])

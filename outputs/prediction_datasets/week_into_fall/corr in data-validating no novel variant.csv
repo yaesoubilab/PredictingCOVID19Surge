@@ -1,10 +1,10 @@
 feature,If threshold passed (0:Yes) 5 | corr,If threshold passed (0:Yes) 5 | p-value,If threshold passed (0:Yes) 7.5 | corr,If threshold passed (0:Yes) 7.5 | p-value,If threshold passed (0:Yes) 10 | corr,If threshold passed (0:Yes) 10 | p-value,If threshold passed (0:Yes) 15 | corr,If threshold passed (0:Yes) 15 | p-value,If threshold passed (0:Yes) 20 | corr,If threshold passed (0:Yes) 20 | p-value
-Obs: New hospitalization rate,-0.677,0.0,-0.729,0.0,-0.761,0.0,-0.756,0.0,-0.699,0.0
-Obs: New hospitalization rate-ave-2wk,-0.687,0.0,-0.732,0.0,-0.762,0.0,-0.745,0.0,-0.677,0.0
-Obs: New hospitalization rate-slope-4wk,-0.142,0.0,-0.188,0.0,-0.21,0.0,-0.31,0.0,-0.403,0.0
-Obs: % of incidence due to novel variant,,,,,,,,,,
-Obs: % of incidence due to novel variant-ave-2wk,,,,,,,,,,
-Obs: % of incidence due to novel variant-slope-4wk,,,,,,,,,,
-Obs: Hospital occupancy rate,-0.732,0.0,-0.773,0.0,-0.798,0.0,-0.786,0.0,-0.704,0.0
-Obs: Cumulative vaccination rate,0.093,0.014,0.111,0.003,0.128,0.001,0.151,0.0,0.103,0.006
-Max Obs: Hospital occupancy rate,-0.778,0.0,-0.829,0.0,-0.845,0.0,-0.807,0.0,-0.72,0.0
+Obs: New hospitalization rate,-0.484,0.0,-0.545,0.0,-0.589,0.0,-0.653,0.0,-0.677,0.0
+Obs: New hospitalization rate-ave-2wk,-0.493,0.0,-0.553,0.0,-0.594,0.0,-0.651,0.0,-0.665,0.0
+Obs: New hospitalization rate-slope-4wk,-0.037,0.328,-0.079,0.038,-0.1,0.008,-0.145,0.0,-0.208,0.0
+Obs: % of incidence due to Novel,,,,,,,,,,
+Obs: % of incidence due to Novel-ave-2wk,,,,,,,,,,
+Obs: % of incidence due to Novel-slope-4wk,,,,,,,,,,
+Obs: Hospital occupancy rate,-0.512,0.0,-0.576,0.0,-0.623,0.0,-0.691,0.0,-0.716,0.0
+Obs: Cumulative vaccination rate,0.044,0.242,0.024,0.52,0.015,0.686,0.02,0.59,0.028,0.467
+Max Obs: Hospital occupancy rate,-0.56,0.0,-0.631,0.0,-0.685,0.0,-0.766,0.0,-0.809,0.0

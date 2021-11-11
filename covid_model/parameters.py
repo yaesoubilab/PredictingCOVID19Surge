@@ -71,7 +71,7 @@ class COVIDParameters(EpiParameters):
 
         # probability that an imported case is infected with the novel strain
         self.paramsForRateDeltaVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Uniform(1.1, 1.5),  # t-middle
+                                          Uniform(1.5, 1.75),  # t-middle
                                           Constant(importation_rate)]  # max
         self.paramsForRateNovelVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
                                           Uniform(1.75, 2.25),
