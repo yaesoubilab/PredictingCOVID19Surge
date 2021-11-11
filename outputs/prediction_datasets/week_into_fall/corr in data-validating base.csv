@@ -1,10 +1,10 @@
-feature,If threshold passed (0:Yes) 5 | corr,If threshold passed (0:Yes) 5 | p-value,If threshold passed (0:Yes) 7.5 | corr,If threshold passed (0:Yes) 7.5 | p-value,If threshold passed (0:Yes) 10 | corr,If threshold passed (0:Yes) 10 | p-value,If threshold passed (0:Yes) 15 | corr,If threshold passed (0:Yes) 15 | p-value,If threshold passed (0:Yes) 20 | corr,If threshold passed (0:Yes) 20 | p-value
-Obs: New hospitalization rate,-0.439,0.0,-0.494,0.0,-0.553,0.0,-0.627,0.0,-0.671,0.0
-Obs: New hospitalization rate-ave-2wk,-0.452,0.0,-0.506,0.0,-0.563,0.0,-0.634,0.0,-0.671,0.0
-Obs: New hospitalization rate-slope-4wk,-0.055,0.147,-0.082,0.03,-0.131,0.0,-0.194,0.0,-0.256,0.0
-Obs: % of incidence due to Novel,-0.022,0.569,-0.032,0.395,-0.067,0.076,-0.107,0.004,-0.157,0.0
-Obs: % of incidence due to Novel-ave-2wk,-0.024,0.532,-0.033,0.388,-0.067,0.076,-0.107,0.005,-0.155,0.0
-Obs: % of incidence due to Novel-slope-4wk,0.004,0.922,-0.024,0.519,-0.057,0.132,-0.103,0.006,-0.168,0.0
-Obs: Hospital occupancy rate,-0.468,0.0,-0.526,0.0,-0.589,0.0,-0.668,0.0,-0.701,0.0
-Obs: Cumulative vaccination rate,0.046,0.228,0.061,0.104,0.049,0.194,0.095,0.012,0.079,0.037
-Max Obs: Hospital occupancy rate,-0.511,0.0,-0.575,0.0,-0.638,0.0,-0.729,0.0,-0.776,0.0
+feature,If threshold passed (0:Yes) 10 | corr,If threshold passed (0:Yes) 10 | p-value,If threshold passed (0:Yes) 15 | corr,If threshold passed (0:Yes) 15 | p-value,If threshold passed (0:Yes) 20 | corr,If threshold passed (0:Yes) 20 | p-value
+Obs: New hospitalization rate,-0.567,0.0,-0.672,0.0,-0.71,0.0
+Obs: New hospitalization rate-ave-2wk,-0.574,0.0,-0.677,0.0,-0.714,0.0
+Obs: New hospitalization rate-slope-4wk,-0.085,0.141,-0.123,0.034,-0.112,0.053
+Obs: % of incidence due to Novel,-0.011,0.845,0.003,0.959,-0.056,0.33
+Obs: % of incidence due to Novel-ave-2wk,-0.01,0.864,0.005,0.935,-0.055,0.341
+Obs: % of incidence due to Novel-slope-4wk,0.122,0.034,0.077,0.183,0.031,0.596
+Obs: Hospital occupancy rate,-0.612,0.0,-0.718,0.0,-0.778,0.0
+Obs: Cumulative vaccination rate,0.115,0.047,0.136,0.019,0.164,0.004
+Max Obs: Hospital occupancy rate,-0.67,0.0,-0.772,0.0,-0.814,0.0

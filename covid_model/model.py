@@ -168,6 +168,7 @@ def build_covid_model(model):
 
         vaccination_in_S[a] = EpiIndepEvent(
             name='Vaccinating S-'+str_a, rate_param=params.vaccRateByAge[a], destination=counting_vacc_in_S[a])
+
         losing_vaccine_immunity[a] = EpiIndepEvent(
             name='Losing vaccine immunity-'+str_a, rate_param=params.rateOfLosingVacImmunity, destination=Ss[a])
 

@@ -92,7 +92,7 @@ class COVIDParameters(EpiParameters):
         # parameters related to vaccine effectiveness
         self.durVacImmunity = Uniform(0.5, 2.5)
         # [original, delta , novel ]
-        self.vacEffAgainstInfByVariant = [Uniform(0, 1) for i in range(len(Variants))]
+        self.vacEffAgainstInfByVariant = [Uniform(0.0, 1.0) for i in range(len(Variants))]
         self.vacEffReducingInfectiousByVariant = [Uniform(0.25, 0.75) for i in range(len(Variants))]
         self.vacEffAgainstHospByVariant = [Uniform(0.9, 1), Uniform(0.75, 1), Uniform(0, 1)]
 
@@ -266,7 +266,10 @@ class COVIDParameters(EpiParameters):
                     # partial immunity against infection with the novel variant
                     # for R after infection with other variants
                     else:
-                        self.suspInRByProfileByVariant[p][against_v] = Equal(self.suscToNovelInUnvacR)
+                        if vs == 0:
+                            self.suspInRByProfileByVariant[p][against_v] = Equal(self.suscToNovelInUnvacR)
+                        else:
+                            self.suspInRByProfileByVariant[p][against_v] = Constant(0)
 
         # relative probability of hospitalization to age 18-29
         for a in range(self.nAgeGroups):
