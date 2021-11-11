@@ -29,7 +29,7 @@ def build_covid_model(model):
     Ds = [None] * pd.length
     ifs_hosp = [None] * pd.length
     counting_vacc_in_S = [None] * pd.nAgeGroups
-    counting_vacc_in_R_by_variant = [[None]*pd.nVariants] * pd.nAgeGroups
+    counting_vacc_in_R_by_variant = [[None]*pd.nVariants for a in range(pd.nAgeGroups)]
 
     # events
     importation_by_variant = [[None]*pd.nVariants for a in range(pd.nAgeGroups)]
@@ -162,7 +162,8 @@ def build_covid_model(model):
         for v in range(pd.nVariants):
             str_a_v = pd.strAgeVariant[a][v]
             vaccination_in_R_by_variant[a][v] = EpiIndepEvent(
-                name='Vaccinating R-' + str_a_v, rate_param=params.vaccRateByAge[a],
+                name='Vaccinating R-' + str_a_v,
+                rate_param=params.vaccRateByAge[a],
                 destination=counting_vacc_in_R_by_variant[a][v])
 
         vaccination_in_S[a] = EpiIndepEvent(
