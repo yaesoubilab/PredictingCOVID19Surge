@@ -492,7 +492,7 @@ def build_covid_model(model):
                              prev_immune_from_inf=prev_immune_from_inf,
                              cum_hosp_rate_by_age=cum_hosp_rate_by_age,
                              cum_vaccine_rate_by_age=cum_vaccine_rate_by_age,
-                             perc_incd_novel=perc_incd_by_variant[Variants.DELTA.value])
+                             perc_incd_delta=perc_incd_by_variant[Variants.DELTA.value])
 
     # --------- interventions, features, conditions ---------
     interventions, features, conditions = get_interventions_features_conditions(
