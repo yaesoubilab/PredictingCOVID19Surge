@@ -71,10 +71,10 @@ class COVIDParameters(EpiParameters):
 
         # probability that an imported case is infected with the novel strain
         self.paramsForRateDeltaVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Constant(5), #Uniform(1.25, 1.5),  # t-middle
+                                          Uniform(1, 1.5),  # t-middle
                                           Constant(importation_rate)]  # max
         self.paramsForRateNovelVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Constant(5), #Uniform(1.75, 2.25),
+                                          Uniform(5, 6),
                                           #Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
                                           Uniform(0.0, importation_rate)]  # max
 
@@ -106,9 +106,9 @@ class COVIDParameters(EpiParameters):
             Constant(100),                      # 0-4
             Uniform(minimum=1.66, maximum=1.8),    # 5-12
             Uniform(minimum=1.0, maximum=1.4),  # 13-17
-            Uniform(minimum=1.0, maximum=1.4),  # 18-29
-            Uniform(minimum=0.9, maximum=1.3),  # 30-49
-            Uniform(minimum=0.9, maximum=1.3),  # 50-64
+            Uniform(minimum=0.9, maximum=1.3),  # 18-29
+            Uniform(minimum=0.85, maximum=1.25),  # 30-49
+            Uniform(minimum=0.85, maximum=1.25),  # 50-64
             Uniform(minimum=0.8, maximum=1.2),  # 65-75
             Uniform(minimum=0.7, maximum=1.1)   # 75+
         ]

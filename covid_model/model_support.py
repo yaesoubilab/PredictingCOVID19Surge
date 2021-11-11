@@ -181,7 +181,7 @@ def add_calibration_info(settings,
                 ratios=settings.cumVaccRateByAgeMean[a], variances=settings.cumVaccRateByAgeVar[a])
 
     # calibration information for the percentage of infection associated with the novel variant
-    # perc_incd_delta.add_calibration_targets(
-    #     ratios=settings.percInfWithNovelMean, survey_sizes=settings.percInfWithNovelN,
-    #     # variances=settings.percInfWithNovelVar
-    # )
+    perc_incd_delta.add_calibration_targets(
+        ratios=settings.percInfWithNovelMean, survey_sizes=settings.percInfWithNovelN,
+        # variances=settings.percInfWithNovelVar
+    )
