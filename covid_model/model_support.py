@@ -185,3 +185,7 @@ def add_calibration_info(settings,
         ratios=settings.percInfWithNovelMean, survey_sizes=settings.percInfWithNovelN,
         # variances=settings.percInfWithNovelVar
     )
+    perc_incd_delta.add_feasible_conditions(
+        feasible_conditions=FeasibleConditions(
+            min_threshold_to_hit=0.2,
+            period=[1, FEASIBILITY_PERIOD+2/52]))
