@@ -177,7 +177,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_delta_vacc = A.TrajPlotInfo(
         outcome_name='Obs: % of new hospitalizations due to Delta-Vacc',
-        title='% new hospitalizations that are\nvaccinated and due to Delta strain',
+        title='% new hospitalizations that are\nvaccinated and due to Delta variant',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
 
@@ -198,7 +198,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
         x_multiplier=obs_incd_multiplier)
     obs_new_hosp_novel_vacc = A.TrajPlotInfo(
         outcome_name='Obs: % of new hospitalizations due to Novel-Vacc',
-        title='% new hospitalizations that are\n vaccinated and due to novel strain',
+        title='% new hospitalizations that are\n vaccinated and due to novel variant',
         y_range=(0, 100), y_multiplier=100,
         x_multiplier=obs_incd_multiplier)
 

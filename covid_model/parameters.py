@@ -74,7 +74,8 @@ class COVIDParameters(EpiParameters):
                                           Uniform(1.25, 1.5),  # t-middle
                                           Constant(importation_rate)]  # max
         self.paramsForRateNovelVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
+                                          Uniform(1.75, 2.25),
+                                          #Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
                                           Uniform(0.0, importation_rate)]  # max
 
         # parameters related to novel variants
