@@ -47,8 +47,8 @@ class COVIDParameters(EpiParameters):
         self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
         self.durE = Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
-        self.durR = Uniform(0.25, 0.75)
-        self.probHosp18To29 = Uniform(0.0001, 0.0075)  # age group 18-29 as the reference
+        self.durR = Uniform(0.25, 1.25)
+        self.probHosp18To29 = Uniform(0.001, 0.0075)  # age group 18-29 as the reference
 
         # seasonality
         self.seasonalityParams = [
@@ -127,7 +127,7 @@ class COVIDParameters(EpiParameters):
         self.y1Thresholds = [Uniform(0, 0.0005), Uniform(0, 0.0005)]  # on/off
         self.y1MaxHospOcc = Uniform(5 / 100000 / 4, 15 / 100000 / 4)
         self.bEffOfControlMeasure = Inverse(par=self.y1MaxHospOcc)
-        self.y1MaxEff = Uniform(0.5, 0.75)
+        self.y1MaxEff = Uniform(0.5, 0.85)
         self.y1EffOfControlMeasures = SigmoidOnModelOutput(
             par_b=self.bEffOfControlMeasure,
             par_max=self.y1MaxEff)
