@@ -47,8 +47,8 @@ class COVIDParameters(EpiParameters):
         self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
         self.durE = Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
-        self.durR = Uniform(0.25, 1.25)
-        self.probHosp18To29 = Uniform(0.001, 0.0075)  # age group 18-29 as the reference
+        self.durR = Uniform(0.25, 0.75)
+        self.probHosp18To29 = Uniform(0.0001, 0.0075)  # age group 18-29 as the reference
 
         # seasonality
         self.seasonalityParams = [
@@ -71,10 +71,10 @@ class COVIDParameters(EpiParameters):
 
         # probability that an imported case is infected with the novel strain
         self.paramsForRateDeltaVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Uniform(1.25, 1.5),  # t-middle
+                                          Constant(5), #Uniform(1.25, 1.5),  # t-middle
                                           Constant(importation_rate)]  # max
         self.paramsForRateNovelVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Uniform(1.75, 2.25),
+                                          Constant(5), #Uniform(1.75, 2.25),
                                           #Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
                                           Uniform(0.0, importation_rate)]  # max
 
