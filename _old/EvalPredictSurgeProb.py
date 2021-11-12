@@ -1,6 +1,6 @@
 import pandas as pd
 
-import covid_prediction.evaluate_predictive_models as E
+import _old.evaluate_predictive_models as E
 
 features = ['Obs: New hospitalization rate',
             'Obs: Cumulative vaccination rate',

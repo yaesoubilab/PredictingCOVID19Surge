@@ -4,6 +4,8 @@ from covid_prediction.model_specs import A, B3, SHORT_FEATURE_NAMES
 from covid_prediction.prediction_models import DecisionTree
 from definitions import ROOT_DIR, FILL_TREE
 
+ALPHA = 0.001
+
 
 def build_a_decision_tree(feature_names, outcome_name, max_depth=None, ccp_alpha=0.0, fig_filename='tree.png'):
 
@@ -33,6 +35,6 @@ if __name__ == '__main__':
     for model in (A, B3):
         build_a_decision_tree(feature_names=model.features,
                               outcome_name='If threshold passed (0:Yes)',
-                              ccp_alpha=0.01,
+                              ccp_alpha=ALPHA,
                               fig_filename=ROOT_DIR+'/outputs/figures/trees/model-{}.png'.format(model.name))
 

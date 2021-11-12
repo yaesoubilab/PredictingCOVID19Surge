@@ -3,7 +3,6 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 
 from SimPy.InOutFunctions import delete_file
 from covid_prediction.feature_engineering import *
-from covid_prediction.feature_selection import rfe, lasso, pi
 from definitions import ROOT_DIR, get_dataset_labels
 
 
@@ -64,29 +63,6 @@ class PreProcessor:
         # updating dataframe
         self.df = pd.DataFrame(self.X, columns=self.featureName)
         self.df[self._yName] = self.y
-
-    def feature_selection(self, estimator, method, num_fs_wanted=10):
-        """
-        :param estimator: a supervised learning estimator with a fit method that provides
-            information about feature importance
-        :param method: 'rfe', 'lasso', and 'pi'
-        :param num_fs_wanted: number of significant features want to select
-        """
-
-        if method == 'rfe':
-            selected_features = rfe(x=self.X, y=self.y, features=self.featureName,
-                                    num_wanted=num_fs_wanted, estimator=estimator)
-        elif method == 'pi':
-            selected_features = pi(x=self.X, y=self.y, features=self.featureName,
-                                   num_wanted=num_fs_wanted, estimator=estimator)
-        elif method == 'lasso':
-            selected_features = lasso(x=self.X, y=self.y, features=self.featureName,
-                                      estimator=estimator)
-        else:
-            raise ValueError('unknown feature selection method')
-
-        # update feature names and predictor values
-        self.update_selected_features(selected_features=selected_features)
 
     def update_selected_features(self, selected_features):
         """ update the selected feature names and the selectedX
