@@ -1,6 +1,6 @@
 from covid_prediction.model_specs import A, SHORT_FEATURE_NAMES
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
-from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS
+from definitions import ROOT_DIR, DIGITS
 
 ALPHA = 0.003
 MODEL = A # B
@@ -19,13 +19,13 @@ def build_a_decision_tree(model_spec, hosp_occu_threshold, ccp_alpha=0.0):
         shorten_feature_names=SHORT_FEATURE_NAMES)
 
     summary.add(model_name=model_spec.name,
-                hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
+                hosp_occu_thresholds=[hosp_occu_threshold],
                 best_spec_and_validation_performance=validation_performance,
                 digits=DIGITS)
 
     # generate the report
     summary.print(
-        file_name=ROOT_DIR + '/outputs/prediction_summary/dec_tree/summary-{}-{}.csv'.format(
+        file_name=ROOT_DIR + '/outputs/prediction_summary/dec_tree/summary-{}-{}-{}.csv'.format(
             model_spec.name, hosp_occu_threshold, ccp_alpha))
 
 

@@ -26,7 +26,7 @@ class SummaryOfTreePerformance:
                       t,
                       # best_spec.meanScore,
                       # best_spec.PI,
-                      best_spec.get_formatted_mean_and_interval(deci=digits)]
+                      None if best_spec is None else best_spec.get_formatted_mean_and_interval(deci=digits)]
             for p in performance:
                 result.extend([
                     round(p.accuracy, digits),
@@ -123,10 +123,10 @@ def optimize_and_eval_dec_tree(
 
         # save the best tree
         if optimal_ccp_alpha is None:
-            filename = ROOT_DIR + '/outputs/figures/trees/model-{}-{}.png'.format(
+            filename = ROOT_DIR + '/outputs/figures/trees/{}-{}.png'.format(
                 model_spec.name, t)
         else:
-            filename = ROOT_DIR + '/outputs/figures/trees/model-{}-{}-{}.png'.format(
+            filename = ROOT_DIR + '/outputs/figures/trees/{}-{}-{}.png'.format(
                 model_spec.name, t, optimal_ccp_alpha)
 
         model.plot_decision_path(
