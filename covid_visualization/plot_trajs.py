@@ -7,20 +7,20 @@ from definitions import AgeGroups, Variants, FEASIBILITY_PERIOD, ROOT_DIR
 
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
-IF_MAKE_VALIDATION_PLOTS = True
 A.Y_LABEL_COORD_X = -0.15
 A.SUBPLOT_W_SPACE = 0.0
 
 
 def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
-         n_random_trajs_to_display=None, save_plots_dir=None):
+         n_random_trajs_to_display=None, save_plots_dir=None,
+         plot_the_size_of_compartments=False):
     """
     :param prev_multiplier: (int) to multiply the simulation time to convert it to year, week, or day.
     :param incd_multiplier: (int) to multiply the simulation period to covert it to year, week, or day.
     :param obs_incd_multiplier: (int) to multiply the observation period to conver it to year, week, or day.
     :param n_random_trajs_to_display: (int) number of trajectories to display
     :param save_plots_dir: (string) directory to save
-    :return:
+    :param plot_the_size_of_compartments: (bool) if plot the size of all compartments
     """
     if save_plots_dir is None:
         save_plots_dir = ROOT_DIR + '/outputs/figures'
@@ -40,14 +40,16 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     # -----------------------------------------------------------------
     # ------ plot information for the validation plot (by age) --------
     # -----------------------------------------------------------------
-    if IF_MAKE_VALIDATION_PLOTS:
+    if plot_the_size_of_compartments:
         for a in range(pd.nAgeGroups):
 
             str_a = pd.strAge[a]
             S = A.TrajPlotInfo(outcome_name='In: Susceptible-'+str_a, title='Susceptible',
-                               y_range=(0, 55000), x_multiplier=prev_multiplier)
+                               # y_range=(0, 55000),
+                               x_multiplier=prev_multiplier)
             V = A.TrajPlotInfo(outcome_name='In: Vaccinated-'+str_a, title='Vaccinated',
-                               y_range=(0, 55000), x_multiplier=prev_multiplier)
+                               # y_range=(0, 55000),
+                               x_multiplier=prev_multiplier)
 
             Es = []
             Is = []
@@ -332,4 +334,6 @@ if __name__ == "__main__":
     plot(prev_multiplier=52,  # to show weeks on the x-axis of prevalence data
          incd_multiplier=sets.simulationOutputPeriod * 52,  # to show weeks on the x-axis of incidence data
          obs_incd_multiplier=sets.observationPeriod * 52,
-         n_random_trajs_to_display=100)
+         n_random_trajs_to_display=100,
+         plot_the_size_of_compartments=sets.ifCollectTrajsOfCompartments)
+
