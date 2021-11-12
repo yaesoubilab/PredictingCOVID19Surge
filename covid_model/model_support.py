@@ -193,4 +193,4 @@ def add_calibration_info(settings,
     perc_incd_novel.add_feasible_conditions(
         feasible_conditions=FeasibleConditions(
             feasible_max=0.0,
-            period=[1, FEASIBILITY_PERIOD]))
+            period=[0.5, FEASIBILITY_PERIOD]))
