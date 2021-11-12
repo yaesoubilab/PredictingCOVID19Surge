@@ -40,7 +40,7 @@ class COVIDParameters(EpiParameters):
         ]
 
         # initial size of S and I
-        self.sizeS0 = Uniform(250000, 1250000)
+        self.sizeS0 = Uniform(500000, 500001) # Uniform(250000, 1250000)
         self.sizeI0 = UniformDiscrete(minimum=1, maximum=5)
 
         # dominant strain
@@ -90,11 +90,11 @@ class COVIDParameters(EpiParameters):
                 self.ratioProbHospByVariant.append(Uniform(0.5, 2))
 
         # parameters related to vaccine effectiveness
-        self.durVacImmunity = Uniform(0.5, 2.5)
+        self.durVacImmunity = Uniform(0.5, 2.5) # Uniform(0.5, 2.5)
         # [original, delta , novel ]
         self.vacEffAgainstInfByVariant = [Uniform(0.0, 1.0) for i in range(len(Variants))]
         self.vacEffReducingInfectiousByVariant = [Uniform(0.25, 0.75) for i in range(len(Variants))]
-        self.vacEffAgainstHospByVariant = [Uniform(0.9, 1), Uniform(0.75, 1), Uniform(0, 1)]
+        self.vacEffAgainstHospByVariant = [Uniform(0.9, 1), Uniform(0.75, 1), Uniform(0, 1)] # [Uniform(0.9999, 1) for i in range(len(Variants))]
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b

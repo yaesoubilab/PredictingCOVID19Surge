@@ -42,7 +42,7 @@ def build_covid_model(model):
     deaths_in_hosp = [None] * pd.length
     vaccination_in_S = [None] * pd.nAgeGroups
     vaccination_in_R_by_variant = [[None]*pd.nVariants for a in range(pd.nAgeGroups)]
-    losing_vaccine_immunity = [None] * pd.length
+    losing_vaccine_immunity = [None] * pd.nAgeGroups
 
     # --------- model compartments ---------
     for a in range(pd.nAgeGroups):
@@ -106,12 +106,13 @@ def build_covid_model(model):
             Vs[a].setup_history(collect_prev=True)
 
             for v in range(pd.nVariants):
-                i = pd.get_row_index(age_group=a, variant=v)
-                Es[i].setup_history(collect_prev=True)
-                Is[i].setup_history(collect_prev=True)
-                Hs[i].setup_history(collect_prev=True)
-                Rs[i].setup_history(collect_prev=True)
-                Ds[i].setup_history(collect_cum_incd=True)
+                for vs in range(pd.nVaccStatus):
+                    i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
+                    Es[i].setup_history(collect_prev=True)
+                    Is[i].setup_history(collect_prev=True)
+                    Hs[i].setup_history(collect_prev=True)
+                    Rs[i].setup_history(collect_prev=True)
+                    Ds[i].setup_history(collect_cum_incd=True)
 
         # --------- model events ---------
         for v in range(pd.nVariants):
@@ -127,26 +128,27 @@ def build_covid_model(model):
             # other events
             for vs in range(pd.nVaccStatus):
                 i = pd.get_row_index(age_group=a, variant=v, vacc_status=vs)
+                p = pd.get_profile_index(variant=v, vacc_status=vs)
                 str_a_p = pd.strAgeProfile[a][v][vs]
 
                 # infection in R
                 for v_prime in range(pd.nVariants):
                     # if being infected with a novel variant
-                    if v != v_prime:
+                    if v != v_prime and vs == 0:
                         i_prime = pd.get_row_index(age_group=a, variant=v_prime, vacc_status=vs)
                         infection_in_R_by_variant[i][v_prime] = EpiDepEvent(
                             name='Infection in R-' + str_a_p, destination=Es[i_prime], generating_pathogen=v_prime)
 
                 leaving_Es[i] = EpiIndepEvent(
-                    name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[v], destination=Is[i])
+                    name='Leaving E-'+str_a_p, rate_param=params.ratesOfLeavingE[p], destination=Is[i])
                 leaving_Is[i] = EpiIndepEvent(
-                    name='Leaving I-'+str_a_p, rate_param=params.ratesOfLeavingI[v], destination=ifs_hosp[i])
+                    name='Leaving I-'+str_a_p, rate_param=params.ratesOfLeavingI[p], destination=ifs_hosp[i])
                 leaving_Hs[i] = EpiIndepEvent(
-                    name='Leaving H-'+str_a_p, rate_param=params.ratesOfLeavingHosp[v], destination=Rs[i])
+                    name='Leaving H-'+str_a_p, rate_param=params.ratesOfLeavingHosp[p], destination=Rs[i])
                 leaving_Rs[i] = EpiIndepEvent(
-                    name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[v], destination=Ss[a])
+                    name='Leaving R-'+str_a_p, rate_param=params.ratesOfLeavingR[p], destination=Ss[a])
                 deaths_in_hosp[i] = EpiIndepEvent(
-                    name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][v], destination=Ds[i])
+                    name='Death in H-'+str_a_p, rate_param=params.ratesOfDeathInHospByAge[a][p], destination=Ds[i])
 
         # importation of new cases
         for v in range(pd.nVariants):
@@ -200,13 +202,13 @@ def build_covid_model(model):
                 Es[i].add_event(event=leaving_Es[i])
                 Is[i].add_event(event=leaving_Is[i])
                 Hs[i].add_events(events=[leaving_Hs[i], deaths_in_hosp[i]])
+                Rs[i].add_events(events=[leaving_Rs[i]])
 
+                # add vaccination if necessary
                 if vs == 0:
-                    Rs[i].add_events(events=[leaving_Rs[i],
-                                             vaccination_in_R_by_variant[a][v]])
-                else:
-                    Rs[i].add_events(events=[leaving_Rs[i]])
+                    Rs[i].add_events(events=[vaccination_in_R_by_variant[a][v]])
 
+                # add infection
                 for v_prime in range(pd.nVariants):
                     if infection_in_R_by_variant[i][v_prime] is not None:
                         Rs[i].add_event(event=infection_in_R_by_variant[i][v_prime])

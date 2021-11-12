@@ -7,7 +7,7 @@ from definitions import AgeGroups, Variants, FEASIBILITY_PERIOD, ROOT_DIR
 
 
 A.FEASIBLE_REGION_COLOR_CODE = 'pink'
-IF_MAKE_VALIDATION_PLOTS = False
+IF_MAKE_VALIDATION_PLOTS = True
 A.Y_LABEL_COORD_X = -0.15
 A.SUBPLOT_W_SPACE = 0.0
 
@@ -44,9 +44,9 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
         for a in range(pd.nAgeGroups):
 
             str_a = pd.strAge[a]
-            S = A.TrajPlotInfo(outcome_name='In: Susceptible-'+str_a, title='Susceptible-'+str_a,
+            S = A.TrajPlotInfo(outcome_name='In: Susceptible-'+str_a, title='Susceptible',
                                y_range=(0, 55000), x_multiplier=prev_multiplier)
-            V = A.TrajPlotInfo(outcome_name='In: Vaccinated-'+str_a, title='Vaccinated-'+str_a,
+            V = A.TrajPlotInfo(outcome_name='In: Vaccinated-'+str_a, title='Vaccinated',
                                y_range=(0, 55000), x_multiplier=prev_multiplier)
 
             Es = []
@@ -57,26 +57,37 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
             for v in range(pd.nVariants):
                 for vs in range(pd.nVaccStatus):
                     str_a_p = pd.strAgeProfile[a][v][vs]
-                    Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed-'+str_a_p,
-                                             y_range=(0, 22000), x_multiplier=prev_multiplier))
-                    Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious-'+str_a_p,
-                                             y_range=(0, 17000), x_multiplier=prev_multiplier))
-                    Hs.append(A.TrajPlotInfo(outcome_name='In: Hospitalized-'+str_a_p, title='Hospitalized-'+str_a_p,
-                                             y_range=(0, 5000), x_multiplier=prev_multiplier))
-                    Rs.append(A.TrajPlotInfo(outcome_name='In: Recovered-'+str_a_p, title='Recovered-'+str_a_p,
-                                             y_range=(0, 105000), x_multiplier=prev_multiplier))
-                    Ds.append(A.TrajPlotInfo(outcome_name='In: Death-'+str_a_p, title='Cumulative death-'+str_a_p,
-                                             y_range=(0, 500), x_multiplier=prev_multiplier))
+                    str_p = pd.strProfile[v][vs]
+                    Es.append(A.TrajPlotInfo(outcome_name='In: Exposed-'+str_a_p, title='Exposed\n'+str_p,
+                                             # y_range=(0, 22000),
+                                             x_multiplier=prev_multiplier))
+                    Is.append(A.TrajPlotInfo(outcome_name='In: Infectious-'+str_a_p, title='Infectious\n'+str_p,
+                                             # y_range=(0, 17000),
+                                             x_multiplier=prev_multiplier))
+                    Hs.append(A.TrajPlotInfo(outcome_name='In: Hospitalized-'+str_a_p, title='Hospitalized\n'+str_p,
+                                             # y_range=(0, 5000),
+                                             x_multiplier=prev_multiplier))
+                    Rs.append(A.TrajPlotInfo(outcome_name='In: Recovered-'+str_a_p, title='Recovered\n'+str_p,
+                                             # y_range=(0, 105000),
+                                             x_multiplier=prev_multiplier))
+                    Ds.append(A.TrajPlotInfo(outcome_name='Total to: Death-'+str_a_p, title='Cumulative death\n'+str_p,
+                                             # y_range=(0, 500),
+                                             x_multiplier=prev_multiplier))
+
+            list_plot_info = []
+            for v in range(pd.nVariants):
+                for vs in range(pd.nVaccStatus):
+                    p = pd.get_profile_index(variant=v, vacc_status=vs)
+                    list_plot_info.extend([Es[p], Is[p], Hs[p], Rs[p], Ds[p]])
+            list_plot_info += [S, V]
 
             # validation
             filename_validation = ROOT_DIR+'/outputs/figures/{}.png'.format(str_a)
-            sim_outcomes.plot_multi_panel(n_rows=3, n_cols=6,
-                                          list_plot_info=[Es[0], Is[0], Hs[0], Rs[0], Rs[0],
-                                                          Es[1], Is[1], Hs[1], Rs[1], Rs[1],
-                                                          S, V],
+            sim_outcomes.plot_multi_panel(n_rows=pd.nProfiles+1, n_cols=5,
+                                          list_plot_info=list_plot_info,
                                           n_random_trajs_to_display=n_random_trajs_to_display,
                                           file_name=filename_validation,
-                                          figure_size=(11, 5.5))
+                                          figure_size=(2*(pd.nVariants+1), 2*5))
 
     # -----------------------------------------------------
     # ------ plot information for the summary plot --------
@@ -141,14 +152,14 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
         x_multiplier=obs_incd_multiplier)
 
     # summary
-    sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
-                                  list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
-                                                  obs_hosp_occ_rate, obs_cum_vacc_rate],
-                                  file_name=save_plots_dir+'/summary3.png',
-                                  n_random_trajs_to_display=n_random_trajs_to_display,
-                                  show_subplot_labels=True,
-                                  figure_size=(2.3*2, 2.4*2)
-                                  )
+    # sim_outcomes.plot_multi_panel(n_rows=2, n_cols=2,
+    #                               list_plot_info=[obs_hosp_rate, obs_cum_hosp_rate,
+    #                                               obs_hosp_occ_rate, obs_cum_vacc_rate],
+    #                               file_name=save_plots_dir+'/summary3.png',
+    #                               n_random_trajs_to_display=n_random_trajs_to_display,
+    #                               show_subplot_labels=True,
+    #                               figure_size=(2.3*2, 2.4*2)
+    #                               )
     sim_outcomes.plot_multi_panel(n_rows=3, n_cols=3,
                                   list_plot_info=[obs_hosp_occ_rate, obs_hosp_rate, obs_prev_immune_from_inf,
                                                   obs_cum_hosp_rate, obs_cum_vacc_rate, obs_incd_delta,
