@@ -1,8 +1,46 @@
 import pandas as pd
 
 import covid_prediction.cross_validation as CV
+from SimPy.InOutFunctions import write_csv
 from covid_prediction.prediction_models import DecisionTree
 from definitions import ROOT_DIR, get_outcome_label, SCENARIOS, FILL_TREE
+
+
+class SummaryOfTreePerformance:
+
+    def __init__(self):
+        # make prediction at different weeks
+        self.rows = [['Model', 'Threshold', 'CV-Formatted PI']] # 'CV-Score', 'CV-PI',
+        for key, value in SCENARIOS.items():
+            self.rows[0].extend(['Acc-' + value, 'Sen-' + value, 'Spe-' + value])
+
+    def add(self, model_name, hosp_occu_thresholds, best_spec_and_validation_performance, digits):
+
+        for t in hosp_occu_thresholds:
+
+            # best specification and performance
+            best_spec, performance = best_spec_and_validation_performance[str(t)]
+
+            # store results
+            result = [model_name,
+                      t,
+                      # best_spec.meanScore,
+                      # best_spec.PI,
+                      best_spec.get_formatted_mean_and_interval(deci=digits)]
+            for p in performance:
+                result.extend([
+                    round(p.accuracy, digits),
+                    None if p.sen is None else round(p.sen, digits),
+                    None if p.spe is None else round(p.spe, digits)
+                ])
+
+            self.rows.append(result)
+
+    def print(self, file_name):
+
+        # print summary of results
+        write_csv(rows=self.rows,
+                  file_name=file_name)
 
 
 def optimize_and_eval_dec_tree(
@@ -96,5 +134,5 @@ def optimize_and_eval_dec_tree(
             simple=True, class_names=['Yes', 'No'],
             precision=2, shorten_feature_names=shorten_feature_names, filled=FILL_TREE)
 
-
     return validation_performance
+
