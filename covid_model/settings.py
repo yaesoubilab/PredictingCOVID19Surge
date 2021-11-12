@@ -25,7 +25,7 @@ class COVIDSettings(ModelSettings):
         self.timeToStartDecisionMaking = 0  # immediately after the detection of spread
                                             # (when we have at least 1 case during an observation period)
 
-        self.ifCollectTrajsOfCompartments = True  # if collect the trajectories of all compartments
+        self.ifCollectTrajsOfCompartments = False  # if collect the trajectories of all compartments
         self.storeProjectedOutcomes = True
         self.checkEradicationConditions = False
 

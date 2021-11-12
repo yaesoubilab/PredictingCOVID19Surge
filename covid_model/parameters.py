@@ -40,7 +40,7 @@ class COVIDParameters(EpiParameters):
         ]
 
         # initial size of S and I
-        self.sizeS0 = Uniform(500000, 500001) # Uniform(250000, 1250000)
+        self.sizeS0 = Uniform(250000, 1250000)
         self.sizeI0 = UniformDiscrete(minimum=1, maximum=5)
 
         # dominant strain
