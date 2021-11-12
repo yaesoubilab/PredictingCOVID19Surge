@@ -1,5 +1,6 @@
 import sys
 
+from SimPy.InOutFunctions import make_directory
 from covid_prediction.pre_process import build_and_combine_datasets
 from covid_prediction.summary_of_trajs import report_traj_summary
 from definitions import FEASIBILITY_PERIOD, N_NOVEL_INCD, WEEKS_IN_FALL, \
@@ -7,8 +8,10 @@ from definitions import FEASIBILITY_PERIOD, N_NOVEL_INCD, WEEKS_IN_FALL, \
 
 if __name__ == "__main__":
 
+    directory = ROOT_DIR+'/outputs/prediction_datasets/'
+    make_directory(filename=directory)
     sys.stdout = open(
-        ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/summary_training_set.txt', 'w')
+        directory + 'summary_training_set.txt', 'w')
 
     # the report the summary of training trajectories
     report_traj_summary(hosp_occ_thresholds=HOSP_OCCU_THRESHOLDS,

@@ -151,7 +151,7 @@ class FeatureEngineering:
         if self.weekOfPredInFall < 0:
             output_dir = Path('outputs/prediction_datasets/time_to_peak/')
         else:
-            output_dir = Path('outputs/prediction_datasets/week_into_fall/')
+            output_dir = Path('outputs/prediction_datasets/')
 
         output_dir.mkdir(parents=True, exist_ok=True)
 

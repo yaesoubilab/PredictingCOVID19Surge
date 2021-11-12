@@ -222,7 +222,7 @@ def build_and_combine_datasets(
     # merge the data collected at different weeks to from a
     # single dataset for training the model
     dataframes = []
-    prefix = '/outputs/prediction_datasets/week_into_fall'
+    prefix = '/outputs/prediction_datasets'
     for w in weeks_in_fall:
         # file name
         label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)

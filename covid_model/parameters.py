@@ -48,7 +48,7 @@ class COVIDParameters(EpiParameters):
         self.durE = Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
         self.durR = Uniform(0.25, 1.25)
-        self.probHosp18To29 = Uniform(0.001, 0.0075)  # age group 18-29 as the reference
+        self.probHosp18To29 = Uniform(0.001, 0.005)  # age group 18-29 as the reference
 
         # seasonality
         self.seasonalityParams = [
@@ -276,7 +276,8 @@ class COVIDParameters(EpiParameters):
             if a == AgeGroups.Age_18_29.value:
                 self.relativeProbHospByAge[a] = Constant(1)
             else:
-                self.relativeProbHospByAge[a] = Gamma(mean=hosp_relative_risk[a], st_dev=hosp_relative_risk[a] * 0.2)
+                self.relativeProbHospByAge[a] = Gamma(mean=hosp_relative_risk[a],
+                                                      st_dev=hosp_relative_risk[a] * 0.1)
 
         # probability of hospitalization by age and profile
         for a in range(self.nAgeGroups):

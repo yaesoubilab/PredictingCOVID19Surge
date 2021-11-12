@@ -65,7 +65,7 @@ def optimize_and_eval_dec_tree(
     """
 
     # read training dataset
-    df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/data-training.csv')
+    df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets/data-training.csv')
     # randomize rows (since the dataset might have some order)
     df_training = df.sample(frac=1, random_state=1)
 
@@ -74,7 +74,7 @@ def optimize_and_eval_dec_tree(
     i = 0
     for key, value in SCENARIOS.items():
         validation_dfs[i] = pd.read_csv(
-            ROOT_DIR+'/outputs/prediction_datasets/week_into_fall/data-validating {}.csv'.format(value))
+            ROOT_DIR+'/outputs/prediction_datasets/data-validating {}.csv'.format(value))
         i += 1
 
     # for all thresholds
