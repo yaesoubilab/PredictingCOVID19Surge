@@ -1,40 +1,26 @@
-import pandas as pd
+from covid_prediction.model_specs import A, SHORT_FEATURE_NAMES
+from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree
 
-from covid_prediction.model_specs import A, B3, SHORT_FEATURE_NAMES
-from covid_prediction.prediction_models import DecisionTree
-from definitions import ROOT_DIR, FILL_TREE
-
-ALPHA = 0.001
+ALPHA = 0.003
+MODEL = A # B
+THRESHOLD = 10
 
 
-def build_a_decision_tree(feature_names, outcome_name, max_depth=None, ccp_alpha=0.0, fig_filename='tree.png'):
+def build_a_decision_tree(model_spec, hosp_occu_threshold, ccp_alpha=0.0):
 
-    # read data
-    dataset = pd.read_csv(ROOT_DIR + '/outputs/prediction_datasets/week_into_fall/combined_data.csv')
+    validation_performance = optimize_and_eval_dec_tree(
+        model_spec=model_spec,
+        hosp_occu_thresholds=[hosp_occu_threshold],
+        optimal_ccp_alpha=ccp_alpha,
+        shorten_feature_names=SHORT_FEATURE_NAMES)
 
-    # create a decision tree
-    dt = DecisionTree(df=dataset, feature_names=feature_names, y_name=outcome_name)
-
-    # train the decision tree
-    dt.train(test_size=0.2, max_depth=max_depth, ccp_alpha=ccp_alpha)
-
-    # print selected features
-    print(dt.selectedFeatures)
-
-    # report the performance of the decision tree on the testing set
-    dt.performanceTest.print()
-
-    # plot the decision path
-    dt.plot_decision_path(file_name=fig_filename, simple=True, class_names=['Yes', 'No'],
-                          impurity=True, proportion=True, label='all', precision=2,
-                          shorten_feature_names=SHORT_FEATURE_NAMES, filled=FILL_TREE)
+    for p in validation_performance[str(hosp_occu_threshold)][1]:
+        print(p)
 
 
 if __name__ == '__main__':
 
-    for model in (A, B3):
-        build_a_decision_tree(feature_names=model.features,
-                              outcome_name='If threshold passed (0:Yes)',
-                              ccp_alpha=ALPHA,
-                              fig_filename=ROOT_DIR+'/outputs/figures/trees/model-{}.png'.format(model.name))
+    build_a_decision_tree(model_spec=MODEL,
+                          hosp_occu_threshold=THRESHOLD,
+                          ccp_alpha=ALPHA)
 
