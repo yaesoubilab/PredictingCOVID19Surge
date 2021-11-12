@@ -1,3 +1,0 @@
-Number of simulation runs: 6000
-Calibration duration (seconds): 421.8
-Number of trajectories with non-zero probability: 215
