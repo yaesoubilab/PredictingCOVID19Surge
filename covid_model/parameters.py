@@ -44,11 +44,11 @@ class COVIDParameters(EpiParameters):
         self.sizeI0 = UniformDiscrete(minimum=1, maximum=5)
 
         # dominant strain
-        self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=4)
+        self.R0 = Beta(mean=2.5, st_dev=0.75, minimum=1.5, maximum=3.5)
         self.durE = Beta(mean=5 * d, st_dev=0.5 * d, minimum=1.5 * d, maximum=6 * d)
         self.durI = Beta(mean=4 * d, st_dev=0.5 * d, minimum=2 * d, maximum=8 * d)
-        self.durR = Uniform(0.25, 1.25)
-        self.probHosp18To29 = Uniform(0.001, 0.005)  # age group 18-29 as the reference
+        self.durR = Uniform(0.25, 1)
+        self.probHosp18To29 = Uniform(0.0005, 0.005)  # age group 18-29 as the reference
 
         # seasonality
         self.seasonalityParams = [
@@ -64,7 +64,7 @@ class COVIDParameters(EpiParameters):
                 self.durHospByProfile.append(Beta(mean=10 * d, st_dev=1 * d, minimum=5 * d, maximum=15 * d))
 
         # to model the increase in the duration of infection-induced immunity after vaccination
-        self.ratioToIncreaseDurRAfterVacc = Uniform(1.0, 1.5)
+        self.ratioToIncreaseDurRAfterVacc = Uniform(1.0, 2.0)
 
         # susceptibility against novel variant in unvaccinated R
         self.suscToNovelInUnvacR = Uniform(0, 0.5)
@@ -74,7 +74,7 @@ class COVIDParameters(EpiParameters):
                                           Uniform(1.5, 1.75),  # t-middle
                                           Constant(importation_rate)]  # max
         self.paramsForRateNovelVariant = [Beta(mean=7, st_dev=0.5, minimum=5, maximum=9),  # b
-                                          Uniform(1.75, 2.25),
+                                          Uniform(1.5, 2),
                                           #Beta(mean=1.75, st_dev=0.01, minimum=1.65, maximum=1.85),  # t_middle
                                           Uniform(0.0, importation_rate)]  # max
 
@@ -92,9 +92,9 @@ class COVIDParameters(EpiParameters):
         # parameters related to vaccine effectiveness
         self.durVacImmunity = Uniform(0.5, 2.5)
         # [original, delta , novel ]
-        self.vacEffAgainstInfByVariant = [Uniform(0.0, 1.0) for i in range(len(Variants))]
+        self.vacEffAgainstInfByVariant = [Uniform(0.0, 1) for i in range(len(Variants))]
         self.vacEffReducingInfectiousByVariant = [Uniform(0.25, 0.75) for i in range(len(Variants))]
-        self.vacEffAgainstHospByVariant = [Uniform(0.9, 1), Uniform(0.75, 1), Uniform(0, 1)]
+        self.vacEffAgainstHospByVariant = [Uniform(0.9, 1), Uniform(0.75, 1), Uniform(0.5, 1)]
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
