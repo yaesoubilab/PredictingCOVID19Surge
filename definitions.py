@@ -10,14 +10,14 @@ PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
 SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
 
 # to build datasets for developing predictive models
-WEEKS_TO_PREDICT = 8
+WEEKS_TO_PREDICT = 6
 WEEKS_IN_FALL = (8, 12, 16, 20, 24, 28) # June 1 is week 36
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
-N_SIM_CALIBRATION = 100*10
-N_SIM_TRAINING = int(2*10)
-N_SIM_VALIDATION = int(1*10)
+N_SIM_CALIBRATION = 100*100
+N_SIM_TRAINING = int(2*100)
+N_SIM_VALIDATION = int(1*100)
 CV_FOLD = 20         # num of splits for cross validation
 FILL_TREE = True
 
