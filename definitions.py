@@ -15,9 +15,9 @@ WEEKS_IN_FALL = (8, 12, 16, 20, 24, 28) # June 1 is week 36
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
-N_SIM_CALIBRATION = 100*100
-N_SIM_TRAINING = int(2*100)
-N_SIM_VALIDATION = int(1*100)
+N_SIM_CALIBRATION = 500*100
+N_SIM_TRAINING = 400
+N_SIM_VALIDATION = 100
 CV_FOLD = 20         # num of splits for cross validation
 FILL_TREE = True
 

@@ -6,7 +6,7 @@ from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD
 
 MODELS = (A, B3)
 
-ALPHAS = np.arange(0.003, 0.020, 0.002) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
+ALPHAS = np.arange(0.002, 0.020, 0.002) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 IF_PARALLEL = False
 
 
