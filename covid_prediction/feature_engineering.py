@@ -272,7 +272,10 @@ class FeatureEngineering:
                             # get the slope
                             x = np.arange(0, v[1])
                             y = observed_values[-v[1]:]
-                            slope = np.polyfit(x, y, deg=1)[0]
+                            if None in y:
+                                slope = 0
+                            else:
+                                slope = np.polyfit(x, y, deg=1)[0]
                             f_values.append(slope)
                         else:
                             raise ValueError('Invalid.')

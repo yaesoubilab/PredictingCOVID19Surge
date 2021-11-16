@@ -66,7 +66,8 @@ def build_covid_model(model):
 
                 # -------- compartments ----------
                 Es[i] = Compartment(name='Exposed-'+str_a_p,
-                                    num_of_pathogens=pd.nVariants, row_index_contact_matrix=a)
+                                    num_of_pathogens=pd.nVariants, if_empty_to_eradicate=True,
+                                    row_index_contact_matrix=a)
                 Is[i] = Compartment(name='Infectious-'+str_a_p,
                                     size_par=params.sizeIProfile0ByAge[a] if v == 0 else Constant(value=0),
                                     infectivity_params=inf_params, if_empty_to_eradicate=True,

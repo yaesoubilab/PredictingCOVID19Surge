@@ -7,7 +7,7 @@ from covid_visualization.plot_trajs import plot
 def simulate():
 
     # get model settings
-    sets = COVIDSettings()
+    sets = COVIDSettings(novel_variant_will_emerge=False)
 
     # make an (empty) epidemic model
     model = EpiModel(id=1, settings=sets)
@@ -15,7 +15,7 @@ def simulate():
     M.build_covid_model(model)
 
     # simulate
-    model.simulate(seed=1142209227) #  347408199
+    model.simulate(seed=139425651) #  347408199
     # print trajectories
     model.export_trajectories(delete_existing_files=True)
 
