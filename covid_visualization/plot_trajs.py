@@ -22,6 +22,8 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
     :param save_plots_dir: (string) directory to save
     :param plot_the_size_of_compartments: (bool) if plot the size of all compartments
     """
+
+    print('Making plots ...')
     if save_plots_dir is None:
         save_plots_dir = ROOT_DIR + '/outputs/figures'
 

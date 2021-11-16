@@ -21,6 +21,8 @@ def simulate(n=25,
              print_summary_stats=True,
              folder_to_save_plots=None):
 
+    print('Simulating ...')
+
     # get model settings
     sets = COVIDSettings(
         novel_variant_will_emerge=novel_variant_will_emerge,
