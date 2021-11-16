@@ -6,7 +6,7 @@ from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
 from definitions import N_SIM_CALIBRATION, N_SIM_TRAINING, N_SIM_VALIDATION, CALIB_PERIOD, ROOT_DIR
 
-RUN_IN_PARALLEL = True
+RUN_IN_PARALLEL = False
 
 
 if __name__ == "__main__":
@@ -44,6 +44,8 @@ if __name__ == "__main__":
                       'used for calibration which is currently {}.'
                       .format(calibration.nTrajsWithNonZeroProb, n_trajs_needed, N_SIM_CALIBRATION))
 
+    file.close()
+
     # save calibration results
     calibration.save_results(filename='outputs/summary/calibration_summary.csv')
 
@@ -53,4 +55,4 @@ if __name__ == "__main__":
              calibrated=True,
              sample_seeds_by_weights=False)
 
-    file.close()
+
