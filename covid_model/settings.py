@@ -28,7 +28,7 @@ class COVIDSettings(ModelSettings):
 
         self.ifCollectTrajsOfCompartments = False  # if collect the trajectories of all compartments
         self.storeProjectedOutcomes = True
-        self.checkEradicationConditions = False
+        self.checkEradicationConditions = True
 
         # economic evaluation settings
         self.warmUpPeriod = D.CALIB_PERIOD

@@ -6,7 +6,7 @@ from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
 from definitions import N_SIM_CALIBRATION, N_SIM_TRAINING, N_SIM_VALIDATION, CALIB_PERIOD, ROOT_DIR
 
-RUN_IN_PARALLEL = False
+RUN_IN_PARALLEL = True
 
 
 if __name__ == "__main__":
