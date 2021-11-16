@@ -1,4 +1,3 @@
-import sys
 import warnings
 
 import apace.Calibration as calib
@@ -7,13 +6,14 @@ from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
 from definitions import N_SIM_CALIBRATION, N_SIM_TRAINING, N_SIM_VALIDATION, CALIB_PERIOD, ROOT_DIR
 
-RUN_IN_PARALLEL = False
+RUN_IN_PARALLEL = True
 
 
 if __name__ == "__main__":
 
-    sys.stdout = open(
-        ROOT_DIR + '/outputs/summary/calibration.txt', 'w')
+    # sys.stdout = open(
+    #     ROOT_DIR + '/outputs/summary/calibration.txt', 'w')
+    file = open(ROOT_DIR + '/outputs/summary/calibration.txt', 'w')
 
     # get model settings
     sets = COVIDSettings(if_calibrating=True)
@@ -23,17 +23,18 @@ if __name__ == "__main__":
     sets.storeParameterValues = False
 
     # calibrate the model
-    calibration = calib.CalibrationWithRandomSampling(model_settings=sets)
+    calibration = calib.CalibrationWithRandomSampling(
+        model_settings=sets, parallelization_approach='few-many', max_tries=100)
 
     calibration.run(
         function_to_populate_model=build_covid_model,
         num_of_iterations=N_SIM_CALIBRATION,
         if_run_in_parallel=RUN_IN_PARALLEL)
 
-    print('Number of simulation runs: {}'.format(N_SIM_CALIBRATION))
-    print('Number of trajectories discarded: {}'.format(calibration.nTrajsWithNonZeroProb))
-    print('Calibration duration (seconds): {}'.format(round(calibration.runTime, 1)))
-    print('Number of trajectories with non-zero probability: {}'.format(calibration.nTrajsWithNonZeroProb))
+    file.write('Number of calibration processors: {}\n'.format(N_SIM_CALIBRATION))
+    file.write('Number of trajectories discarded: {}\n'.format(calibration.nTrajsDiscarded))
+    file.write('Calibration duration (seconds): {}\n'.format(round(calibration.runTime, 1)))
+    file.write('Number of trajectories with non-zero probability: {}\n'.format(calibration.nTrajsWithNonZeroProb))
     n_trajs_needed = N_SIM_TRAINING+N_SIM_VALIDATION
     if calibration.nTrajsWithNonZeroProb < n_trajs_needed:
         warnings.warn('\nNumber of trajectories with non-zero probability ({}) is less than '
@@ -52,4 +53,4 @@ if __name__ == "__main__":
              calibrated=True,
              sample_seeds_by_weights=False)
 
-    sys.stdout.close()
+    file.close()
