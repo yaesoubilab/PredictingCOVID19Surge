@@ -1,6 +1,0 @@
-Number of simulation runs: 500
-Calibration duration (seconds): 114.1
-Number of trajectories with non-zero probability: 8
-Simulation run time (seconds): 8.11602 (7.76812, 8.37994)
-Duration of Physical distancing during calibration period:  0.65865 (0.35625, 1.1981)
-Duration of Physical distancing during fall/winter:  0.47115 (0.33125, 0.74183)

@@ -19,6 +19,7 @@ class COVIDSettings(ModelSettings):
 
         # model settings
         self.deltaT = 1 / 364
+        self.maxSimDuration = 4 # years
         self.simulationDuration = D.SIM_DURATION  # years of simulation
         self.simulationOutputPeriod = 7/364  # simulation output period
         self.observationPeriod = 7/364    # days for observation period

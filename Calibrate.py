@@ -7,7 +7,7 @@ from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
 from definitions import N_SIM_CALIBRATION, N_SIM_TRAINING, N_SIM_VALIDATION, CALIB_PERIOD, ROOT_DIR
 
-RUN_IN_PARALLEL = True
+RUN_IN_PARALLEL = False
 
 
 if __name__ == "__main__":
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     sets.simulationDuration = CALIB_PERIOD
     sets.ifCollectTrajsOfCompartments = False
     sets.exportCalibrationTrajs = False
-    sets.storeParameterValues=False
+    sets.storeParameterValues = False
 
     # calibrate the model
     calibration = calib.CalibrationWithRandomSampling(model_settings=sets)
@@ -31,6 +31,7 @@ if __name__ == "__main__":
         if_run_in_parallel=RUN_IN_PARALLEL)
 
     print('Number of simulation runs: {}'.format(N_SIM_CALIBRATION))
+    print('Number of trajectories discarded: {}'.format(calibration.nTrajsWithNonZeroProb))
     print('Calibration duration (seconds): {}'.format(round(calibration.runTime, 1)))
     print('Number of trajectories with non-zero probability: {}'.format(calibration.nTrajsWithNonZeroProb))
     n_trajs_needed = N_SIM_TRAINING+N_SIM_VALIDATION
