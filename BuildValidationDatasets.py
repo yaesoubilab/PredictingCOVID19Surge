@@ -5,7 +5,7 @@ import apace.Calibration as calib
 from BuildTrainingDataset import build_and_combine_datasets
 from SimulateMany import simulate
 from definitions import ROOT_DIR, FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TRAINING, \
-    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT
+    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
 
 
 def build_validation_datasets():
@@ -22,33 +22,33 @@ def build_validation_datasets():
     if len(seeds) <= N_SIM_TRAINING + N_SIM_VALIDATION:
         print('** Warning **: there is overlap between simulation trajectories used for training and validation.')
 
-    # # simulate a new set of trajectories for validation
-    # simulate(n=N_SIM_VALIDATION,
-    #          seeds=seeds[-N_SIM_VALIDATION:],
-    #          n_to_display=N_SIM_VALIDATION,
-    #          sample_seeds_by_weights=False,
-    #          print_summary_stats=False,
-    #          folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/base')
-    #
-    # # ---- build the dataset for the base scenario ----
-    # build_and_combine_datasets(
-    #     name_of_dataset='data-validating ' + SCENARIOS['base'],
-    #     time_of_fall=FEASIBILITY_PERIOD,
-    #     weeks_in_fall=WEEKS_IN_FALL,
-    #     weeks_to_predict=4,
-    #     hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
-    #     survey_size_novel_inf=N_NOVEL_INCD
-    # )
-    #
-    # # ---- build the dataset with smaller survey size ----
-    # build_and_combine_datasets(
-    #     name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
-    #     time_of_fall=FEASIBILITY_PERIOD,
-    #     weeks_in_fall=WEEKS_IN_FALL,
-    #     weeks_to_predict=WEEKS_TO_PREDICT,
-    #     hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
-    #     survey_size_novel_inf=SMALLER_N_NOVEL_INCD,
-    # )
+    # simulate a new set of trajectories for validation
+    simulate(n=N_SIM_VALIDATION,
+             seeds=seeds[-N_SIM_VALIDATION:],
+             n_to_display=N_SIM_VALIDATION,
+             sample_seeds_by_weights=False,
+             print_summary_stats=False,
+             folder_to_save_plots=ROOT_DIR + '/outputs/figures/scenarios/base')
+
+    # ---- build the dataset for the base scenario ----
+    build_and_combine_datasets(
+        name_of_dataset='data-validating ' + SCENARIOS['base'],
+        time_of_fall=FEASIBILITY_PERIOD,
+        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_to_predict=4,
+        hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
+        survey_size_novel_inf=N_NOVEL_INCD
+    )
+
+    # ---- build the dataset with smaller survey size ----
+    build_and_combine_datasets(
+        name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
+        time_of_fall=FEASIBILITY_PERIOD,
+        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_to_predict=WEEKS_TO_PREDICT,
+        hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
+        survey_size_novel_inf=SMALLER_N_NOVEL_INCD,
+    )
 
     # ---- build the dataset with no novel variant ----
     # simulate
