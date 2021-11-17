@@ -1,9 +1,9 @@
-from covid_prediction.model_specs import A, SHORT_FEATURE_NAMES
+from covid_prediction.model_specs import B3, SHORT_FEATURE_NAMES
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
 from definitions import ROOT_DIR, DIGITS
 
 ALPHA = 0.005
-MODEL = A # B
+MODEL = B3
 THRESHOLD = 15
 
 
