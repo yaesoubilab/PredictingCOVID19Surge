@@ -4,20 +4,19 @@ from enum import Enum
 DIGITS = 3
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-FEASIBILITY_PERIOD = 1.5 # year (from Mar-1, 2020 to Aug-31, 2021 which is 1.5 years)
-CALIB_PERIOD = 2  #
-PROJ_PERIOD = 0.25  # year (from Sep-1, 2021 to May-31, 2022 which is 0.75 year)
-SIM_DURATION = CALIB_PERIOD + PROJ_PERIOD
+FEASIBILITY_PERIOD = 1.75  # years (from Mar-1, 2020 to Dec-1) -> week 91
+CALIB_PERIOD = 2  # years (simulation duration during calibration)
+SIM_DURATION = 2.25  # years (until Jul-1, 2022)
 
 # to build datasets for developing predictive models
 WEEKS_TO_PREDICT = 6
-WEEKS_IN_FALL = (8, 12, 16, 20, 24, 28) # June 1 is week 36
+WEEKS_IN_WINTER = (4, 8, 12, 16, 20)
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
-N_SIM_CALIBRATION = 10000
-N_SIM_TRAINING = 2000
-N_SIM_VALIDATION = 500
+N_SIM_CALIBRATION = 1000
+N_SIM_TRAINING = 200
+N_SIM_VALIDATION = 50
 CV_FOLD = 10         # num of splits for cross validation
 FILL_TREE = True
 
@@ -92,26 +91,6 @@ class ProfileDefiner:
 
     def get_profile_index(self, variant, vacc_status):
         return self.nVaccStatus * variant + vacc_status
-
-    # @staticmethod
-    # def get_str_age_and_profile(age_group, variant, vacc_status):
-    #     return AGES[age_group] + '-' + VARIANTS[variant] + '-' + VACC_STATUS[vacc_status]
-    #
-    # @staticmethod
-    # def get_str_age_and_variant(age_group, variant):
-    #     return AGES[age_group] + '-' + VARIANTS[variant]
-    #
-    # @staticmethod
-    # def get_str_age(age_group):
-    #     return AGES[age_group]
-    #
-    # @staticmethod
-    # def get_str_variant(variant):
-    #     return VARIANTS[variant]
-    #
-    # @staticmethod
-    # def get_str_vacc_status(vacc_status):
-    #     return VACC_STATUS[vacc_status]
 
 
 def get_dataset_labels(week, survey_size=None, bias_delay=None):

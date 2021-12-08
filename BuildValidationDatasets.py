@@ -5,7 +5,7 @@ import apace.Calibration as calib
 from BuildTrainingDataset import build_and_combine_datasets
 from SimulateMany import simulate
 from definitions import ROOT_DIR, FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TRAINING, \
-    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_FALL, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
+    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_WINTER, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
 
 
 def build_validation_datasets():
@@ -34,7 +34,7 @@ def build_validation_datasets():
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['base'],
         time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_in_fall=WEEKS_IN_WINTER,
         weeks_to_predict=4,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
@@ -44,7 +44,7 @@ def build_validation_datasets():
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
         time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_in_fall=WEEKS_IN_WINTER,
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=SMALLER_N_NOVEL_INCD,
@@ -62,7 +62,7 @@ def build_validation_datasets():
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no novel variant'],
         time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_in_fall=WEEKS_IN_WINTER,
         weeks_to_predict=4,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
@@ -80,7 +80,7 @@ def build_validation_datasets():
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no control measure'],
         time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_FALL,
+        weeks_in_fall=WEEKS_IN_WINTER,
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
