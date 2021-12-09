@@ -14,9 +14,9 @@ WEEKS_IN_WINTER = (4, 8, 12, 16, 20)
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
-N_SIM_CALIBRATION = 200
-N_SIM_TRAINING = 20
-N_SIM_VALIDATION = 5
+N_SIM_CALIBRATION = 2000
+N_SIM_TRAINING = 200
+N_SIM_VALIDATION = 50
 CV_FOLD = 10         # num of splits for cross validation
 FILL_TREE = True
 
