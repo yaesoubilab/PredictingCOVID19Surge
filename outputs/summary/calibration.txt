@@ -1,4 +1,4 @@
-Number of calibration processors: 10000
-Number of trajectories discarded: 187335
-Calibration duration (seconds): 10685.4
-Number of trajectories with non-zero probability: 3279
+Number of calibration processors: 200
+Number of trajectories discarded: 5907
+Calibration duration (seconds): 391.2
+Number of trajectories with non-zero probability: 39

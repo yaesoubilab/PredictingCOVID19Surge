@@ -11,7 +11,7 @@ IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 
 IF_PARALLEL = True
-USE_CALIBRATED_MODEL = False
+USE_CALIBRATED_MODEL = True
 
 
 def simulate(n=25,

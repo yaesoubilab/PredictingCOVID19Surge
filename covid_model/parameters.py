@@ -25,7 +25,7 @@ class COVIDParameters(EpiParameters):
         # -------- model main parameters -------------
         # age groups: ['0-4yrs', '5-12yrs', '13-17yrs', '18-29yrs', '30-49yrs', '50-64yrs', '65-74yrs', '75+yrs']
         us_age_dist = [0.060, 0.100, 0.064, 0.163, 0.256, 0.192, 0.096, 0.069]
-        hosp_relative_risk = [0.5, 0.5, 0.25, 1, 2, 4, 18, 40]
+        hosp_relative_risk = [0.5, 0.5, 0.25, 1, 2, 8, 18, 65]
         prob_death = [0.002, 0.002, 0.002, 0.026, 0.026, 0.079, 0.141, 0.209]
         import_rate = 52 * 5 / 8 # distributed uniformly over age groups
         contact_matrix = [
@@ -98,7 +98,7 @@ class COVIDParameters(EpiParameters):
         # [original, delta , novel ]
         self.vacEffAgainstInfByVariant = [Uniform(0.0, 1) for i in range(len(Variants))]
         self.vacEffReducingInfectiousByVariant = [Uniform(0.25, 0.75) for i in range(len(Variants))]
-        self.vacEffAgainstHospByVariant = [Uniform(0.9, 1), Uniform(0.75, 1), Uniform(0.5, 1)]
+        self.vacEffAgainstHospByVariant = [Uniform(0.85, 1), Uniform(0.75, 1), Uniform(0.5, 1)]
 
         # vaccination rate is age-dependent
         self.vaccRateParams = [Uniform(minimum=-20, maximum=-10),    # b
@@ -110,10 +110,10 @@ class COVIDParameters(EpiParameters):
             Constant(100),                      # 0-4
             Uniform(minimum=1.66, maximum=1.8),    # 5-12
             Uniform(minimum=1.0, maximum=1.4),  # 13-17
-            Uniform(minimum=0.9, maximum=1.3),  # 18-29
+            Uniform(minimum=0.85, maximum=1.25),  # 18-29
             Uniform(minimum=0.85, maximum=1.25),  # 30-49
             Uniform(minimum=0.85, maximum=1.25),  # 50-64
-            Uniform(minimum=0.8, maximum=1.2),  # 65-75
+            Uniform(minimum=0.75, maximum=1.15),  # 65-75
             Uniform(minimum=0.7, maximum=1.1)   # 75+
         ]
         self.vaccRateMaxByAge = [
@@ -123,7 +123,7 @@ class COVIDParameters(EpiParameters):
             Uniform(minimum=1, maximum=3),  # 18-29
             Uniform(minimum=1, maximum=3),  # 30-49
             Uniform(minimum=2, maximum=4),  # 50-64
-            Uniform(minimum=2, maximum=4),  # 65-75
+            Uniform(minimum=3, maximum=5),  # 65-75
             Uniform(minimum=2, maximum=4)   # 75+
         ]
 
