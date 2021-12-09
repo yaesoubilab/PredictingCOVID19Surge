@@ -1,6 +1,7 @@
 import warnings
 
 import apace.Calibration as calib
+from SimPy.InOutFunctions import make_directory
 from SimulateMany import simulate
 from covid_model.model import build_covid_model
 from covid_model.settings import COVIDSettings
@@ -11,8 +12,7 @@ RUN_IN_PARALLEL = True
 
 if __name__ == "__main__":
 
-    # sys.stdout = open(
-    #     ROOT_DIR + '/outputs/summary/calibration.txt', 'w')
+    make_directory(ROOT_DIR + '/outputs/summary/')
     file = open(ROOT_DIR + '/outputs/summary/calibration.txt', 'w')
 
     # get model settings

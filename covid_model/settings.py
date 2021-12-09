@@ -42,6 +42,7 @@ class COVIDSettings(ModelSettings):
 
         # calibration targets
         if if_calibrating:
+            self.calcLikelihood = if_calibrating
             self.cumHospRateMean = []
             self.cumHospRateVar = []
             self.cumHospRateN = []
