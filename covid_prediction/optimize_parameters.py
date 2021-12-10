@@ -46,6 +46,7 @@ class SummaryOfTreePerformance:
 def optimize_and_eval_dec_tree(
         model_spec,
         hosp_occu_thresholds,
+        weeks_to_predict,
         list_of_ccp_alphas=None,
         optimal_ccp_alpha=None,
         cv_fold=10,
@@ -54,6 +55,7 @@ def optimize_and_eval_dec_tree(
     """
     :param model_spec: (ModelSpec) model specifications
     :param hosp_occu_thresholds: (list) of thresholds for hospital occupancy
+    :param weeks_to_predict: (int) number of weeks to predict in the future
     :param list_of_ccp_alphas: (list) of ccp alphas
     :param optimal_ccp_alpha: (float) if None, the optimal value of alpha will be determined, otherwise the provided
         value will be used to train and evaluate the tree
@@ -65,7 +67,7 @@ def optimize_and_eval_dec_tree(
     """
 
     # read training dataset
-    df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets/data-training.csv')
+    df = pd.read_csv(ROOT_DIR+'/outputs/prediction_datasets_{}_weeks/data-training.csv'.format(weeks_to_predict))
     # randomize rows (since the dataset might have some order)
     df_training = df.sample(frac=1, random_state=1)
 
@@ -74,7 +76,7 @@ def optimize_and_eval_dec_tree(
     i = 0
     for key, value in SCENARIOS.items():
         validation_dfs[i] = pd.read_csv(
-            ROOT_DIR+'/outputs/prediction_datasets/data-validating {}.csv'.format(value))
+            ROOT_DIR+'/outputs/prediction_datasets_{}_weeks/data-validating {}.csv'.format(weeks_to_predict, value))
         i += 1
 
     # for all thresholds
@@ -94,10 +96,12 @@ def optimize_and_eval_dec_tree(
 
             best_spec = cv.find_best_parameters(
                 run_in_parallel=if_parallel,
-                save_to_file_performance=ROOT_DIR + '/outputs/prediction_summary/dec_tree/cv/cv-{}-{}.csv'
-                    .format(model_spec.name, t),
-                save_to_file_features=ROOT_DIR + '/outputs/prediction_summary/dec_tree/features/features-{}-{}.csv'
-                    .format(model_spec.name, t)
+                save_to_file_performance=ROOT_DIR
+                                         + '/outputs/prediction_summary_{}_weeks/dec_tree/cv/cv-{}-{}.csv'
+                                             .format(weeks_to_predict, model_spec.name, t),
+                save_to_file_features=ROOT_DIR
+                                      + '/outputs/prediction_summary_{}_weeks/dec_tree/features/features-{}-{}.csv'
+                                          .format(weeks_to_predict, model_spec.name, t)
             )
             feature_names = best_spec.selectedFeatures
             ccp_alpha = best_spec.ccpAlpha
@@ -123,11 +127,11 @@ def optimize_and_eval_dec_tree(
 
         # save the best tree
         if optimal_ccp_alpha is None:
-            filename = ROOT_DIR + '/outputs/figures/trees/{}-{}.png'.format(
-                model_spec.name, t)
+            filename = ROOT_DIR + '/outputs/figures/trees_{}_weeks/{}-{}.png'.format(
+                weeks_to_predict, model_spec.name, t)
         else:
-            filename = ROOT_DIR + '/outputs/figures/trees/{}-{}-{}.png'.format(
-                model_spec.name, t, optimal_ccp_alpha)
+            filename = ROOT_DIR + '/outputs/figures/trees_{}_weeks/{}-{}-{}.png'.format(
+                weeks_to_predict, model_spec.name, t, optimal_ccp_alpha)
 
         model.plot_decision_path(
             file_name=filename,

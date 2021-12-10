@@ -76,6 +76,7 @@ class PreProcessor:
 
 
 def build_dataset(weeks_into_winter,
+                  weeks_to_predict,
                   weeks_of_pred_period,
                   hosp_thresholds,
                   survey_size_novel_inf,
@@ -83,6 +84,7 @@ def build_dataset(weeks_into_winter,
                   n_of_trajs_used=None):
     """ create the dataset needed to develop the predictive models
     :param weeks_into_winter: (int) a positive int for number of weeks into winter
+    :param weeks_to_predict: (int) weeks to predict in the future
     :param weeks_of_pred_period: (tuple) weeks when the prediction period starts and ends;
         it is assumed that prediction is made at time y0 for an outcome observed during (y0, y1).
     :param hosp_thresholds: (list) of thresholds of hospitalization capacity
@@ -95,6 +97,7 @@ def build_dataset(weeks_into_winter,
     # read dataset
     feature_engineer = FeatureEngineering(
         dir_of_trajs='outputs/trajectories',
+        weeks_to_predict=weeks_to_predict,
         weeks_of_pred_period=weeks_of_pred_period,
         hosp_thresholds=hosp_thresholds,
         n_of_trajs_used=n_of_trajs_used)
@@ -215,6 +218,7 @@ def build_and_combine_datasets(
 
         # build the dataset
         build_dataset(weeks_into_winter=weeks_into_winter,
+                      weeks_to_predict=weeks_to_predict,
                       weeks_of_pred_period=(pred_week, pred_week + weeks_to_predict),
                       hosp_thresholds=hosp_occu_thresholds,
                       survey_size_novel_inf=survey_size_novel_inf,
@@ -226,7 +230,7 @@ def build_and_combine_datasets(
     # merge the data collected at different weeks to from a
     # single dataset for training the model
     dataframes = []
-    prefix = '/outputs/prediction_datasets'
+    prefix = '/outputs/prediction_datasets_{}_weeks'.format(weeks_to_predict)
     for w in weeks:
         # file name
         label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)

@@ -12,7 +12,7 @@ def build_validation_datasets():
 
     warnings.filterwarnings("ignore")
     sys.stdout = open(
-        ROOT_DIR+'/outputs/prediction_datasets/summary_validating_set.txt', 'w')
+        ROOT_DIR+'/outputs/prediction_datasets_{}_weeks/summary_validating_set.txt'.format(WEEKS_TO_PREDICT), 'w')
 
     # ---- build the dataset for the base scenario ----
     # get the seeds and probability weights

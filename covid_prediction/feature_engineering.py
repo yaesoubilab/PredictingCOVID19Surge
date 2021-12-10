@@ -55,17 +55,19 @@ class ErrorModel:
 
 
 class FeatureEngineering:
-    def __init__(self, dir_of_trajs, weeks_of_pred_period,
+    def __init__(self, dir_of_trajs, weeks_of_pred_period, weeks_to_predict,
                  hosp_thresholds, n_of_trajs_used=None):
         """ create the dataset needed to develop the predictive models
         :param dir_of_trajs: (string) the name of directory where trajectories are located
         :param weeks_of_pred_period: (tuple) (y0, y1) weeks when the prediction period starts and ends
+        :weeks_to_predict: (int) number of weeks to predict in the future
         :param hosp_thresholds: (list) of thresholds for hospitalization capacity
         :param n_of_trajs_used: (None or int) number of trajectories used to build the dataset
             (if None, all trajectories are used)
         """
         self.directoryName = dir_of_trajs
         self.weeksOfPredictionPeriod = weeks_of_pred_period
+        self.weeksToPredict = weeks_to_predict
         self.hospThresholds = hosp_thresholds
         if n_of_trajs_used is None:
             self.namesOfTrajFiles = os.listdir(dir_of_trajs)
@@ -91,7 +93,7 @@ class FeatureEngineering:
         col_labels.extend(info_of_parameter_fs)
         # print feature names
         write_csv(rows=[[c] for c in col_labels],
-                  file_name='outputs/prediction_datasets/features.csv')
+                  file_name='outputs/prediction_datasets_{}_weeks/features.csv'.format(self.weeksToPredict))
 
         # add columns for outcomes
         col_labels.append('Max ' + HOSP_OCCUPANCY_IN_TRAJ_FILE)
@@ -142,7 +144,7 @@ class FeatureEngineering:
                           columns=col_labels)
 
         # find directoy
-        output_dir = Path('outputs/prediction_datasets/')
+        output_dir = Path('outputs/prediction_datasets_{}_weeks/'.format(self.weeksToPredict))
 
         output_dir.mkdir(parents=True, exist_ok=True)
 

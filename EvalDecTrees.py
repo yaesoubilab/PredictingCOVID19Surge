@@ -2,11 +2,11 @@ import numpy as np
 
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
-from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD
+from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD, WEEKS_TO_PREDICT
 
-MODELS = (A, B3)
+MODELS = (A, B)
 
-ALPHAS = np.arange(0.001, 0.020, 0.002) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
+ALPHAS = np.arange(0.001, 0.020, 0.0005) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 IF_PARALLEL = True
 
 
@@ -21,6 +21,7 @@ def evaluate():
 
         best_spec_and_validation_performance = optimize_and_eval_dec_tree(
             model_spec=model,
+            weeks_to_predict=WEEKS_TO_PREDICT,
             hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
             list_of_ccp_alphas=ALPHAS,
             cv_fold=CV_FOLD,
@@ -33,7 +34,8 @@ def evaluate():
                     digits=DIGITS)
 
     # generate the report
-    summary.print(file_name=ROOT_DIR + '/outputs/prediction_summary/dec_tree/summary.csv')
+    summary.print(
+        file_name=ROOT_DIR + '/outputs/prediction_summary_{}_weeks/dec_tree/summary.csv'.format(WEEKS_TO_PREDICT))
 
 
 if __name__ == '__main__':
