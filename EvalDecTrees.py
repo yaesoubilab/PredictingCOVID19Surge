@@ -9,6 +9,10 @@ MODELS = (A, B)
 ALPHAS = np.arange(0.001, 0.020, 0.0005) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
 IF_PARALLEL = True
 
+# a pruner tree will be selected if it's accuracy is less that the accuracy of the optimal
+# tree by this amount
+ERROR_TOLERANCE = 0.01
+
 
 def evaluate():
 
@@ -24,6 +28,7 @@ def evaluate():
             weeks_to_predict=WEEKS_TO_PREDICT,
             hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
             list_of_ccp_alphas=ALPHAS,
+            error_tolerance=ERROR_TOLERANCE,
             cv_fold=CV_FOLD,
             if_parallel=IF_PARALLEL,
             shorten_feature_names=SHORT_FEATURE_NAMES)

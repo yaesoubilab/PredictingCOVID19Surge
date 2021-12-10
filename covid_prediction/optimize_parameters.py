@@ -49,6 +49,7 @@ def optimize_and_eval_dec_tree(
         weeks_to_predict,
         list_of_ccp_alphas=None,
         optimal_ccp_alpha=None,
+        error_tolerance=0.01,
         cv_fold=10,
         if_parallel=False,
         shorten_feature_names=None):
@@ -59,6 +60,8 @@ def optimize_and_eval_dec_tree(
     :param list_of_ccp_alphas: (list) of ccp alphas
     :param optimal_ccp_alpha: (float) if None, the optimal value of alpha will be determined, otherwise the provided
         value will be used to train and evaluate the tree
+    :param error_tolerance: (float) a pruner tree will be selected if it's accuracy is less
+        that the accuracy of the optimal tree by this amount
     :param cv_fold: (int) number of cross validation folds
     :param if_parallel: (bool) set True to run code in parallel
     :param shorten_feature_names: (dictionary) with keys as features names in the dataset and
@@ -91,6 +94,7 @@ def optimize_and_eval_dec_tree(
                 feature_names=model_spec.features,
                 outcome_name=get_outcome_label(threshold=t),
                 list_of_ccp_alphas=list_of_ccp_alphas,
+                error_tolerance=error_tolerance,
                 cv_fold=cv_fold,
                 scoring='accuracy')
 

@@ -364,7 +364,7 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
 
     def __init__(self, df, feature_names, outcome_name,
                  list_of_n_features_wanted=None, list_of_max_depths=None, list_of_ccp_alphas=None,
-                 feature_selection_method=None, cv_fold=10, scoring=None):
+                 feature_selection_method=None, cv_fold=10, error_tolerance=0.01, scoring=None):
         """
         :param df: (panda DataFrame)
         :param feature_names: (list) of feature names to be included in the analysis
@@ -374,6 +374,8 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         :param list_of_ccp_alphas: (list) of ccp alphas
         :param feature_selection_method: (string) 'rfe', 'lasso', or 'pi'
         :param cv_fold: (int) number of cross validation folds
+        :param error_tolerance: (float) a tree with lower accuracy than but pruner than the optimal tree
+            would be selected if it's accuracy is within error_tolerance of the accuracy of the optimal tree.
         :param scoring: (string) from: https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
         """
 
@@ -383,6 +385,8 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                                      if_outcome_binary=True,
                                      if_standardize=False,
                                      balance_binary_outcome=True)
+
+        self.errorTolerance = error_tolerance
 
         if list_of_n_features_wanted is None:
             list_of_n_features_wanted = [None]
