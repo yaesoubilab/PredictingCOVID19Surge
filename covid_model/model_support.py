@@ -2,7 +2,8 @@ from apace.CalibrationSupport import FeasibleConditions
 from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule, PredeterminedDecisionRule
 from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
-from covid_model.data import MAX_HOSP_OCC_RATE, MIN_HOSP_OCC_RATE, MAX_HOSP_RATE_OVERALL, MIN_HOSP_RATE_OVERALL, MAX_PREV_IMMUNE_FROM_INF
+from covid_model.data import MAX_HOSP_OCC_RATE, MIN_HOSP_OCC_RATE, MAX_HOSP_RATE_OVERALL, \
+    MIN_HOSP_RATE_OVERALL, MAX_PREV_IMMUNE_FROM_INF, CUM_HOSP_RATE_OVERALL
 from definitions import FEASIBILITY_PERIOD, SIM_DURATION
 
 
@@ -164,6 +165,10 @@ def add_calibration_info(settings,
     # calibration information for the overall hospitalization rate
     cum_hosp_rate_by_age[0].add_calibration_targets(
         ratios=settings.cumHospRateMean, variances=settings.cumHospRateVar)
+    cum_hosp_rate_by_age[0].add_feasible_conditions(
+        feasible_conditions=FeasibleConditions(
+            feasible_max=CUM_HOSP_RATE_OVERALL[0][3]*1.25 / 100000,
+            period=[0, FEASIBILITY_PERIOD]))
 
     # calibration information for hospitalization rate by age
     for a in range(age_groups_profiles.nAgeGroups):

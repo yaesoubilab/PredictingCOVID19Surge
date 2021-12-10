@@ -10,14 +10,14 @@ SIM_DURATION = 2.25  # years (until Jun-1, 2022)
 
 # to build datasets for developing predictive models
 FIRST_WEEK_OF_WINTER = 96
-WEEKS_TO_PREDICT = 4
+WEEKS_TO_PREDICT = 8
 # WEEKS_IN_WINTER = (0, 4, 8, 12, 16, 20)
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 
 # number of simulation runs used for calibration, training and validation
-N_SIM_CALIBRATION = 1500*2
-N_SIM_TRAINING = 200*2
-N_SIM_VALIDATION = 50*2
+N_SIM_CALIBRATION = 150*3
+N_SIM_TRAINING = 20*3
+N_SIM_VALIDATION = 5*3
 CV_FOLD = 10         # num of splits for cross validation
 FILL_TREE = True
 
