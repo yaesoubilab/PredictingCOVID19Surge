@@ -11,7 +11,7 @@ IF_PARALLEL = True
 
 # a pruner tree will be selected if it's accuracy is less that the accuracy of the optimal
 # tree by this amount
-ERROR_TOLERANCE = 0.01
+ERROR_TOLERANCE = 0.005
 
 
 def evaluate():

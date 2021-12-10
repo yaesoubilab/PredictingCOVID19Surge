@@ -5,7 +5,7 @@ from definitions import ROOT_DIR, DIGITS
 
 ALPHA = 0.003
 MODEL = models.B
-THRESHOLD = 15
+THRESHOLD = 10
 WEEKS_TO_PREDICT = 8
 
 

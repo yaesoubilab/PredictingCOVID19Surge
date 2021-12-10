@@ -417,6 +417,7 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
         # find the best specification
         best_spec = None
         max_score = float('-inf')
+        alpha_of_max_score = 0
         summary = [['# features', 'max depth', 'ccp alpha', 'Score', 'Score and PI']]
 
         for s in self.crossValidationSummaries:
@@ -426,8 +427,11 @@ class DecTreeParameterOptimizer(_ParameterOptimizer):
                             round(s.meanScore, 3),
                             s.get_formatted_mean_and_interval(deci=3)])
             if s.meanScore > max_score:
-                best_spec = s
                 max_score = s.meanScore
+                alpha_of_max_score = s.ccpAlpha
+
+            if s.meanScore >= max_score - self.errorTolerance and s.ccpAlpha >= alpha_of_max_score:
+                best_spec = s
 
         self._save_results(summary=summary,
                            best_spec=best_spec,
