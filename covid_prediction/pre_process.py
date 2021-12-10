@@ -75,16 +75,15 @@ class PreProcessor:
         self.selectedX = np.asarray(self.df[self.selectedFeatureNames])
 
 
-def build_dataset(week_of_prediction_in_fall,
-                  pred_period,
+def build_dataset(weeks_into_winter,
+                  weeks_of_pred_period,
                   hosp_thresholds,
                   survey_size_novel_inf,
                   report_corr=True,
                   n_of_trajs_used=None):
     """ create the dataset needed to develop the predictive models
-    :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
-                                             a negative int for number of weeks before the peak
-    :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends;
+    :param weeks_into_winter: (int) a positive int for number of weeks into winter
+    :param weeks_of_pred_period: (tuple) weeks when the prediction period starts and ends;
         it is assumed that prediction is made at time y0 for an outcome observed during (y0, y1).
     :param hosp_thresholds: (list) of thresholds of hospitalization capacity
     :param survey_size_novel_inf: (int) survey size of novel infection surveillance
@@ -96,8 +95,7 @@ def build_dataset(week_of_prediction_in_fall,
     # read dataset
     feature_engineer = FeatureEngineering(
         dir_of_trajs='outputs/trajectories',
-        week_of_prediction_in_fall=week_of_prediction_in_fall,
-        pred_period=pred_period,
+        weeks_of_pred_period=weeks_of_pred_period,
         hosp_thresholds=hosp_thresholds,
         n_of_trajs_used=n_of_trajs_used)
 
@@ -105,7 +103,7 @@ def build_dataset(week_of_prediction_in_fall,
     err_novel_incd = ErrorModel(survey_size=survey_size_novel_inf, weeks_delay=1)
 
     # find output file name
-    label = get_dataset_labels(week=week_of_prediction_in_fall, survey_size=survey_size_novel_inf)
+    label = get_dataset_labels(week=weeks_into_winter, survey_size=survey_size_novel_inf)
     output_file = 'data-{}.csv'.format(label)
 
     # create new dataset based on raw data
@@ -192,12 +190,12 @@ def build_dataset(week_of_prediction_in_fall,
 
 
 def build_and_combine_datasets(
-        name_of_dataset, time_of_fall, weeks_in_fall,
+        name_of_dataset, first_week_of_winter, last_week_of_winter,
         weeks_to_predict, hosp_occu_thresholds, survey_size_novel_inf, n_of_trajs_used=None):
     """
-    :param name_of_dataset: (string) 'training dataset' or 'validation'
-    :param time_of_fall: (float) year of simulation that marks the begining of fall
-    :param weeks_in_fall: (list) of weeks into fall where feature values should be recorded
+    :param name_of_dataset: (string) name of the dataset to save as
+    :param first_week_of_winter: (int) first week of winter
+    :param last_week_of_winter: (int) last week of winter
     :param weeks_to_predict: (int) number of weeks in future when outcomes should be predicted
     :param hosp_occu_thresholds: (list) of thresholds for hospital occupancy
     :param survey_size_novel_inf: (int) survey size of novel infection surveillance
@@ -206,24 +204,30 @@ def build_and_combine_datasets(
     """
 
     # datasets for predicting whether hospitalization capacities would surpass withing 4 weeks
-    for week_in_fall in weeks_in_fall:
+    weeks_into_winter = 0
+    weeks = []  # to then read the files
+    while first_week_of_winter + weeks_into_winter + weeks_to_predict <= last_week_of_winter:
 
-        # find the time (year) for which the prediction should be made
-        time_of_prediction = time_of_fall + week_in_fall / 52
+        weeks.append(weeks_into_winter)
+
+        # the week at which the prediction should be made
+        pred_week = first_week_of_winter + weeks_into_winter
 
         # build the dataset
-        build_dataset(week_of_prediction_in_fall=week_in_fall,
-                      pred_period=(time_of_prediction, time_of_prediction + weeks_to_predict / 52),
+        build_dataset(weeks_into_winter=weeks_into_winter,
+                      weeks_of_pred_period=(pred_week, pred_week + weeks_to_predict),
                       hosp_thresholds=hosp_occu_thresholds,
                       survey_size_novel_inf=survey_size_novel_inf,
                       report_corr=False,
                       n_of_trajs_used=n_of_trajs_used)
 
+        weeks_into_winter += 2
+
     # merge the data collected at different weeks to from a
     # single dataset for training the model
     dataframes = []
     prefix = '/outputs/prediction_datasets'
-    for w in weeks_in_fall:
+    for w in weeks:
         # file name
         label = get_dataset_labels(week=w, survey_size=survey_size_novel_inf)
         file_name = ROOT_DIR + prefix + '/data-{}.csv'.format(label)

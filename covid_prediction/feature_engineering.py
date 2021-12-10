@@ -55,19 +55,17 @@ class ErrorModel:
 
 
 class FeatureEngineering:
-    def __init__(self, dir_of_trajs, week_of_prediction_in_fall, pred_period, hosp_thresholds, n_of_trajs_used=None):
+    def __init__(self, dir_of_trajs, weeks_of_pred_period,
+                 hosp_thresholds, n_of_trajs_used=None):
         """ create the dataset needed to develop the predictive models
         :param dir_of_trajs: (string) the name of directory where trajectories are located
-        :param week_of_prediction_in_fall: (int) a positive int for number of weeks into fall and
-                                                 a negative int for number of weeks before the peak
-        :param pred_period: (tuple) (y0, y1) time (in year) when the prediction period starts and ends
+        :param weeks_of_pred_period: (tuple) (y0, y1) weeks when the prediction period starts and ends
         :param hosp_thresholds: (list) of thresholds for hospitalization capacity
         :param n_of_trajs_used: (None or int) number of trajectories used to build the dataset
             (if None, all trajectories are used)
         """
         self.directoryName = dir_of_trajs
-        self.weekOfPredInFall = week_of_prediction_in_fall
-        self.weeksOfPredictionPeriod = (round(pred_period[0] * 52, 0), round(pred_period[1] * 52, 0))
+        self.weeksOfPredictionPeriod = weeks_of_pred_period
         self.hospThresholds = hosp_thresholds
         if n_of_trajs_used is None:
             self.namesOfTrajFiles = os.listdir(dir_of_trajs)
@@ -118,17 +116,13 @@ class FeatureEngineering:
             if_hosp_threshold_passed, hosp_max, peak_week = \
                 self._get_if_threshold_passed_and_max_and_week_of_peak(df=df)
 
-            # find the time when feature values should be collected
-            if self.weekOfPredInFall < 0:
-                pred_week = peak_week + self.weekOfPredInFall
-            else:
-                pred_week = self.weeksOfPredictionPeriod[0]
-
             # read values of incidence and prevalence features for this trajectory
-            incd_fs = self._get_feature_values(df=df, week=pred_week,
-                                               info_of_features=info_of_incd_fs, incd_or_prev='incd')
-            prev_fs = self._get_feature_values(df=df, week=pred_week,
-                                               info_of_features=info_of_prev_fs, incd_or_prev='prev')
+            incd_fs = self._get_feature_values(
+                df=df, week=self.weeksOfPredictionPeriod[0],
+                info_of_features=info_of_incd_fs, incd_or_prev='incd')
+            prev_fs = self._get_feature_values(
+                df=df, week=self.weeksOfPredictionPeriod[0],
+                info_of_features=info_of_prev_fs, incd_or_prev='prev')
 
             # make a row of feature values
             # incidence features, prevalence features
@@ -148,10 +142,7 @@ class FeatureEngineering:
                           columns=col_labels)
 
         # find directoy
-        if self.weekOfPredInFall < 0:
-            output_dir = Path('outputs/prediction_datasets/time_to_peak/')
-        else:
-            output_dir = Path('outputs/prediction_datasets/')
+        output_dir = Path('outputs/prediction_datasets/')
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -177,7 +168,7 @@ class FeatureEngineering:
         maximum = 0
         week_of_peak = None
         for pair in zip(obs_times, obs_weeks, hosp_occu_rates):
-            if self.weeksOfPredictionPeriod[0] <= pair[1] <= self.weeksOfPredictionPeriod[1]:
+            if self.weeksOfPredictionPeriod[0] <= pair[1] < self.weeksOfPredictionPeriod[1]:
                 if pair[2] > maximum:
                     week_of_peak = pair[1]
                     maximum = pair[2]
@@ -234,7 +225,7 @@ class FeatureEngineering:
             if incd_or_prev == 'incd':
                 for pair in zip(df['Observation Period'], col):
                     if not np.isnan(pair[1]):
-                        if pair[0] <= week:
+                        if pair[0] < week:
                             true_values.append(pair[1]*multiplier)
                             if err_model is None:
                                 observed_values.append(true_values[-1])

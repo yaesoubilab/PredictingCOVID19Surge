@@ -3,7 +3,7 @@ import sys
 from SimPy.InOutFunctions import make_directory
 from covid_prediction.pre_process import build_and_combine_datasets
 from covid_prediction.summary_of_trajs import report_traj_summary
-from definitions import FEASIBILITY_PERIOD, N_NOVEL_INCD, WEEKS_IN_WINTER, \
+from definitions import SIM_DURATION, N_NOVEL_INCD, FIRST_WEEK_OF_WINTER, \
     HOSP_OCCU_THRESHOLDS, ROOT_DIR, WEEKS_TO_PREDICT
 
 if __name__ == "__main__":
@@ -21,8 +21,8 @@ if __name__ == "__main__":
     # fall/winter start in week 78 and end on 117
     build_and_combine_datasets(
         name_of_dataset='data-training',
-        time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_WINTER,
+        first_week_of_winter=FIRST_WEEK_OF_WINTER,
+        last_week_of_winter=int(SIM_DURATION*52),
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD)

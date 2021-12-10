@@ -33,8 +33,8 @@ def build_validation_datasets():
     # ---- build the dataset for the base scenario ----
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['base'],
-        time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_WINTER,
+        first_week_of_winter=FEASIBILITY_PERIOD,
+        last_week_of_winter=WEEKS_IN_WINTER,
         weeks_to_predict=4,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
@@ -43,8 +43,8 @@ def build_validation_datasets():
     # ---- build the dataset with smaller survey size ----
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
-        time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_WINTER,
+        first_week_of_winter=FEASIBILITY_PERIOD,
+        last_week_of_winter=WEEKS_IN_WINTER,
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=SMALLER_N_NOVEL_INCD,
@@ -61,8 +61,8 @@ def build_validation_datasets():
     # build the dataset
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no novel variant'],
-        time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_WINTER,
+        first_week_of_winter=FEASIBILITY_PERIOD,
+        last_week_of_winter=WEEKS_IN_WINTER,
         weeks_to_predict=4,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
@@ -79,8 +79,8 @@ def build_validation_datasets():
     # build the dataset
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no control measure'],
-        time_of_fall=FEASIBILITY_PERIOD,
-        weeks_in_fall=WEEKS_IN_WINTER,
+        first_week_of_winter=FEASIBILITY_PERIOD,
+        last_week_of_winter=WEEKS_IN_WINTER,
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
