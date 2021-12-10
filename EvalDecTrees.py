@@ -6,7 +6,7 @@ from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD, WEEKS_T
 
 MODELS = (A, B)
 
-ALPHAS = np.arange(0.001, 0.020, 0.0005) # [0, 0.01, 0.02, 0.03, 0.04, 0.05]
+ALPHAS = np.arange(0.001, 0.020, 0.001)
 IF_PARALLEL = True
 
 # a pruner tree will be selected if it's accuracy is less that the accuracy of the optimal

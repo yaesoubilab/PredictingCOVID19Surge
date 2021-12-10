@@ -3,7 +3,7 @@ from covid_prediction.model_specs import SHORT_FEATURE_NAMES
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
 from definitions import ROOT_DIR, DIGITS
 
-ALPHA = 0.003
+ALPHA = 0.0005
 MODEL = models.B
 THRESHOLD = 10
 WEEKS_TO_PREDICT = 8

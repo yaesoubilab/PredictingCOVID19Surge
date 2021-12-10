@@ -11,8 +11,7 @@ if __name__ == "__main__":
              novel_variant_will_emerge=True,
              mitigating_strategies_on=True)
 
-    print('Building training datasets ...')
-    build_training_dataset()
+    for w in (4, 8):
 
-    print('Building validation datasets ...')
-    build_validation_datasets()
+        build_training_dataset(weeks_to_predict=w)
+        build_validation_datasets(weeks_to_predict=w)

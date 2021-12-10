@@ -8,11 +8,11 @@ from definitions import ROOT_DIR, SIM_DURATION, N_SIM_VALIDATION, N_SIM_TRAINING
     N_NOVEL_INCD, SCENARIOS, FIRST_WEEK_OF_WINTER, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
 
 
-def build_validation_datasets():
+def build_validation_datasets(weeks_to_predict):
 
     warnings.filterwarnings("ignore")
     sys.stdout = open(
-        ROOT_DIR+'/outputs/prediction_datasets_{}_weeks/summary_validating_set.txt'.format(WEEKS_TO_PREDICT), 'w')
+        ROOT_DIR+'/outputs/prediction_datasets_{}_weeks/summary_validating_set.txt'.format(weeks_to_predict), 'w')
 
     # ---- build the dataset for the base scenario ----
     # get the seeds and probability weights
@@ -35,7 +35,7 @@ def build_validation_datasets():
         name_of_dataset='data-validating ' + SCENARIOS['base'],
         first_week_of_winter=FIRST_WEEK_OF_WINTER,
         last_week_of_winter=int(SIM_DURATION*52),
-        weeks_to_predict=WEEKS_TO_PREDICT,
+        weeks_to_predict=weeks_to_predict,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
     )
@@ -45,7 +45,7 @@ def build_validation_datasets():
         name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
         first_week_of_winter=FIRST_WEEK_OF_WINTER,
         last_week_of_winter=int(SIM_DURATION*52),
-        weeks_to_predict=WEEKS_TO_PREDICT,
+        weeks_to_predict=weeks_to_predict,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=SMALLER_N_NOVEL_INCD,
     )
@@ -63,7 +63,7 @@ def build_validation_datasets():
         name_of_dataset='data-validating ' + SCENARIOS['no novel variant'],
         first_week_of_winter=FIRST_WEEK_OF_WINTER,
         last_week_of_winter=int(SIM_DURATION*52),
-        weeks_to_predict=WEEKS_TO_PREDICT,
+        weeks_to_predict=weeks_to_predict,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
     )
@@ -81,7 +81,7 @@ def build_validation_datasets():
         name_of_dataset='data-validating ' + SCENARIOS['no control measure'],
         first_week_of_winter=FIRST_WEEK_OF_WINTER,
         last_week_of_winter=int(SIM_DURATION*52),
-        weeks_to_predict=WEEKS_TO_PREDICT,
+        weeks_to_predict=weeks_to_predict,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
     )
@@ -90,4 +90,4 @@ def build_validation_datasets():
 
 
 if __name__ == '__main__':
-    build_validation_datasets()
+    build_validation_datasets(weeks_to_predict=WEEKS_TO_PREDICT)

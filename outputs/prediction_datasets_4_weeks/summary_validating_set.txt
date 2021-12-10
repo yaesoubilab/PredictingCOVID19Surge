@@ -1,0 +1,26 @@
+Simulating ...
+Making plots ...
+---- summary of 'data-validating base' dataset ----
+# of records: 900
+% observations where threshold 10 is passed: 77.1
+% observations where threshold 15 is passed: 56.9
+% observations where threshold 20 is passed: 43.7
+---- summary of 'data-validating smaller survey' dataset ----
+# of records: 900
+% observations where threshold 10 is passed: 77.1
+% observations where threshold 15 is passed: 56.9
+% observations where threshold 20 is passed: 43.7
+Simulating ...
+Making plots ...
+---- summary of 'data-validating no novel variant' dataset ----
+# of records: 900
+% observations where threshold 10 is passed: 78.1
+% observations where threshold 15 is passed: 63.9
+% observations where threshold 20 is passed: 48.9
+Simulating ...
+Making plots ...
+---- summary of 'data-validating no control measure' dataset ----
+# of records: 900
+% observations where threshold 10 is passed: 92.3
+% observations where threshold 15 is passed: 87.1
+% observations where threshold 20 is passed: 78.9
