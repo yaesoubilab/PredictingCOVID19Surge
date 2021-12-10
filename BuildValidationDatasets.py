@@ -4,8 +4,8 @@ import warnings
 import apace.Calibration as calib
 from BuildTrainingDataset import build_and_combine_datasets
 from SimulateMany import simulate
-from definitions import ROOT_DIR, FEASIBILITY_PERIOD, N_SIM_VALIDATION, N_SIM_TRAINING, \
-    N_NOVEL_INCD, SCENARIOS, WEEKS_IN_WINTER, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
+from definitions import ROOT_DIR, SIM_DURATION, N_SIM_VALIDATION, N_SIM_TRAINING, \
+    N_NOVEL_INCD, SCENARIOS, FIRST_WEEK_OF_WINTER, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
 
 
 def build_validation_datasets():
@@ -33,9 +33,9 @@ def build_validation_datasets():
     # ---- build the dataset for the base scenario ----
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['base'],
-        first_week_of_winter=FEASIBILITY_PERIOD,
-        last_week_of_winter=WEEKS_IN_WINTER,
-        weeks_to_predict=4,
+        first_week_of_winter=FIRST_WEEK_OF_WINTER,
+        last_week_of_winter=int(SIM_DURATION*52),
+        weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
     )
@@ -43,8 +43,8 @@ def build_validation_datasets():
     # ---- build the dataset with smaller survey size ----
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['smaller survey'],
-        first_week_of_winter=FEASIBILITY_PERIOD,
-        last_week_of_winter=WEEKS_IN_WINTER,
+        first_week_of_winter=FIRST_WEEK_OF_WINTER,
+        last_week_of_winter=int(SIM_DURATION*52),
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=SMALLER_N_NOVEL_INCD,
@@ -61,9 +61,9 @@ def build_validation_datasets():
     # build the dataset
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no novel variant'],
-        first_week_of_winter=FEASIBILITY_PERIOD,
-        last_week_of_winter=WEEKS_IN_WINTER,
-        weeks_to_predict=4,
+        first_week_of_winter=FIRST_WEEK_OF_WINTER,
+        last_week_of_winter=int(SIM_DURATION*52),
+        weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
     )
@@ -79,8 +79,8 @@ def build_validation_datasets():
     # build the dataset
     build_and_combine_datasets(
         name_of_dataset='data-validating ' + SCENARIOS['no control measure'],
-        first_week_of_winter=FEASIBILITY_PERIOD,
-        last_week_of_winter=WEEKS_IN_WINTER,
+        first_week_of_winter=FIRST_WEEK_OF_WINTER,
+        last_week_of_winter=int(SIM_DURATION*52),
         weeks_to_predict=WEEKS_TO_PREDICT,
         hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
         survey_size_novel_inf=N_NOVEL_INCD
