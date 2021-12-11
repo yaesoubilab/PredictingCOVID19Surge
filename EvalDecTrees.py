@@ -2,7 +2,7 @@ import numpy as np
 
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
-from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD, WEEKS_TO_PREDICT
+from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD
 
 MODELS = (A, B)
 
@@ -14,18 +14,18 @@ IF_PARALLEL = True
 ERROR_TOLERANCE = 0.005
 
 
-def evaluate():
+def evaluate(weeks_to_predict):
 
     # summary builder
     summary = SummaryOfTreePerformance()
 
     for model in MODELS:
 
-        print("Evaluating model {}.".format(model.name))
+        print("Evaluating model {} for {}-week prediction.".format(model.name, weeks_to_predict))
 
         best_spec_and_validation_performance = optimize_and_eval_dec_tree(
             model_spec=model,
-            weeks_to_predict=WEEKS_TO_PREDICT,
+            weeks_to_predict=weeks_to_predict,
             hosp_occu_thresholds=HOSP_OCCU_THRESHOLDS,
             list_of_ccp_alphas=ALPHAS,
             error_tolerance=ERROR_TOLERANCE,
@@ -40,10 +40,11 @@ def evaluate():
 
     # generate the report
     summary.print(
-        file_name=ROOT_DIR + '/outputs/prediction_summary_{}_weeks/dec_tree/summary.csv'.format(WEEKS_TO_PREDICT))
+        file_name=ROOT_DIR + '/outputs/prediction_summary_{}_weeks/dec_tree/summary.csv'.format(weeks_to_predict))
 
 
 if __name__ == '__main__':
 
-    evaluate()
+    evaluate(weeks_to_predict=4)
+    evaluate(weeks_to_predict=8)
 
