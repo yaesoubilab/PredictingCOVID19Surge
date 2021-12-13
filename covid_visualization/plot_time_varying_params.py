@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from SimPy.Parameters import Constant, TimeDependentSigmoid, TimeDependentCosine
+from SimPy.Plots.FigSupport import output_figure
+from definitions import ROOT_DIR
 
 SIM_DURATION = 2.25
 T0 = 0
@@ -37,7 +39,7 @@ def cos(t, a_0, a_1, phase, scale):
 def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
                            bs, f_mins, f_maxs, t_mids, t_mins,
                            x_min_max, y_label, x_label,
-                           vertical_line=None, fig_size=(7.5, 3.2), round_b=None):
+                           vertical_line=None, fig_size=(7.5, 3.2), round_b=None, file_name='sigmoid.png'):
 
     # ------------------
     ts = np.linspace(start=x_min_max[0], stop=x_min_max[1])
@@ -120,13 +122,14 @@ def plot_sigmoid_functions(b, f_min, f_max, t_mid, t_min,
 
     axarr[0].set_ylabel(y_label)
     plt.tight_layout()
+    output_figure(plt, filename=file_name)
     plt.show()
 
 
 def plot_alpha_h(h_max, alpha_max,
                  h_maxs, alpha_maxs,
                  x_min_max, y_label, x_label,
-                 vertical_line=None, fig_size=(7.5, 3.2)):
+                 vertical_line=None, fig_size=(7.5, 3.2), file_name='alpha'):
 
     # ------------------
     hs = np.linspace(start=x_min_max[0], stop=x_min_max[1])
@@ -173,13 +176,14 @@ def plot_alpha_h(h_max, alpha_max,
 
     axarr[0].set_ylabel(y_label)
     plt.tight_layout()
+    output_figure(plt, filename=file_name)
     plt.show()
 
 
 def plot_cos_functions(phase, a_0, a_1,
                        phases, a_0s, a_1s,
                        x_label,
-                       y_label, fig_size=(7.5, 3.2)):
+                       y_label, fig_size=(7.5, 3.2), file_name='cosine'):
 
     # ------------------
     ts = np.linspace(start=T0, stop=SIM_DURATION)
@@ -236,6 +240,7 @@ def plot_cos_functions(phase, a_0, a_1,
 
     axarr[0].set_ylabel(y_label)
     plt.tight_layout()
+    output_figure(plt, filename=file_name)
     plt.show()
 
 
@@ -249,7 +254,8 @@ plot_sigmoid_functions(b=7, bs=[5, 7, 9],
                        x_min_max=[T0, SIM_DURATION],
                        x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
                        vertical_line=SEPTEMBER_FIRST,
-                       fig_size=(6, 2.8))
+                       fig_size=(6, 2.8),
+                       file_name=ROOT_DIR+'/outputs/figures/params/prob_novel.png')
 
 # rate of vaccination
 Y_RANGE = (0, 3)
@@ -263,7 +269,8 @@ plot_sigmoid_functions(b=-7.5, bs=[-10, -7.5, -5],
                        x_min_max=[T0, SIM_DURATION],
                        x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
                        vertical_line=SEPTEMBER_FIRST,
-                       fig_size=(9, 2.8))
+                       fig_size=(9, 2.8),
+                       file_name=ROOT_DIR+'/outputs/figures/params/vaccination.png')
 
 # effectiveness of control strategies
 X_RANGE = (-1, 31)
@@ -274,7 +281,8 @@ plot_alpha_h(h_max=15, alpha_max=0.7,
              y_label=r'$\alpha(h)$',
              x_min_max=[0, 30],
              x_label='Hospital occupancy ' + r'$(h)$',
-             fig_size=(4.5, 2.8))
+             fig_size=(4.5, 2.8),
+             file_name=ROOT_DIR+'/outputs/figures/params/alpha.png')
 
 # seasonality
 Y_RANGE = (0, 3)
@@ -286,4 +294,5 @@ plot_cos_functions(phase=0, phases=[-0.25, 0.0, 0.25],
                    # x_range=[T0, SIM_DURATION],
                    x_label='Simulation year {}\nsince March 1, 2010'.format(r'$(t)$'),
                    # vertical_line = SEPTEMBER_FIRST,
-                   fig_size=(6, 2.8))
+                   fig_size=(6, 2.8),
+                   file_name=ROOT_DIR+'/outputs/figures/params/seasonality.png')
