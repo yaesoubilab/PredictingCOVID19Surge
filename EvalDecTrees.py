@@ -46,5 +46,5 @@ def evaluate(weeks_to_predict):
 if __name__ == '__main__':
 
     evaluate(weeks_to_predict=4)
-    evaluate(weeks_to_predict=8)
+    # evaluate(weeks_to_predict=8)
 

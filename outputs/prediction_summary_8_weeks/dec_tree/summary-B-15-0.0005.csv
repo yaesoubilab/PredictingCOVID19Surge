@@ -1,0 +1,2 @@
+Model,Threshold,CV-Formatted PI,Acc-base,Sen-base,Spe-base,Acc-no control measure,Sen-no control measure,Spe-no control measure,Acc-no novel variant,Sen-no novel variant,Spe-no novel variant,Acc-smaller survey,Sen-smaller survey,Spe-smaller survey
+B,15,,0.882,0.811,0.915,0.964,0.773,0.987,0.905,0.882,0.916,0.884,0.809,0.918

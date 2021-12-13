@@ -3,10 +3,10 @@ from covid_prediction.model_specs import SHORT_FEATURE_NAMES
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
 from definitions import ROOT_DIR, DIGITS
 
-ALPHA = 0.0005
+ALPHA = 0.0015
 MODEL = models.B
-THRESHOLD = 10
-WEEKS_TO_PREDICT = 8
+THRESHOLD = 20
+WEEKS_TO_PREDICT = 4
 
 
 def build_a_decision_tree(model_spec, weeks_to_predict, hosp_occu_threshold, ccp_alpha=0.0):
