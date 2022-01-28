@@ -179,7 +179,7 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
                                   file_name=save_plots_dir+'/summary_r21.png',
                                   n_random_trajs_to_display=n_random_trajs_to_display,
                                   show_subplot_labels=True,
-                                  figure_size=(2.2, 2.3*2)
+                                  figure_size=(2.2*2, 2.3)
                                   )
 
     # -----------------------------------------------------
