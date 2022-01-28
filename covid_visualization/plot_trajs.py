@@ -174,6 +174,14 @@ def plot(prev_multiplier=52, incd_multiplier=1, obs_incd_multiplier=1,
                                   figure_size=(2.3*3, 2.4*3)
                                   )
 
+    sim_outcomes.plot_multi_panel(n_rows=1, n_cols=2,
+                                  list_plot_info=[obs_cum_hosp_rate, obs_cum_vacc_rate, obs_incd_delta],
+                                  file_name=save_plots_dir+'/summary_r21.png',
+                                  n_random_trajs_to_display=n_random_trajs_to_display,
+                                  show_subplot_labels=True,
+                                  figure_size=(2.2, 2.3*2)
+                                  )
+
     # -----------------------------------------------------
     # ------ plot information for the novel variant plot --------
     # -----------------------------------------------------
