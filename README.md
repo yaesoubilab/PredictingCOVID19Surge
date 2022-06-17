@@ -1,4 +1,4 @@
-# Predicting COVID-19 Surge in Fall 2021
+# Predicting COVID-19 Surge in Fall and Spring 2022
 
 ## Dependencies
 Add the following libraries to the project Content Root.
