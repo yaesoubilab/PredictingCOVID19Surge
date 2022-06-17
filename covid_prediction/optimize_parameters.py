@@ -1,8 +1,8 @@
 import pandas as pd
 
 import covid_prediction.cross_validation as CV
-from SimPy.InOutFunctions import write_csv
 from covid_prediction.prediction_models import DecisionTree
+from deampy.in_out_functions import write_csv
 from definitions import ROOT_DIR, get_outcome_label, SCENARIOS, FILL_TREE
 
 

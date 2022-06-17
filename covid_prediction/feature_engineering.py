@@ -7,7 +7,7 @@ import pandas as pd
 from numpy.random import RandomState
 from scipy.stats import pearsonr
 
-from SimPy.InOutFunctions import write_csv
+from deampy.in_out_functions import write_csv
 from definitions import HOSP_OCCUPANCY_IN_TRAJ_FILE, OUTCOME_NAME_IN_DATASET, get_outcome_label
 
 

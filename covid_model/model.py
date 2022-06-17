@@ -1,9 +1,9 @@
-from SimPy.Parameters import Constant
-from apace.ModelObjects import Compartment, ChanceNode, Counter, \
+from apacepy.model_objects import Compartment, ChanceNode, Counter, \
     DeathCompartment, EpiIndepEvent, EpiDepEvent, PoissonEvent
-from apace.TimeSeries import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
+from apacepy.time_series import SumIncidence, SumPrevalence, SumCumulativeIncidence, RatioTimeSeries
 from covid_model.model_support import get_interventions_features_conditions, add_calibration_info
 from covid_model.parameters import COVIDParameters
+from deampy.parameters import Constant
 from definitions import ProfileDefiner, Variants
 
 

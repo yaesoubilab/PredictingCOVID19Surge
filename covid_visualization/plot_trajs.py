@@ -1,4 +1,4 @@
-import apace.analysis.Trajectories as A
+import apacepy.analysis.trajectories as A
 import covid_model.data as D
 import definitions as Def
 from covid_model.data import *

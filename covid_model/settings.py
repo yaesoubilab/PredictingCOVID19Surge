@@ -1,6 +1,6 @@
 import definitions as D
-from apace.CalibrationSupport import get_survey_size
-from apace.Inputs import ModelSettings
+from apacepy.calibration_support import get_survey_size
+from apacepy.inputs import ModelSettings
 from covid_model.data import *
 from definitions import AgeGroups
 

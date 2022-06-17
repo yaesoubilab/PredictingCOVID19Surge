@@ -1,9 +1,9 @@
-from SimPy.Parameters import Constant, Multinomial, AMultinomialOutcome, Inverse, Logit, Product, \
+from apacepy.inputs import EpiParameters
+from apacepy.inputs import InfectivityFromR0
+from deampy.parameters import Constant, Multinomial, AnOutcomeOfAMultiVariateDist, Inverse, Logit, Product, \
     OneMinus, MatrixOfParams, TimeDependentSigmoid, \
     Beta, Uniform, UniformDiscrete, Gamma, Equal, OneMinusTimes, \
     SigmoidOnModelOutput, TimeDependentCosine
-from apace.Inputs import EpiParameters
-from apace.Inputs import InfectivityFromR0
 from definitions import AgeGroups, Variants, ProfileDefiner
 
 
@@ -206,8 +206,10 @@ class COVIDParameters(EpiParameters):
         self.distI0ToIs = Multinomial(par_n=self.sizeI0, p_values=us_age_dist)
 
         for a in range(self.nAgeGroups):
-            self.sizeSByAge.append(AMultinomialOutcome(par_multinomial=self.distS0ToSs, outcome_index=a))
-            self.sizeIProfile0ByAge.append(AMultinomialOutcome(par_multinomial=self.distI0ToIs, outcome_index=a))
+            self.sizeSByAge.append(AnOutcomeOfAMultiVariateDist(
+                par_multivariate=self.distS0ToSs, outcome_index=a))
+            self.sizeIProfile0ByAge.append(AnOutcomeOfAMultiVariateDist(
+                par_multivariate=self.distI0ToIs, outcome_index=a))
 
         # susceptibility of the vaccinated against different variants
         for v in range(self.nVariants):

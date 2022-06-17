@@ -1,6 +1,6 @@
-from apace.CalibrationSupport import FeasibleConditions
-from apace.Control import InterventionAffectingContacts, ConditionBasedDecisionRule, PredeterminedDecisionRule
-from apace.FeaturesAndConditions import FeatureSurveillance, FeatureIntervention, \
+from apacepy.calibration_support import FeasibleConditions
+from apacepy.control import InterventionAffectingContacts, ConditionBasedDecisionRule, PredeterminedDecisionRule
+from apacepy.features_conditions import FeatureSurveillance, FeatureIntervention, \
     ConditionOnFeatures, FeatureEpidemicTime, ConditionOnConditions
 from covid_model.data import MAX_HOSP_OCC_RATE, MIN_HOSP_OCC_RATE, MAX_HOSP_RATE_OVERALL, \
     MIN_HOSP_RATE_OVERALL, MAX_PREV_IMMUNE_FROM_INF, CUM_HOSP_RATE_OVERALL

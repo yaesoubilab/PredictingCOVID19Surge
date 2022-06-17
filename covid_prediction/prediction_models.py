@@ -9,8 +9,8 @@ from sklearn.model_selection import train_test_split, cross_val_predict, cross_v
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 
-import SimPy.Statistics as Stat
-from SimPy.InOutFunctions import make_directory
+import deampy.statistics as Stat
+from deampy.in_out_functions import make_directory
 
 
 class Classifier:

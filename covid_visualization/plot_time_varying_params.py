@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from SimPy.Parameters import Constant, TimeDependentSigmoid, TimeDependentCosine
-from SimPy.Plots.FigSupport import output_figure
+from deampy.parameters import Constant, TimeDependentSigmoid, TimeDependentCosine
+from deampy.plots.plot_support import output_figure
 from definitions import ROOT_DIR
 
 SIM_DURATION = 2.25

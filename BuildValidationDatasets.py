@@ -1,7 +1,7 @@
 import sys
 import warnings
 
-import apace.Calibration as calib
+import apacepy.calibration as calib
 from BuildTrainingDataset import build_and_combine_datasets
 from SimulateMany import simulate
 from definitions import ROOT_DIR, SIM_DURATION, N_SIM_VALIDATION, N_SIM_TRAINING, \

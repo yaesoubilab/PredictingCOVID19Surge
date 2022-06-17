@@ -4,10 +4,10 @@ from sklearn.model_selection import cross_val_score
 from sklearn.neural_network import MLPRegressor
 from sklearn.tree import DecisionTreeClassifier
 
-from SimPy.InOutFunctions import write_csv
-from SimPy.Statistics import SummaryStat
 from covid_prediction.pre_process import PreProcessor
 from covid_prediction.prediction_models import DecisionTree
+from deampy.in_out_functions import write_csv
+from deampy.statistics import SummaryStat
 
 MAX_PROCESSES = mp.cpu_count()  # maximum number of processors
 

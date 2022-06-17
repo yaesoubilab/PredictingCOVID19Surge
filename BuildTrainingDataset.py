@@ -1,8 +1,8 @@
 import sys
 
-from SimPy.InOutFunctions import make_directory
 from covid_prediction.pre_process import build_and_combine_datasets
 from covid_prediction.summary_of_trajs import report_traj_summary
+from deampy.in_out_functions import make_directory
 from definitions import SIM_DURATION, N_NOVEL_INCD, FIRST_WEEK_OF_WINTER, \
     HOSP_OCCU_THRESHOLDS, ROOT_DIR, WEEKS_TO_PREDICT
 

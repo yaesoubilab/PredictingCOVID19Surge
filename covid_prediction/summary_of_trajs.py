@@ -1,5 +1,6 @@
-import apace.analysis.Trajectories as T
-from SimPy.Statistics import SummaryStat
+import apacepy.analysis.Trajectories as T
+from deampy.Statistics import SummaryStat
+
 from definitions import FEASIBILITY_PERIOD, SIM_DURATION, ROOT_DIR
 
 

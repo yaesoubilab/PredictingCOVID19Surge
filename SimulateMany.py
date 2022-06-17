@@ -1,5 +1,5 @@
-import apace.Calibration as calib
-from apace.MultiEpidemics import MultiEpidemics
+import apacepy.calibration as calib
+from apacepy.multi_epidemics import MultiEpidemics
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot

@@ -1,4 +1,5 @@
-from SimPy.InOutFunctions import write_csv
+from deampy.InOutFunctions import write_csv
+
 from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import get_neural_net_best_spec
 from covid_prediction.print_features import print_selected_features_neu_nets

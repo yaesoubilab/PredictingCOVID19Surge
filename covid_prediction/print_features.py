@@ -1,4 +1,5 @@
-from SimPy.InOutFunctions import read_csv_rows, write_csv
+from deampy.InOutFunctions import read_csv_rows, write_csv
+
 from covid_prediction.model_specs import *
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 

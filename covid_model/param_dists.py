@@ -1,7 +1,7 @@
 import scipy.stats as scs
 
-import SimPy.FormatFunctions as F
-import SimPy.RandomVariateGenerators as Fit
+import deampy.format_functions as F
+import deampy.random_variats as Fit
 
 # [mean, stDev, min, max]
 R0 = [2.5, 0.7, 1.5, 4]

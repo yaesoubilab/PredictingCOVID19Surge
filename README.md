@@ -1,9 +1,7 @@
 # Predicting COVID-19 Surge in Fall and Spring 2022
 
 ## Dependencies
-Add the following libraries to the project Content Root.
-1. [APACE](https://github.com/yaesoubilab/APACE)
-2. [SimPy](https://github.com/yaesoubilab/SimPy)
+Packages `deampy`, `apacepy`, `pydotplus`, and `imblearn`.
 
 ## Workflow
 

@@ -1,4 +1,4 @@
-from apace.Epidemic import EpiModel
+from apacepy.epidemic import EpiModel
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot

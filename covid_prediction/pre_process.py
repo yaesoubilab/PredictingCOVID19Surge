@@ -1,8 +1,8 @@
 from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 
-from SimPy.InOutFunctions import delete_file
 from covid_prediction.feature_engineering import *
+from deampy.in_out_functions import delete_file
 from definitions import ROOT_DIR, get_dataset_labels
 
 

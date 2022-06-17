@@ -3,9 +3,9 @@ import string
 import matplotlib.pyplot as plt
 import numpy as np
 
-from SimPy.InOutFunctions import read_csv_rows
-from SimPy.Plots.FigSupport import output_figure
-from SimPy.Statistics import SummaryStat
+from deampy.in_out_functions import read_csv_rows
+from deampy.plots.plot_support import output_figure
+from deampy.statistics import SummaryStat
 from definitions import ROOT_DIR, get_dataset_labels, get_short_outcome
 
 X_LABEL_COLORS = ['black', 'purple', 'magenta', 'blue', 'cyan', 'green', 'orange', 'red', 'brown']
