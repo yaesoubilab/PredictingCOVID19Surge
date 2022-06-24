@@ -1,10 +1,10 @@
 
 SHORT_FEATURE_NAMES = {
     'Obs: Hospital occupancy rate': 'H',
-    'Obs: New hospitalization rate-slope-4wk': 'dH',
+    'Obs: New hospitalization rate-slope-4wk': 'dA',
     'Obs: New hospitalization rate-ave-2wk': 'A',
-    'Obs: Cumulative hospitalization rate': 'sumHosp',
-    'Obs: Cumulative vaccination rate': 'Vacc',
+    'Obs: Cumulative hospitalization rate': 'sA',
+    'Obs: Cumulative vaccination rate': 'sV',
     'Obs: % of incidence due to Novel-ave-2wk': 'N',
     'Obs: % of incidence due to Novel-slope-4wk': 'dN'
 }
