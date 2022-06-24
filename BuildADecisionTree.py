@@ -5,8 +5,8 @@ from definitions import ROOT_DIR, DIGITS
 
 ALPHA = 0.002
 MODEL = models.B
-THRESHOLD = 20
-WEEKS_TO_PREDICT = 4
+THRESHOLD = 10
+WEEKS_TO_PREDICT = 8
 
 
 def build_a_decision_tree(model_spec, weeks_to_predict, hosp_occu_threshold, ccp_alpha=0.0):
