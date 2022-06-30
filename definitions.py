@@ -7,7 +7,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # calibration settings
 FEASIBILITY_PERIOD = 1.75  # years (from Mar-1, 2020 to Dec-1) -> week 91
 CALIB_PERIOD = 2  # years (simulation duration during calibration)
-N_SIM_CALIBRATION = 150 #*50  # number of simulated trajectories used for calibration
+N_SIM_CALIBRATION = 150*50  # number of simulated trajectories used for calibration
 
 SIM_DURATION = 2.25  # years (until Jun-1, 2022)
 
@@ -17,8 +17,8 @@ WEEKS_TO_PREDICT = 8
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 
 # number of simulation runs used for training and validation
-N_SIM_TRAINING = 20 #*50
-N_SIM_VALIDATION = 5 #*50
+N_SIM_TRAINING = 20*50
+N_SIM_VALIDATION = 5*50
 CV_FOLD = 10         # num of splits for cross validation
 FILL_TREE = True
 
