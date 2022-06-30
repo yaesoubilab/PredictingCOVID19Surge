@@ -1,15 +1,14 @@
 from build_training_datasets import build_training_dataset
 from build_validation_datasets import build_validation_datasets
 
+"""
+This scrip builds the datasets needed to train and validate the decision rules
+for prediction over the next 4 and 8 weeks.  
+"""
+
 if __name__ == "__main__":
 
-    # simulate(n=N_SIM_TRAINING,
-    #          n_to_display=min(100, N_SIM_TRAINING),
-    #          calibrated=True,
-    #          novel_variant_will_emerge=True,
-    #          mitigating_strategies_on=True)
+    for weeks_to_predict in (4, 8):
 
-    for w in (4, 8):
-
-        build_training_dataset(weeks_to_predict=w)
-        build_validation_datasets(weeks_to_predict=w)
+        build_training_dataset(weeks_to_predict=weeks_to_predict)
+        build_validation_datasets(weeks_to_predict=weeks_to_predict)

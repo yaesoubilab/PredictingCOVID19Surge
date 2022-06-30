@@ -12,7 +12,7 @@ N_SIM_CALIBRATION = 150 #*50  # number of simulated trajectories used for calibr
 SIM_DURATION = 2.25  # years (until Jun-1, 2022)
 
 # to build datasets for developing predictive models
-FIRST_WEEK_OF_WINTER = 96
+FIRST_WEEK_OF_PREDICTION_PERIOD = 96  # for example, 96 is the first week of winter
 WEEKS_TO_PREDICT = 8
 HOSP_OCCU_THRESHOLDS = (10, 15, 20)  # per 100,000 population
 

@@ -1,10 +1,11 @@
 import apacepy.calibration as calib
 from apacepy.multi_epidemics import MultiEpidemics
+
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot
 
-N = 100 # N_SIM_TRAINING  # number of simulation
+N = 100  # N_SIM_TRAINING  # number of simulation
 IF_NOVEL_VARIANT = True     # default True
 IF_MITIGATION = True        # default True
 
