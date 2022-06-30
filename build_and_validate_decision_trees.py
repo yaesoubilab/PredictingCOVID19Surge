@@ -4,9 +4,8 @@ from covid_prediction.model_specs import *
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
 from definitions import ROOT_DIR, HOSP_OCCU_THRESHOLDS, DIGITS, CV_FOLD
 
-MODELS = (A, B)
-
-ALPHAS = np.arange(0.001, 0.020, 0.001)
+MODELS = (A, B)  # decision trees to evaluate
+ALPHAS = np.arange(0.001, 0.020, 0.001)  # values of ccp penalty
 IF_PARALLEL = True
 
 # a pruner tree will be selected if it's accuracy is less that the accuracy of the optimal

@@ -3,10 +3,16 @@ from covid_prediction.model_specs import SHORT_FEATURE_NAMES
 from covid_prediction.optimize_parameters import optimize_and_eval_dec_tree, SummaryOfTreePerformance
 from definitions import ROOT_DIR, DIGITS
 
-ALPHA = 0.002
-MODEL = models.B
-THRESHOLD = 10
-WEEKS_TO_PREDICT = 8
+"""
+To create and validate a decision tree with an specific value for the ccp penalty. 
+The decision rule will be stored under outputs/figures/trees_?_weeks and the 
+performance of the decision rule will be stored under outputs/prediction_summary_?_weeks.
+"""
+
+CCP_ALPHA = 0.002   # ccp penalty value
+MODEL = models.B    # decision tree A vs B
+HOSP_OCCUPANCY_THRESHOLD = 10   # the specified hospital occupancy threshold
+WEEKS_TO_PREDICT = 8    # weeks to predict
 
 
 def build_a_decision_tree(model_spec, weeks_to_predict, hosp_occu_threshold, ccp_alpha=0.0):
@@ -36,6 +42,6 @@ if __name__ == '__main__':
 
     build_a_decision_tree(model_spec=MODEL,
                           weeks_to_predict=WEEKS_TO_PREDICT,
-                          hosp_occu_threshold=THRESHOLD,
-                          ccp_alpha=ALPHA)
+                          hosp_occu_threshold=HOSP_OCCUPANCY_THRESHOLD,
+                          ccp_alpha=CCP_ALPHA)
 

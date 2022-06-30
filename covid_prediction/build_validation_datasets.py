@@ -28,7 +28,7 @@ def build_validation_datasets(weeks_to_predict):
     # ---- build the dataset for the base scenario ----
     # get the seeds and probability weights
     seeds = calib.get_seeds_with_non_zero_prob(
-        filename='outputs/summary/calibration_summary.csv',
+        filename='../outputs/summary/calibration_summary.csv',
         random_state=0)
     if len(seeds) <= N_SIM_TRAINING + N_SIM_VALIDATION:
         print('** Warning **: there is overlap between simulation trajectories used for training and validation.')

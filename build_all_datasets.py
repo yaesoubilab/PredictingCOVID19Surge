@@ -1,5 +1,5 @@
-from build_training_datasets import build_training_dataset
-from build_validation_datasets import build_validation_datasets
+from covid_prediction.build_training_datasets import build_training_dataset
+from covid_prediction.build_validation_datasets import build_validation_datasets
 
 """
 This scrip builds the datasets needed to train and validate the decision rules
