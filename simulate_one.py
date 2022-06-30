@@ -1,10 +1,11 @@
 from apacepy.epidemic import EpiModel
+
 from covid_model import model as M
 from covid_model.settings import COVIDSettings
 from covid_visualization.plot_trajs import plot
 
 
-def simulate():
+def simulate(seed):
 
     # get model settings
     sets = COVIDSettings(novel_variant_will_emerge=True, if_calibrating=True)
@@ -15,7 +16,7 @@ def simulate():
     M.build_covid_model(model)
 
     # simulate
-    model.simulate(seed=1282240807) #  347408199
+    model.simulate(seed=seed)
     # print trajectories
     model.export_trajectories(delete_existing_files=True)
 
@@ -29,4 +30,4 @@ def simulate():
 
 
 if __name__ == "__main__":
-    simulate()
+    simulate(seed=1282240807)

@@ -2,10 +2,11 @@ import sys
 import warnings
 
 import apacepy.calibration as calib
-from BuildTrainingDataset import build_and_combine_datasets
-from SimulateMany import simulate
+
+from build_training_datasets import build_and_combine_datasets
 from definitions import ROOT_DIR, SIM_DURATION, N_SIM_VALIDATION, N_SIM_TRAINING, \
     N_NOVEL_INCD, SCENARIOS, FIRST_WEEK_OF_WINTER, HOSP_OCCU_THRESHOLDS, WEEKS_TO_PREDICT, SMALLER_N_NOVEL_INCD
+from simulate_many import simulate
 
 
 def build_validation_datasets(weeks_to_predict):

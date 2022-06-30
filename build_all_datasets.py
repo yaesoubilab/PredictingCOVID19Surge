@@ -1,5 +1,5 @@
-from BuildTrainingDataset import build_training_dataset
-from BuildValidationDatasets import build_validation_datasets
+from build_training_datasets import build_training_dataset
+from build_validation_datasets import build_validation_datasets
 
 if __name__ == "__main__":
 
