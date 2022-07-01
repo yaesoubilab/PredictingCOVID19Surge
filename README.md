@@ -1,4 +1,4 @@
-# Predicting COVID-19 Surge in Fall and Spring 2022
+# Predicting Local Surges in COVID-19 Hospitalizations 
 
 ## Dependencies
 Packages: `deampy (1.0.17)`, `apacepy (1.0.5)`, `pydotplus (2.0.2)`, and `imblearn (0.0)`.
